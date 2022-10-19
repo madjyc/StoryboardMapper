@@ -1,24 +1,24 @@
 # Storyboard Mapper v0.1 alpha
 
-**Mind-mapping for storyboarders**, made with **Godot 3.5**.
+**Mind-mapping for storyboarders**, made in **Godot Engine 3.5**.
 
-**Storyboard Mapper** helps to organize your images in sequences, like connected **Post-It**s, and play them in realtime, like a slideshow. Give each image a duration, add subtitles or even a sound file if you want to. You're done.
+**Storyboard Mapper** helps to organize your images in sequences, like connected **Post-It**s, and play them in realtime in a slideshow. Give each image a duration, add subtitles or even a sound file if you want to. You're done.
 
-![screenshot](https://github.com/madjyc/StoryboardMapper/blob/Images/Screencopies/StoryboardMapper.jpg)
+![screenshot](../Images/Screencopies/StoryboardMapper.jpg)
 
 Simple as 1-2-3.
 
-## 1. Download and install Godot 3.5
+## 1. Download and install Godot Engine 3.5
 
-### [Click here to download Godot 3.5](https://godotengine.org/download)
+### [Click here to download Godot Engine 3.5](https://godotengine.org/download)
 
 ## 2. Download Storyboard Mapper
 
 If for some reason you're not keen on cloning the repository, you can simply download the project in a ZIP file:
 1. Click on the green <kbd>Code</kbd> button at the top of this page, then on <kbd>Download ZIP</kbd>.
 2. Unzip it wherever you fancy.
-3. Run **Godot 3.5**, click on <kbd>Import</kbd> and find **Storyboard Mapper** wherever your fancy has unzipped it, select the project file "**project.godot**", click on <kbd>Open</kbd>, then <kbd>Import & Edit</kbd>.
-4. Hit <kbd>F5</kbd> and here you go.
+3. Run **Godot Engine**, click on <kbd>Import</kbd> and find **Storyboard Mapper** wherever your fancy unzipped it, select the project file "**project.godot**", click on <kbd>Open</kbd>, then <kbd>Import & Edit</kbd>.
+4. Hit <kbd>F5</kbd> and there you go.
 
 ## 3. Use it!
 
@@ -40,6 +40,6 @@ Yes it is. But hey, it works! The project started as a proof of concept and some
 
 ## Thanks
 
-Shoutout to:
+Big shoutout to:
 * Emilio Coppola for his [tutorials on GraphEdit](https://www.youtube.com/c/EmilioTube/videos).
 * Andrew Wilkes for his [tutorial on GraphEdit](https://gdscript.com/solutions/godot-graphnode-and-graphedit-tutorial/).
