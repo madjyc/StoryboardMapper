@@ -4,7 +4,7 @@
 
 **Storyboard Mapper** helps to organize your images in sequences, like connected **Post-It**s, and play them in realtime, like a slideshow. Give each image a duration, add subtitles or even a sound file if you want to. You're done.
 
-![screenshot](Screencopies/StoryboardMapper.jpg)
+![screenshot](https://github.com/madjyc/StoryboardMapper/blob/Images/Screencopies/StoryboardMapper.jpg)
 
 Simple as 1-2-3.
 
