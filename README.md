@@ -41,5 +41,5 @@ Yes it is. But hey, it works! The project started as a proof of concept and some
 ## Thanks
 
 Shoutout to:
-* Emilio Coppola for his [![tutorials on GraphEdit](https://www.youtube.com/c/EmilioTube/videos)].
-* Andrew Wilkes for his [![tutorial on GraphEdit](https://gdscript.com/solutions/godot-graphnode-and-graphedit-tutorial/)].
+* Emilio Coppola for his [tutorials on GraphEdit](https://www.youtube.com/c/EmilioTube/videos).
+* Andrew Wilkes for his [tutorial on GraphEdit](https://gdscript.com/solutions/godot-graphnode-and-graphedit-tutorial/).
