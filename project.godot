@@ -1,0 +1,75 @@
+; Engine configuration file.
+; It's best edited using the editor UI and not directly,
+; since the parameters that go here are not all obvious.
+;
+; Format:
+;   [section] ; section goes between []
+;   param=value ; assign values to parameters
+
+config_version=4
+
+_global_script_classes=[ {
+"base": "WindowDialog",
+"class": "DisplayDialog",
+"language": "GDScript",
+"path": "res://Scripts/DisplayDialog.gd"
+}, {
+"base": "Resource",
+"class": "GraphData",
+"language": "GDScript",
+"path": "res://Scripts/GraphData.gd"
+}, {
+"base": "Resource",
+"class": "GraphNodeData",
+"language": "GDScript",
+"path": "res://Scripts/GraphNodeData.gd"
+}, {
+"base": "GraphEdit",
+"class": "ImageGraph",
+"language": "GDScript",
+"path": "res://Scripts/GraphEdit.gd"
+}, {
+"base": "GraphNode",
+"class": "ImageGraphNode",
+"language": "GDScript",
+"path": "res://Scripts/GraphNode.gd"
+} ]
+_global_script_class_icons={
+"DisplayDialog": "",
+"GraphData": "",
+"GraphNodeData": "",
+"ImageGraph": "",
+"ImageGraphNode": ""
+}
+
+[application]
+
+config/name="StoryboardMapper"
+run/main_scene="res://Scenes/Main.tscn"
+config/icon="res://icon.png"
+
+[autoload]
+
+AsyncImageLoader="*res://Scripts/AsyncImageLoader.gd"
+
+[display]
+
+window/size/width=1280
+window/size/height=768
+
+[global]
+
+default=false
+
+[gui]
+
+common/drop_mouse_on_gui_input_disabled=true
+
+[physics]
+
+common/enable_pause_aware_picking=true
+
+[rendering]
+
+quality/driver/driver_name="GLES2"
+environment/default_environment="res://Resources/default_env.tres"

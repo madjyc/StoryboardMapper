@@ -1,0 +1,121 @@
+[gd_scene load_steps=5 format=2]
+
+[ext_resource path="res://Scenes/DisplayDialog.tscn" type="PackedScene" id=1]
+[ext_resource path="res://Scripts/GraphEdit.gd" type="Script" id=2]
+[ext_resource path="res://Assets/Icons/Play.svg" type="Texture" id=3]
+[ext_resource path="res://Assets/Icons/Add.svg" type="Texture" id=4]
+
+[node name="Graph" type="GraphEdit"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+right_disconnects = true
+use_snap = false
+script = ExtResource( 2 )
+
+[node name="HBoxContainer" type="HBoxContainer" parent="."]
+margin_left = 261.0
+margin_top = 9.0
+margin_right = 392.0
+margin_bottom = 33.0
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="GridColsSpinBox" type="SpinBox" parent="HBoxContainer"]
+margin_right = 74.0
+margin_bottom = 24.0
+hint_tooltip = "Number of columns in grid"
+min_value = 1.0
+value = 5.0
+
+[node name="AddButton" type="Button" parent="HBoxContainer"]
+margin_left = 78.0
+margin_right = 106.0
+margin_bottom = 24.0
+hint_tooltip = "Add a new frame"
+icon = ExtResource( 4 )
+
+[node name="PlayButton" type="Button" parent="HBoxContainer"]
+margin_left = 110.0
+margin_right = 138.0
+margin_bottom = 24.0
+hint_tooltip = "Play from selected frame"
+disabled = true
+icon = ExtResource( 3 )
+
+[node name="DebugButton" type="Button" parent="HBoxContainer"]
+visible = false
+margin_left = 142.0
+margin_right = 195.0
+margin_bottom = 24.0
+text = "Debug"
+
+[node name="DisplayDialog" parent="." instance=ExtResource( 1 )]
+
+[node name="OpenImgFileDialog" type="FileDialog" parent="."]
+margin_left = -632.0
+margin_top = 64.0
+margin_right = -48.0
+margin_bottom = 526.0
+popup_exclusive = true
+window_title = "Open a File"
+resizable = true
+mode = 0
+access = 2
+filters = PoolStringArray( "*.jpg, *.jpeg", "*.png", "*.bmp" )
+
+[node name="OpenSndFileDialog" type="FileDialog" parent="."]
+margin_left = -632.0
+margin_top = 64.0
+margin_right = -48.0
+margin_bottom = 526.0
+popup_exclusive = true
+window_title = "Open a File"
+resizable = true
+mode = 0
+access = 2
+filters = PoolStringArray( "*.mp3", "*.ogg" )
+
+[node name="OpenFileDialog" type="FileDialog" parent="."]
+margin_left = -696.0
+margin_top = 8.0
+margin_right = -112.0
+margin_bottom = 470.0
+popup_exclusive = true
+window_title = "Open a File"
+mode = 0
+access = 2
+filters = PoolStringArray( "*.res" )
+
+[node name="SaveFileDialog" type="FileDialog" parent="."]
+margin_left = -664.0
+margin_top = -24.0
+margin_right = -80.0
+margin_bottom = 438.0
+popup_exclusive = true
+window_title = "Save File"
+access = 2
+filters = PoolStringArray( "*.res" )
+
+[connection signal="connection_from_empty" from="." to="." method="_on_GraphEdit_connection_from_empty"]
+[connection signal="connection_request" from="." to="." method="_on_GraphEdit_connection_request"]
+[connection signal="connection_to_empty" from="." to="." method="_on_GraphEdit_connection_to_empty"]
+[connection signal="copy_nodes_request" from="." to="." method="_on_GraphEdit_copy_nodes_request"]
+[connection signal="delete_nodes_request" from="." to="." method="_on_GraphEdit_delete_nodes_request"]
+[connection signal="disconnection_request" from="." to="." method="_on_GraphEdit_disconnection_request"]
+[connection signal="duplicate_nodes_request" from="." to="." method="_on_GraphEdit_duplicate_nodes_request"]
+[connection signal="gui_input" from="." to="." method="_on_Graph_gui_input"]
+[connection signal="node_selected" from="." to="." method="_on_Graph_node_selected"]
+[connection signal="node_unselected" from="." to="." method="_on_Graph_node_unselected"]
+[connection signal="paste_nodes_request" from="." to="." method="_on_GraphEdit_paste_nodes_request"]
+[connection signal="pressed" from="HBoxContainer/AddButton" to="." method="_on_AddButton_pressed"]
+[connection signal="pressed" from="HBoxContainer/PlayButton" to="." method="_on_PlayButton_pressed"]
+[connection signal="pressed" from="HBoxContainer/DebugButton" to="." method="_on_DebugButton_pressed"]
+[connection signal="file_selected" from="OpenImgFileDialog" to="." method="_on_OpenImgFileDialog_file_selected"]
+[connection signal="popup_hide" from="OpenImgFileDialog" to="." method="_on_OpenImgFileDialog_popup_hide"]
+[connection signal="file_selected" from="OpenSndFileDialog" to="." method="_on_OpenSndFileDialog_file_selected"]
+[connection signal="popup_hide" from="OpenSndFileDialog" to="." method="_on_OpenSndFileDialog_popup_hide"]
+[connection signal="file_selected" from="OpenFileDialog" to="." method="_on_OpenFileDialog_file_selected"]
+[connection signal="popup_hide" from="OpenFileDialog" to="." method="_on_OpenFileDialog_popup_hide"]
+[connection signal="file_selected" from="SaveFileDialog" to="." method="_on_SaveFileDialog_file_selected"]
+[connection signal="popup_hide" from="SaveFileDialog" to="." method="_on_SaveFileDialog_popup_hide"]
