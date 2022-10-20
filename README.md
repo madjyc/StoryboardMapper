@@ -1,6 +1,7 @@
-![License](https://img.shields.io/badge/license-MIT-blue.svg)
+![License](https://img.shields.io/badge/license-MIT-yellow.svg)
 ![Godot Version](https://img.shields.io/badge/godot-3.5-blue.svg)
-![Version](https://img.shields.io/badge/version-v0.1-alpha-orange.svg)
+![Version](https://img.shields.io/badge/version-v0.1-orange.svg)
+![Status](https://img.shields.io/badge/status-alpha-green.svg)
 
 # Storyboard Mapper v0.1 alpha
 
