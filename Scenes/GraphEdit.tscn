@@ -10,6 +10,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 right_disconnects = true
 use_snap = false
+zoom_min = 0.162
 script = ExtResource( 2 )
 
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
@@ -57,8 +58,8 @@ flat = true
 
 [node name="DebugButton" type="Button" parent="CanvasLayer/HBoxContainer"]
 visible = false
-margin_left = 142.0
-margin_right = 195.0
+margin_left = 174.0
+margin_right = 227.0
 margin_bottom = 24.0
 text = "Debug"
 
