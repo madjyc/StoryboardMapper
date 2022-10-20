@@ -13,7 +13,7 @@ var node_chain_index: int = -1
 var state: int = STOPPED
 var is_looping = false
 
-onready var graph_node = preload("res://Scenes/GraphNode.tscn")
+onready var graph_node = preload("res://Scenes/ImageGraphNode.tscn")
 onready var display_rect: = $VBoxContainer/Control/TextureRect
 onready var subtitle: = $VBoxContainer/Control/Subtitle
 onready var subedit: = $VBoxContainer/HBoxContainer/SubtitleEdit

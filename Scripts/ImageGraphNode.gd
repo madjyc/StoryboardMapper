@@ -77,8 +77,8 @@ func _on_GraphNode_resize_request(new_size):
 func _on_GraphNode_close_request():
 	var graph = get_parent()
 	assert(graph is GraphEdit)
-	assert(graph.has_method("delete_node"))
-	graph.delete_node(self)
+	assert(graph.has_method("delete_image_node"))
+	graph.delete_image_node(self)
 
 
 func _on_TextureRect_gui_input(event):
@@ -155,8 +155,8 @@ func load_sound_from_file(path: String):
 	
 	var ext: = path.get_extension()
 	match ext:
-		"wav":
-			sound = AudioStreamSample.new()
+#		"wav":
+#			sound = AudioStreamSample.new()
 		"mp3":
 			sound = AudioStreamMP3.new()
 		"ogg":
@@ -199,3 +199,10 @@ func reload_image_file():
 
 func reload_sound_file():
 	get_parent().reload_node_sound(self)
+
+
+func _on_GraphNode_offset_changed():
+	var graph = get_parent()
+	assert(graph is GraphEdit)
+	assert(graph.has_method("node_offset_changed")) # signal
+	graph.node_offset_changed(self)

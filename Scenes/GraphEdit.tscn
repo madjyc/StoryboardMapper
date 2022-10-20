@@ -1,13 +1,16 @@
-[gd_scene load_steps=5 format=2]
+[gd_scene load_steps=6 format=2]
 
 [ext_resource path="res://Scenes/DisplayDialog.tscn" type="PackedScene" id=1]
 [ext_resource path="res://Scripts/GraphEdit.gd" type="Script" id=2]
-[ext_resource path="res://Assets/Icons/Play.svg" type="Texture" id=3]
+[ext_resource path="res://Assets/Icons/PlayScene.svg" type="Texture" id=3]
 [ext_resource path="res://Assets/Icons/Add.svg" type="Texture" id=4]
+[ext_resource path="res://Assets/Icons/VisualShaderNodeComment.svg" type="Texture" id=5]
 
 [node name="Graph" type="GraphEdit"]
 anchor_right = 1.0
 anchor_bottom = 1.0
+custom_constants/port_grab_distance_vertical = 26
+custom_constants/port_grab_distance_horizontal = 30
 right_disconnects = true
 use_snap = false
 zoom_min = 0.162
@@ -47,9 +50,18 @@ hint_tooltip = "Add a new frame"
 icon = ExtResource( 4 )
 flat = true
 
-[node name="PlayButton" type="Button" parent="CanvasLayer/HBoxContainer"]
+[node name="CommentButton" type="Button" parent="CanvasLayer/HBoxContainer"]
 margin_left = 142.0
-margin_right = 170.0
+margin_right = 168.0
+margin_bottom = 24.0
+hint_tooltip = "Add a new frame"
+disabled = true
+icon = ExtResource( 5 )
+flat = true
+
+[node name="PlayButton" type="Button" parent="CanvasLayer/HBoxContainer"]
+margin_left = 172.0
+margin_right = 200.0
 margin_bottom = 24.0
 hint_tooltip = "Play from selected frame"
 disabled = true
@@ -123,6 +135,7 @@ filters = PoolStringArray( "*.res" )
 [connection signal="paste_nodes_request" from="." to="." method="_on_GraphEdit_paste_nodes_request"]
 [connection signal="color_changed" from="CanvasLayer/HBoxContainer/ColorPicker" to="." method="_on_ColorPicker_color_changed"]
 [connection signal="pressed" from="CanvasLayer/HBoxContainer/AddButton" to="." method="_on_AddButton_pressed"]
+[connection signal="pressed" from="CanvasLayer/HBoxContainer/CommentButton" to="." method="_on_CommentButton_pressed"]
 [connection signal="pressed" from="CanvasLayer/HBoxContainer/PlayButton" to="." method="_on_PlayButton_pressed"]
 [connection signal="pressed" from="CanvasLayer/HBoxContainer/DebugButton" to="." method="_on_DebugButton_pressed"]
 [connection signal="file_selected" from="OpenImgFileDialog" to="." method="_on_OpenImgFileDialog_file_selected"]

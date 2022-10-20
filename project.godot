@@ -9,6 +9,16 @@
 config_version=4
 
 _global_script_classes=[ {
+"base": "GraphNode",
+"class": "CommentGraphNode",
+"language": "GDScript",
+"path": "res://Scripts/CommentGraphNode.gd"
+}, {
+"base": "ColorRect",
+"class": "CommentRect",
+"language": "GDScript",
+"path": "res://Scripts/CommentRect.gd"
+}, {
 "base": "WindowDialog",
 "class": "DisplayDialog",
 "language": "GDScript",
@@ -32,9 +42,11 @@ _global_script_classes=[ {
 "base": "GraphNode",
 "class": "ImageGraphNode",
 "language": "GDScript",
-"path": "res://Scripts/GraphNode.gd"
+"path": "res://Scripts/ImageGraphNode.gd"
 } ]
 _global_script_class_icons={
+"CommentGraphNode": "",
+"CommentRect": "",
 "DisplayDialog": "",
 "GraphData": "",
 "GraphNodeData": "",

@@ -23,7 +23,9 @@ var dragged_nodes_initial_offsets_in_graph_space: Array = []
 var old_global_mouse_position: Vector2
 var nodes_were_dragged: bool = false
 
-onready var graph_node = preload("res://Scenes/GraphNode.tscn")
+onready var image_graph_node = preload("res://Scenes/ImageGraphNode.tscn")
+onready var comment_graph_node = preload("res://Scenes/CommentGraphNode.tscn")
+#onready var comment = preload("res://Scenes/CommentRect.tscn")
 onready var display_dlg: = $DisplayDialog
 onready var image_dlg: = $OpenImgFileDialog
 onready var sound_dlg: = $OpenSndFileDialog
@@ -32,6 +34,7 @@ onready var save_dlg: = $SaveFileDialog
 onready var grid_num_cols: = $CanvasLayer/HBoxContainer/GridColsSpinBox
 onready var colorpicker: = $CanvasLayer/HBoxContainer/ColorPicker
 onready var add_button: = $CanvasLayer/HBoxContainer/AddButton
+onready var comment_button: = $CanvasLayer/HBoxContainer/CommentButton
 onready var play_button: = $CanvasLayer/HBoxContainer/PlayButton
 
 
@@ -110,6 +113,7 @@ func update_main_window_title():
 
 
 func update_buttons():
+	comment_button.disabled = selected_nodes.size() == 0
 	play_button.disabled = selected_nodes.size() != 1
 
 
@@ -258,9 +262,9 @@ func set_selected_nodes_to_custom_size():
 		node.rect_size = custom_node_size
 
 
-#########
-## NEW ##
-#########
+############
+## CREATE ##
+############
 
 func snap_position(pos: Vector2) -> Vector2:
 	var snap = get_snap()
@@ -288,10 +292,10 @@ func get_mouse_position_in_graph_space() -> Vector2:
 
 
 # Ajoute un nouveau node au graph. Son centre est positionné à l'offset donné.
-func add_new_node(ofs: Vector2, select_exclusive: bool = true, autoload: bool = true) -> ImageGraphNode:
-	var node = graph_node.instance()
+func add_new_image_node(ofs: Vector2, select_exclusive: bool = true, autoload: bool = true) -> ImageGraphNode:
+	var node = image_graph_node.instance()
+	add_child(node, true) # /!\ before set_offset.
 	node.set_offset(ofs - node.rect_size / 2)
-	add_child(node, true)
 	node.set_bg_color(node_bg_color)
 	if select_exclusive:
 		select_node_ex(node)
@@ -305,18 +309,19 @@ func add_new_node(ofs: Vector2, select_exclusive: bool = true, autoload: bool = 
 
 # Ajoute un nouveau node au graph quand l'utilisateur appuie sur le bouton 'Add'.
 func _on_AddButton_pressed():
-	add_new_node(get_mouse_position_in_graph_space() + Vector2(200, 200))
+	add_new_image_node(get_mouse_position_in_graph_space() + Vector2(200, 200))
 
 
 # Ajoute un nouveau node au graph quand l'utilisateur double-clique sur le graph.
 func _on_Graph_gui_input(event):
 	if event is InputEventMouseButton and event.doubleclick:
-		add_new_node(get_mouse_position_in_graph_space())
+		add_new_image_node(get_mouse_position_in_graph_space())
 
 
 # Drag and drop de fichiers.
 func _on_files_dropped(files, screen):
-	yield(get_tree(),"idle_frame") # hack to get valid mouse position
+	yield(get_tree(),"idle_frame") # hack to get a valid mouse position
+	files.sort()
 	deselect_all_nodes()
 	var ofs: = get_mouse_position_in_graph_space()
 	var line_start: = ofs.x
@@ -326,7 +331,7 @@ func _on_files_dropped(files, screen):
 	for path in files:
 		var ext: String = path.get_extension()
 		if IMG_EXTENSIONS.has(ext):
-			var new_node: ImageGraphNode = add_new_node(ofs, false, false)
+			var new_node: ImageGraphNode = add_new_image_node(ofs, false, false)
 			new_node.load_thumbnail_from_file(path)
 			
 			col += 1
@@ -592,7 +597,7 @@ func _on_GraphEdit_connection_to_empty(from: String, from_slot: int, release_pos
 	assert(from_node)
 	
 	# Crée un nouveau node et le connecte.
-	var new_node = add_new_node(convert_viewport_ofs_to_graph_ofs(release_position))
+	var new_node = add_new_image_node(convert_viewport_ofs_to_graph_ofs(release_position))
 	assert(new_node)
 	connect_node(from, from_slot, new_node.name, from_slot)
 	
@@ -611,7 +616,7 @@ func _on_GraphEdit_connection_from_empty(to: String, to_slot: int, release_posit
 	assert(to_node)
 
 	# Crée un nouveau node et le connecte.
-	var new_node: ImageGraphNode = add_new_node(convert_viewport_ofs_to_graph_ofs(release_position))
+	var new_node: ImageGraphNode = add_new_image_node(convert_viewport_ofs_to_graph_ofs(release_position))
 	assert(new_node)
 	connect_node(new_node.name, to_slot, to, to_slot)
 	
@@ -714,10 +719,15 @@ func _on_GraphEdit_duplicate_nodes_request():
 ## DELETE ##
 ############
 
-func delete_node(node: ImageGraphNode):
+func delete_image_node(node: ImageGraphNode):
 	assert(node)
 	remove_node_connections(node)
 	deselect_node(node)
+	node.queue_free()
+
+
+func delete_comment_node(node: CommentGraphNode):
+	assert(node)
 	node.queue_free()
 
 
@@ -725,8 +735,48 @@ func _on_GraphEdit_delete_nodes_request(node_names: Array):
 	for node_name in node_names:
 		var node = get_node(node_name)
 		assert(node)
-		deselect_node(node)
-		delete_node(node)
+		if node is ImageGraphNode:
+			deselect_node(node)
+			delete_image_node(node)
+		elif node is CommentGraphNode:
+			delete_comment_node(node)
+
+
+#############
+## COMMENT ##
+#############
+
+# Ajoute un nouveau node au graph. Son centre est positionné à l'offset donné.
+func add_new_comment_node() -> CommentGraphNode:
+	var comment_node = comment_graph_node.instance()
+	add_child(comment_node, true)
+	add_selected_nodes_to_comment_node(comment_node)
+	return comment_node
+
+
+func add_selected_nodes_to_comment_node(comment_node: CommentGraphNode):
+	for image_node in selected_nodes:
+		if image_node is ImageGraphNode:
+			comment_node.add_image_node(image_node, false)
+	comment_node.update_size()
+
+
+func remove_selected_nodes_from_comment_node(comment_node: CommentGraphNode):
+	for image_node in selected_nodes:
+		if image_node is ImageGraphNode:
+			comment_node.remove_image_node(image_node, false)
+	comment_node.update_size()
+
+
+func node_offset_changed(node: ImageGraphNode):
+	for comment_node in get_children():
+		if not comment_node is CommentGraphNode or not comment_node.contains_image_node(node):
+			continue
+		comment_node.update_size()
+
+
+func _on_CommentButton_pressed():
+	add_new_comment_node()
 
 
 ###############
@@ -758,7 +808,7 @@ func init_graph(graph_data: GraphData):
 	
 	# Nodes
 	for node_data in graph_data.nodes:
-		var new_node: ImageGraphNode = graph_node.instance()
+		var new_node: ImageGraphNode = image_graph_node.instance()
 		new_node.set_name(node_data.name)
 		new_node.rect_size = node_data.rect_size
 		add_child(new_node, true) # /!\ before assigning data
