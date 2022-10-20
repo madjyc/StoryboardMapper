@@ -5,11 +5,12 @@ class_name ImageGraph
 
 const APP_NAME: String = "Storyboard Mapper"
 const DEFAULT_FILENAME: String = "Untitled"
-const FILE_VERSION: float = 0.1
+const FILE_VERSION: String = "0.1.0-alpha"
 const IMG_EXTENSIONS: Array = ["jpg", "jpeg", "png", "bmp"]
 const DEFAULT_NODE_SPACING: float = 40.0
 const MIN_DRAG_DISTANCE: float = 5.0
 
+var node_bg_color: = Color.black
 var custom_node_size: Vector2
 var current_path: String
 var current_file_name: String
@@ -28,13 +29,15 @@ onready var image_dlg: = $OpenImgFileDialog
 onready var sound_dlg: = $OpenSndFileDialog
 onready var open_dlg: = $OpenFileDialog
 onready var save_dlg: = $SaveFileDialog
-onready var add_button: = $HBoxContainer/AddButton
-onready var play_button: = $HBoxContainer/PlayButton
-onready var grid_num_cols: = $HBoxContainer/GridColsSpinBox
+onready var grid_num_cols: = $CanvasLayer/HBoxContainer/GridColsSpinBox
+onready var colorpicker: = $CanvasLayer/HBoxContainer/ColorPicker
+onready var add_button: = $CanvasLayer/HBoxContainer/AddButton
+onready var play_button: = $CanvasLayer/HBoxContainer/PlayButton
 
 
 func _ready():
 	OS.set_low_processor_usage_mode(true) # Economise la batterie des mobiles.
+	$CanvasLayer.offset.y = rect_position.y
 	current_file_name = DEFAULT_FILENAME
 	current_path = ""
 	update_main_window_title()
@@ -286,17 +289,18 @@ func get_mouse_position_in_graph_space() -> Vector2:
 
 # Ajoute un nouveau node au graph. Son centre est positionné à l'offset donné.
 func add_new_node(ofs: Vector2, select_exclusive: bool = true, autoload: bool = true) -> ImageGraphNode:
-	var new_node = graph_node.instance()
-	add_child(new_node, true)
-	new_node.set_offset(ofs - new_node.rect_size / 2)
+	var node = graph_node.instance()
+	node.set_offset(ofs - node.rect_size / 2)
+	add_child(node, true)
+	node.set_bg_color(node_bg_color)
 	if select_exclusive:
-		select_node_ex(new_node)
+		select_node_ex(node)
 	else:
-		#new_node.selected = true
-		select_node_ex(new_node, false)
+		#node.selected = true
+		select_node_ex(node, false)
 	if autoload:
-		open_load_image_dialog(new_node)
-	return new_node
+		open_load_image_dialog(node)
+	return node
 
 
 # Ajoute un nouveau node au graph quand l'utilisateur appuie sur le bouton 'Add'.
@@ -749,6 +753,9 @@ func new_file():
 func init_graph(graph_data: GraphData):
 	clear_graph()
 	
+	colorpicker.color = graph_data.node_bg_color
+	node_bg_color = graph_data.node_bg_color
+	
 	# Nodes
 	for node_data in graph_data.nodes:
 		var new_node: ImageGraphNode = graph_node.instance()
@@ -756,6 +763,7 @@ func init_graph(graph_data: GraphData):
 		new_node.rect_size = node_data.rect_size
 		add_child(new_node, true) # /!\ before assigning data
 		new_node.offset = node_data.offset
+		new_node.set_bg_color(graph_data.node_bg_color)
 		new_node.set_extra_data(node_data.extra_data)
 	
 	# Connexions
@@ -771,6 +779,26 @@ func init_graph(graph_data: GraphData):
 		from_node.next_node = to_node
 
 
+func load_graph(path: String):
+	var dir = Directory.new()
+	if not dir.file_exists(path):
+		print("File ", path, " doesn't exist")
+		return
+	
+	if ResourceLoader.exists(path):
+		var graph_data = ResourceLoader.load(path)
+		if graph_data is GraphData:
+			if graph_data.version == FILE_VERSION:
+				init_graph(graph_data)
+			else:
+				print("Error, incompatible file version ", graph_data.version)
+				return
+	
+	current_file_name = path.get_file()
+	current_path = path
+	update_main_window_title()
+
+
 func save_graph(path: String):
 	# Crée et remplit un nouvau GraphData avec les données du grap et de ses nodes.
 	var graph_data = GraphData.new()
@@ -778,6 +806,7 @@ func save_graph(path: String):
 	
 	# Version number
 	graph_data.version = FILE_VERSION
+	graph_data.node_bg_color = node_bg_color
 	
 	# Graph nodes
 	for node in get_children():
@@ -813,26 +842,6 @@ func save_graph(path: String):
 	update_main_window_title()
 
 
-func load_graph(path: String):
-	var dir = Directory.new()
-	if not dir.file_exists(path):
-		print("File ", path, " doesn't exist")
-		return
-	
-	if ResourceLoader.exists(path):
-		var graph_data = ResourceLoader.load(path)
-		if graph_data is GraphData:
-			if graph_data.version == FILE_VERSION:
-				init_graph(graph_data)
-			else:
-				print("Error, incompatible file version ", graph_data.version)
-				return
-	
-	current_file_name = path.get_file()
-	current_path = path
-	update_main_window_title()
-
-
 func open_file():
 	open_dlg.popup_centered()
 
@@ -848,18 +857,18 @@ func save_file_as():
 	save_dlg.popup_centered()
 
 
-func _on_SaveFileDialog_file_selected(path):
-	move_popups_out_of_the_way()
-	#save_graph("user://saves/", "graph.res")
-	# étendre ResourceFormatSaver
-	save_graph(path)
-
-
 func _on_OpenFileDialog_file_selected(path):
 	move_popups_out_of_the_way()
 	#load_graph("user://saves/", "graph.res")
 	# étendre ResourceFormatLoader
 	load_graph(path)
+
+
+func _on_SaveFileDialog_file_selected(path):
+	move_popups_out_of_the_way()
+	#save_graph("user://saves/", "graph.res")
+	# étendre ResourceFormatSaver
+	save_graph(path)
 
 
 #############
@@ -921,3 +930,10 @@ func play_animation():
 
 func _on_PlayButton_pressed():
 	play_animation()
+
+
+func _on_ColorPicker_color_changed(color):
+	node_bg_color = color
+	for node in get_children():
+		if node is ImageGraphNode:
+			node.set_bg_color(node_bg_color)

@@ -12,38 +12,50 @@ right_disconnects = true
 use_snap = false
 script = ExtResource( 2 )
 
-[node name="HBoxContainer" type="HBoxContainer" parent="."]
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="HBoxContainer" type="HBoxContainer" parent="CanvasLayer"]
 margin_left = 261.0
 margin_top = 9.0
-margin_right = 392.0
+margin_right = 431.0
 margin_bottom = 33.0
 __meta__ = {
 "_edit_group_": true
 }
 
-[node name="GridColsSpinBox" type="SpinBox" parent="HBoxContainer"]
+[node name="GridColsSpinBox" type="SpinBox" parent="CanvasLayer/HBoxContainer"]
 margin_right = 74.0
 margin_bottom = 24.0
 hint_tooltip = "Number of columns in grid"
 min_value = 1.0
 value = 5.0
 
-[node name="AddButton" type="Button" parent="HBoxContainer"]
+[node name="ColorPicker" type="ColorPickerButton" parent="CanvasLayer/HBoxContainer"]
 margin_left = 78.0
 margin_right = 106.0
 margin_bottom = 24.0
-hint_tooltip = "Add a new frame"
-icon = ExtResource( 4 )
+rect_min_size = Vector2( 28, 24 )
+hint_tooltip = "Frame background color"
+flat = true
 
-[node name="PlayButton" type="Button" parent="HBoxContainer"]
+[node name="AddButton" type="Button" parent="CanvasLayer/HBoxContainer"]
 margin_left = 110.0
 margin_right = 138.0
+margin_bottom = 24.0
+hint_tooltip = "Add a new frame"
+icon = ExtResource( 4 )
+flat = true
+
+[node name="PlayButton" type="Button" parent="CanvasLayer/HBoxContainer"]
+margin_left = 142.0
+margin_right = 170.0
 margin_bottom = 24.0
 hint_tooltip = "Play from selected frame"
 disabled = true
 icon = ExtResource( 3 )
+flat = true
 
-[node name="DebugButton" type="Button" parent="HBoxContainer"]
+[node name="DebugButton" type="Button" parent="CanvasLayer/HBoxContainer"]
 visible = false
 margin_left = 142.0
 margin_right = 195.0
@@ -108,9 +120,10 @@ filters = PoolStringArray( "*.res" )
 [connection signal="node_selected" from="." to="." method="_on_Graph_node_selected"]
 [connection signal="node_unselected" from="." to="." method="_on_Graph_node_unselected"]
 [connection signal="paste_nodes_request" from="." to="." method="_on_GraphEdit_paste_nodes_request"]
-[connection signal="pressed" from="HBoxContainer/AddButton" to="." method="_on_AddButton_pressed"]
-[connection signal="pressed" from="HBoxContainer/PlayButton" to="." method="_on_PlayButton_pressed"]
-[connection signal="pressed" from="HBoxContainer/DebugButton" to="." method="_on_DebugButton_pressed"]
+[connection signal="color_changed" from="CanvasLayer/HBoxContainer/ColorPicker" to="." method="_on_ColorPicker_color_changed"]
+[connection signal="pressed" from="CanvasLayer/HBoxContainer/AddButton" to="." method="_on_AddButton_pressed"]
+[connection signal="pressed" from="CanvasLayer/HBoxContainer/PlayButton" to="." method="_on_PlayButton_pressed"]
+[connection signal="pressed" from="CanvasLayer/HBoxContainer/DebugButton" to="." method="_on_DebugButton_pressed"]
 [connection signal="file_selected" from="OpenImgFileDialog" to="." method="_on_OpenImgFileDialog_file_selected"]
 [connection signal="popup_hide" from="OpenImgFileDialog" to="." method="_on_OpenImgFileDialog_popup_hide"]
 [connection signal="file_selected" from="OpenSndFileDialog" to="." method="_on_OpenSndFileDialog_file_selected"]

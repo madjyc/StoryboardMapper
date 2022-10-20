@@ -1,3 +1,7 @@
+![License](https://img.shields.io/badge/license-MIT-blue.svg)
+![Godot Version](https://img.shields.io/badge/godot-3.5-blue.svg)
+![Version](https://img.shields.io/badge/version-v0.1-alpha-orange.svg)
+
 # Storyboard Mapper v0.1 alpha
 
 **Mind-mapping for storyboarders**, made with **Godot 3.5**.

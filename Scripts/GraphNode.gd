@@ -13,15 +13,21 @@ var sound: AudioStream = null
 
 var ctrl_key_was_down: bool # Dragging
 
-onready var thumbnail: = $VBoxContainer/Control/TextureRect
+onready var background: = $VBoxContainer/Control/Background
+onready var thumbnail: = $VBoxContainer/Control/Thumbnail
 onready var subedit: = $VBoxContainer/SubtitleEdit
 onready var spinbox: = $VBoxContainer/HBoxContainer/SpinBox
 
 
 func _ready():
+	assert(background)
 	assert(thumbnail)
 	assert(subedit)
 	assert(spinbox)
+
+
+func set_bg_color(color: Color):
+	background.color = color
 
 
 func get_thumbnail_texture():
@@ -53,7 +59,8 @@ func set_extra_data(node_data: Dictionary):
 	snd_path = node_data["snd_path"]
 	subedit.text = node_data["subtitle"]
 	spinbox.set_value(node_data["duration"])
-	load_thumbnail_from_file(img_path)
+	if not img_path.empty():
+		load_thumbnail_from_file(img_path)
 	if not snd_path.empty():
 		load_sound_from_file(snd_path)
 

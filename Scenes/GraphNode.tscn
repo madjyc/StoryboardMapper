@@ -43,14 +43,14 @@ margin_bottom = 113.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="ColorRect" type="ColorRect" parent="VBoxContainer/Control"]
+[node name="Background" type="ColorRect" parent="VBoxContainer/Control"]
 anchor_right = 1.0
 anchor_bottom = 1.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
 color = Color( 0, 0, 0, 1 )
 
-[node name="TextureRect" type="TextureRect" parent="VBoxContainer/Control"]
+[node name="Thumbnail" type="TextureRect" parent="VBoxContainer/Control"]
 anchor_right = 1.0
 anchor_bottom = 1.0
 mouse_filter = 0
@@ -124,8 +124,8 @@ icon_align = 1
 
 [connection signal="close_request" from="." to="." method="_on_GraphNode_close_request"]
 [connection signal="resize_request" from="." to="." method="_on_GraphNode_resize_request"]
-[connection signal="focus_entered" from="VBoxContainer/Control/TextureRect" to="." method="_on_TextureRect_focus_entered"]
-[connection signal="gui_input" from="VBoxContainer/Control/TextureRect" to="." method="_on_TextureRect_gui_input"]
+[connection signal="focus_entered" from="VBoxContainer/Control/Thumbnail" to="." method="_on_TextureRect_focus_entered"]
+[connection signal="gui_input" from="VBoxContainer/Control/Thumbnail" to="." method="_on_TextureRect_gui_input"]
 [connection signal="pressed" from="VBoxContainer/HBoxContainer/LoadButton" to="." method="_on_LoadButton_pressed"]
 [connection signal="pressed" from="VBoxContainer/HBoxContainer/SoundButton" to="." method="_on_SoundButton_pressed"]
 [connection signal="pressed" from="VBoxContainer/HBoxContainer/DelSoundButton" to="." method="_on_DelSoundButton_pressed"]
