@@ -4,62 +4,116 @@ class_name ImageGraph
 #export(NodePath) var popup
 
 const APP_NAME: String = "Storyboard Mapper"
-const DEFAULT_FILENAME: String = "Untitled"
-const FILE_VERSION: String = "0.1.0-alpha"
-const IMG_EXTENSIONS: Array = ["jpg", "jpeg", "png", "bmp"]
-const DEFAULT_NODE_SPACING: float = 40.0
+const DEFAULT_PROJECT_FILENAME: String = "Untitled"
+const PROJECT_FILE_VERSION: String = "0.1.1"
+const IMAGE_FILE_EXTENSIONS: Array = ["jpg", "jpeg", "png", "bmp"]
+const DEFAULT_IMG_NODE_SPACING: float = 40.0
 const MIN_DRAG_DISTANCE: float = 5.0
+const NEW_NODE_DEFAULT_OFFSET: = Vector2(0.0, 200.0) # graph space
 
-var node_bg_color: = Color.black
-var custom_node_size: Vector2
-var current_path: String
-var current_file_name: String
-var selected_nodes: Array = []
-var copied_nodes: Array = []
-var active_node: ImageGraphNode = null
+var img_node_bg_color: = Color.black
+var custom_img_node_size: Vector2
+var project_file_path: String
+var project_file_name: String
+var selected_img_nodes: Array = []
+var copied_img_nodes: Array = [] # array of ImageGraphNode
+var active_img_node: ImageGraphNode = null
 
-var dragging_selected_nodes: bool = false
-var dragged_nodes_initial_offsets_in_graph_space: Array = []
-var old_global_mouse_position: Vector2
-var nodes_were_dragged: bool = false
+var dragging_selected_img_nodes: bool = false
+var dragged_img_nodes_initial_offsets: Array = [] # offsets are in graph space
+var old_global_mouse_position: Vector2 # to allow comparison with get_global_mouse_position() during drag
+var dragging_beyond_min_distance: bool = false
 
-onready var image_graph_node = preload("res://Scenes/ImageGraphNode.tscn")
-onready var comment_graph_node = preload("res://Scenes/CommentGraphNode.tscn")
-#onready var comment = preload("res://Scenes/CommentRect.tscn")
+onready var imageGraphNode = preload("res://Scenes/ImageGraphNode.tscn")
+onready var commentGraphNode = preload("res://Scenes/CommentGraphNode.tscn")
+
 onready var display_dlg: = $DisplayDialog
-onready var image_dlg: = $OpenImgFileDialog
-onready var sound_dlg: = $OpenSndFileDialog
-onready var open_dlg: = $OpenFileDialog
-onready var save_dlg: = $SaveFileDialog
-onready var grid_num_cols: = $CanvasLayer/HBoxContainer/GridColsSpinBox
+onready var open_image_file_dlg: = $OpenImgFileDialog
+onready var open_sound_file_dlg: = $OpenSndFileDialog
+onready var open_project_file_dlg: = $OpenFileDialog
+onready var save_project_file_dlg: = $SaveFileDialog
+onready var grid_num_columns: = $CanvasLayer/HBoxContainer/GridColsSpinBox
 onready var colorpicker: = $CanvasLayer/HBoxContainer/ColorPicker
 onready var add_button: = $CanvasLayer/HBoxContainer/AddButton
 onready var comment_button: = $CanvasLayer/HBoxContainer/CommentButton
-onready var play_button: = $CanvasLayer/HBoxContainer/PlayButton
+onready var display_button: = $CanvasLayer/HBoxContainer/PlayButton
 
 
 func _ready():
-	OS.set_low_processor_usage_mode(true) # Economise la batterie des mobiles.
+	OS.set_low_processor_usage_mode(true) # Saves mobile batteries.
 	$CanvasLayer.offset.y = rect_position.y
-	current_file_name = DEFAULT_FILENAME
-	current_path = ""
+	project_file_name = DEFAULT_PROJECT_FILENAME
+	project_file_path = ""
 	update_main_window_title()
 	get_tree().connect("files_dropped", self, "_on_files_dropped")
-	move_popups_out_of_the_way()
+	move_hidden_popups_out_of_the_way()
+	update_buttons()
 
+
+#######################
+## SPACE CONVERSIONS ##
+#######################
+
+func snap_position(pos: Vector2) -> Vector2:
+	var snap = get_snap()
+	pos.x = int(pos.x / snap) * snap
+	pos.y = int(pos.y / snap) * snap
+	return pos
+
+
+func convert_position_in_viewport_to_offset_in_graph(pos_in_viewport: Vector2) -> Vector2:
+	var ofs_in_graph = (scroll_offset + pos_in_viewport) / zoom
+	if !is_using_snap():
+		return ofs_in_graph
+	return snap_position(ofs_in_graph)
+
+
+func convert_offset_in_graph_to_position_in_viewport(ofs_in_graph: Vector2) -> Vector2:
+	var pos_in_viewport = ofs_in_graph * zoom - scroll_offset
+	return pos_in_viewport
+
+
+func convert_global_mouse_position_to_offset_in_graph() -> Vector2:
+	return convert_position_in_viewport_to_offset_in_graph(get_global_mouse_position() - rect_position)
+
+
+##############
+## DRAGGING ##
+##############
 
 func _process(_delta):
 	# Are we dragging selected nodes?
-	if dragging_selected_nodes:
+	if dragging_selected_img_nodes:
 		var global_mouse_position = get_global_mouse_position()
 		
-		# Considère dragging si ça n'était pas déjà le cas et que la distance de dragging est suffisante.
-		if !nodes_were_dragged and global_mouse_position.distance_to(old_global_mouse_position) >= MIN_DRAG_DISTANCE:
-			nodes_were_dragged = true
+		# To allow dragging image nodes, the dragging distance has to be greater than MIN_DRAG_DISTANCE.
+		if !dragging_beyond_min_distance and global_mouse_position.distance_to(old_global_mouse_position) >= MIN_DRAG_DISTANCE:
+			dragging_beyond_min_distance = true
 		
-		if nodes_were_dragged:
-			for i in range(selected_nodes.size()):
-				selected_nodes[i].set_offset(get_mouse_position_in_graph_space() - dragged_nodes_initial_offsets_in_graph_space[i])
+		if dragging_beyond_min_distance:
+			for i in range(selected_img_nodes.size()):
+				selected_img_nodes[i].set_offset(convert_global_mouse_position_to_offset_in_graph() - dragged_img_nodes_initial_offsets[i])
+
+
+func start_dragging_selected_img_nodes(pointed_node: ImageGraphNode):
+	dragging_selected_img_nodes = true
+	dragging_beyond_min_distance = false
+	dragged_img_nodes_initial_offsets.clear() # Security
+	
+	var global_mouse_position = get_global_mouse_position()
+	old_global_mouse_position = global_mouse_position
+	
+	for node in selected_img_nodes:
+		var ofs: Vector2 = (global_mouse_position - rect_position - node.rect_position) / zoom # viewport to graph space
+		if is_using_snap():
+			ofs = snap_position(ofs)
+		dragged_img_nodes_initial_offsets.push_back(ofs)
+
+
+func stop_dragging_selected_img_nodes() -> bool:
+	dragging_selected_img_nodes = false
+	dragged_img_nodes_initial_offsets.clear()
+	return dragging_beyond_min_distance
 
 
 ##########
@@ -68,8 +122,8 @@ func _process(_delta):
 
 func _on_DebugButton_pressed():
 	print("-----------------------------")
-	print("Selected: ", selected_nodes)
-	print("Copied: ", copied_nodes)
+	print("Selected: ", selected_img_nodes)
+	print("Copied: ", copied_img_nodes)
 #	print("DisplayDialog: ", display_dlg.rect_position)
 #	print("ImgFileDlg: ", image_dlg.rect_position)
 #	print("OpenFileDialog: ", open_dlg.rect_position)
@@ -109,27 +163,26 @@ func _on_DebugButton_pressed():
 
 
 func update_main_window_title():
-	OS.set_window_title(current_file_name + " - " + APP_NAME)
+	OS.set_window_title(project_file_name + " - " + APP_NAME)
 
 
 func update_buttons():
-	comment_button.disabled = selected_nodes.size() == 0
-	play_button.disabled = selected_nodes.size() != 1
+	display_button.disabled = selected_img_nodes.size() != 1
 
 
 # Hack to prevent hidden popups from stealing mouse input.
-func move_popups_out_of_the_way():
+func move_hidden_popups_out_of_the_way():
 	var infinite_pos: = Vector2(-1e6, -1e6)
 #	if not display_dlg.visible:
 #		display_dlg.rect_position = infinite_pos
-	if not image_dlg.visible:
-		image_dlg.rect_position = infinite_pos
-	if not sound_dlg.visible:
-		sound_dlg.rect_position = infinite_pos
-	if not open_dlg.visible:
-		open_dlg.rect_position = infinite_pos
-	if not save_dlg.visible:
-		save_dlg.rect_position = infinite_pos
+	if not open_image_file_dlg.visible:
+		open_image_file_dlg.rect_position = infinite_pos
+	if not open_sound_file_dlg.visible:
+		open_sound_file_dlg.rect_position = infinite_pos
+	if not open_project_file_dlg.visible:
+		open_project_file_dlg.rect_position = infinite_pos
+	if not save_project_file_dlg.visible:
+		save_project_file_dlg.rect_position = infinite_pos
 #	var parent = get_parent()
 #	assert(parent)
 #	if parent.has_method("move_popups_out_of_the_way"):
@@ -137,213 +190,170 @@ func move_popups_out_of_the_way():
 
 
 func _on_OpenImgFileDialog_popup_hide():
-	move_popups_out_of_the_way()
+	move_hidden_popups_out_of_the_way()
 
 
 func _on_OpenSndFileDialog_popup_hide():
-	move_popups_out_of_the_way()
+	move_hidden_popups_out_of_the_way()
 
 
 func _on_SaveFileDialog_popup_hide():
-	move_popups_out_of_the_way()
+	move_hidden_popups_out_of_the_way()
 
 
 func _on_OpenFileDialog_popup_hide():
-	move_popups_out_of_the_way()
+	move_hidden_popups_out_of_the_way()
 
 
-func get_grid_num_cols() -> int:
-	return grid_num_cols.get_value()
-
-
-func start_dragging_selected_nodes(pointed_node: ImageGraphNode):
-	dragging_selected_nodes = true
-	nodes_were_dragged = false
-	dragged_nodes_initial_offsets_in_graph_space.clear() # Security
-	var global_mouse_position = get_global_mouse_position()
-	old_global_mouse_position = global_mouse_position
-	for node in selected_nodes:
-		var ofs: Vector2 = (global_mouse_position - rect_position - node.rect_position) / zoom
-		if is_using_snap():
-			ofs = snap_position(ofs)
-		dragged_nodes_initial_offsets_in_graph_space.push_back(ofs)
-
-
-func stop_dragging_selected_nodes() -> bool:
-	dragging_selected_nodes = false
-	dragged_nodes_initial_offsets_in_graph_space.clear()
-	return nodes_were_dragged
+func get_grid_num_columns() -> int:
+	return grid_num_columns.get_value()
 
 
 func align_horizontally():
-	if selected_nodes.size() < 2:
+	if selected_img_nodes.size() < 2:
 		return
-	var master_node: ImageGraphNode = selected_nodes.front()
-	var master_node_x: = master_node.offset.x
-	for node in selected_nodes:
-		node.offset.x = master_node_x
+	var master_node: ImageGraphNode = selected_img_nodes.front()
+	assert(master_node)
+	for node in selected_img_nodes:
+		node.offset.x = master_node.offset.x
 
 
 func align_vertically():
-	if selected_nodes.size() < 2:
+	if selected_img_nodes.size() < 2:
 		return
-	var master_node: ImageGraphNode = selected_nodes.front()
-	var master_node_y: = master_node.offset.y
-	for node in selected_nodes:
-		node.offset.y = master_node_y
+	var master_node: ImageGraphNode = selected_img_nodes.front()
+	assert(master_node)
+	for node in selected_img_nodes:
+		node.offset.y = master_node.offset.y
 
 
 func distribute_row():
-	if selected_nodes.size() != 1:
+	if selected_img_nodes.size() != 1:
 		return
-	var node: ImageGraphNode = selected_nodes.front()
-	var ofs: Vector2 = node.offset
+	var node: ImageGraphNode = selected_img_nodes.front()
+	assert(node)
+	var ofs: = node.offset
 	while node.next_node:
-		ofs.x += node.rect_size.x + DEFAULT_NODE_SPACING
+		ofs.x += node.rect_size.x + DEFAULT_IMG_NODE_SPACING
 		node = node.next_node
 		node.offset = ofs
 
 
 func distribute_col():
-	if selected_nodes.size() != 1:
+	if selected_img_nodes.size() != 1:
 		return
-	var node: ImageGraphNode = selected_nodes.front()
-	var ofs: Vector2 = node.offset
+	var node: ImageGraphNode = selected_img_nodes.front()
+	assert(node)
+	var ofs: = node.offset
 	while node.next_node:
-		ofs.y += node.rect_size.y + DEFAULT_NODE_SPACING
+		ofs.y += node.rect_size.y + DEFAULT_IMG_NODE_SPACING
 		node = node.next_node
 		node.offset = ofs
 
 
 func distribute_diag():
-	if selected_nodes.size() != 1:
+	if selected_img_nodes.size() != 1:
 		return
-	var node: ImageGraphNode = selected_nodes.front()
+	var node: ImageGraphNode = selected_img_nodes.front()
+	assert(node)
 	var ofs: Vector2 = node.offset
 	while node.next_node:
-		ofs.x += node.rect_size.x + DEFAULT_NODE_SPACING
-		ofs.y += node.rect_size.y / 2 + DEFAULT_NODE_SPACING
+		ofs.x += node.rect_size.x + DEFAULT_IMG_NODE_SPACING
+		ofs.y += node.rect_size.y / 2 + DEFAULT_IMG_NODE_SPACING
 		node = node.next_node
 		node.offset = ofs
 
 
-# Drag and drop de fichiers.
 func distribute_grid():
-	if selected_nodes.size() != 1:
+	if selected_img_nodes.size() != 1:
 		return
-	var num_cols: int = get_grid_num_cols()
-	var node: ImageGraphNode = selected_nodes.front()
-	var ofs: Vector2 = node.offset
-	var line_start: = ofs.x
+	var num_cols: = get_grid_num_columns()
+	var node: ImageGraphNode = selected_img_nodes.front()
+	assert(node)
+	var ofs: = node.offset
+	var row_ofs_x: = ofs.x
 	var col = 0
 	while node.next_node:
 		col += 1
 		if col < num_cols:
-			ofs.x += node.rect_size.x + DEFAULT_NODE_SPACING
+			ofs.x += node.rect_size.x + DEFAULT_IMG_NODE_SPACING
 		else:
 			col = 0
-			ofs.x = line_start
-			ofs.y += node.rect_size.y + DEFAULT_NODE_SPACING
+			ofs.x = row_ofs_x
+			ofs.y += node.rect_size.y + DEFAULT_IMG_NODE_SPACING
 		node = node.next_node
 		node.offset = ofs
 
 
-func set_custom_size_from_selected_node():
-	if selected_nodes.size() != 1:
+func store_selected_img_node_as_custom_img_node_size():
+	if selected_img_nodes.size() != 1:
 		return
-	var node = selected_nodes.front()
-	custom_node_size = node.rect_size
+	var node = selected_img_nodes.front()
+	assert(node)
+	custom_img_node_size = node.rect_size
 
 
-func set_selected_nodes_to_custom_size():
-	if selected_nodes.size() == 0:
+func resize_selected_img_nodes_to_custom_img_node_size():
+	if selected_img_nodes.size() == 0:
 		return
-	for node in selected_nodes:
-		node.rect_size = custom_node_size
+	for node in selected_img_nodes:
+		node.rect_size = custom_img_node_size
 
 
 ############
 ## CREATE ##
 ############
 
-func snap_position(pos: Vector2) -> Vector2:
-	var snap = get_snap()
-	pos.x = int(pos.x / snap) * snap
-	pos.y = int(pos.y / snap) * snap
-	return pos
 
-
-# Convertit un offset dans le viewport (ex: get_global_mouse_position()) dans l'espace du graph.
-func convert_viewport_ofs_to_graph_ofs(viewport_pos: Vector2) -> Vector2:
-	var ofs = (scroll_offset + viewport_pos) / zoom
-	if !is_using_snap():
-		return ofs
-	return snap_position(ofs)
-
-
-# Inverse de la conversion ci-dessus.
-func convert_graph_ofs_to_viewport_ofs(graph_pos: Vector2) -> Vector2:
-	var ofs = graph_pos * zoom - scroll_offset
-	return ofs
-
-
-func get_mouse_position_in_graph_space() -> Vector2:
-	return convert_viewport_ofs_to_graph_ofs(get_global_mouse_position() - rect_position)
-
-
-# Ajoute un nouveau node au graph. Son centre est positionné à l'offset donné.
-func add_new_image_node(ofs: Vector2, select_exclusive: bool = true, autoload: bool = true) -> ImageGraphNode:
-	var node = image_graph_node.instance()
-	add_child(node, true) # /!\ before set_offset.
+# Creates a new image node and adds it to the graph, centered on the given offset (in graph space).
+func add_new_image_node(ofs: Vector2, exclusive_select: bool = true, open_image_file: bool = true) -> ImageGraphNode:
+	var node = imageGraphNode.instance()
+	add_child(node, true) # /!\ before set_offset
 	node.set_offset(ofs - node.rect_size / 2)
-	node.set_bg_color(node_bg_color)
-	if select_exclusive:
-		select_node_ex(node)
-	else:
-		#node.selected = true
-		select_node_ex(node, false)
-	if autoload:
-		open_load_image_dialog(node)
+	node.set_bg_color(img_node_bg_color)
+	select_img_node(node, exclusive_select)
+	if open_image_file:
+		display_open_image_file_dialog(node)
 	return node
 
 
-# Ajoute un nouveau node au graph quand l'utilisateur appuie sur le bouton 'Add'.
 func _on_AddButton_pressed():
-	add_new_image_node(get_mouse_position_in_graph_space() + Vector2(200, 200))
+	add_new_image_node(convert_global_mouse_position_to_offset_in_graph() + NEW_NODE_DEFAULT_OFFSET)
 
 
-# Ajoute un nouveau node au graph quand l'utilisateur double-clique sur le graph.
 func _on_Graph_gui_input(event):
+	# Adds a new node to the graph (centered on mouse position) when user double-clicks on the graph.
 	if event is InputEventMouseButton and event.doubleclick:
-		add_new_image_node(get_mouse_position_in_graph_space())
+		add_new_image_node(convert_global_mouse_position_to_offset_in_graph())
 
 
-# Drag and drop de fichiers.
+# Drag & drop of external files, responds to 'files_dropped' signal.
 func _on_files_dropped(files, screen):
-	yield(get_tree(),"idle_frame") # hack to get a valid mouse position
-	files.sort()
+	yield(get_tree(),"idle_frame") # hack to get a valid mouse position (doesn't work everytime)
+	files.sort() # array of String (absolute file paths)
 	deselect_all_nodes()
-	var ofs: = get_mouse_position_in_graph_space()
+	var ofs: = convert_global_mouse_position_to_offset_in_graph()
 	var line_start: = ofs.x
-	var num_cols: int = get_grid_num_cols()
+	var num_cols: int = get_grid_num_columns()
 	var col = 0
 	var prev_node: ImageGraphNode = null
 	for path in files:
 		var ext: String = path.get_extension()
-		if IMG_EXTENSIONS.has(ext):
+		if IMAGE_FILE_EXTENSIONS.has(ext):
 			var new_node: ImageGraphNode = add_new_image_node(ofs, false, false)
 			new_node.load_thumbnail_from_file(path)
 			
+			# Organize in grid
 			col += 1
 			if col < num_cols:
-				ofs.x += new_node.rect_size.x + DEFAULT_NODE_SPACING
+				ofs.x += new_node.rect_size.x + DEFAULT_IMG_NODE_SPACING
 			else:
 				col = 0
 				ofs.x = line_start
-				ofs.y += new_node.rect_size.y + DEFAULT_NODE_SPACING
+				ofs.y += new_node.rect_size.y + DEFAULT_IMG_NODE_SPACING
 			
+			# Connect to previous node in order
 			if prev_node:
-				# Crée une nouvelle connexion entre les nodes 'prev_node' et 'new_node'.
 				var err = connect_node(prev_node.name, 0, new_node.name, 0)
 				if err ==  OK:
 					prev_node.next_node = new_node
@@ -357,21 +367,21 @@ func _on_files_dropped(files, screen):
 ##########
 
 # Recursive
-func _find_all_nodes_before_node(node: ImageGraphNode, connections: Dictionary, found_nodes: Array):
+func _find_all_nodes_before_node(node: ImageGraphNode, sorted_connections: Dictionary, found_nodes: Array):
 	assert(node)
-	if not connections.has(node):
+	if not sorted_connections.has(node):
 		return
-	var prev_nodes: Array = connections[node]
+	var prev_nodes: Array = sorted_connections[node]
 	for n in prev_nodes:
 		if found_nodes.has(n):
 			continue
 		found_nodes.push_back(n)
-		_find_all_nodes_before_node(n, connections, found_nodes)
+		_find_all_nodes_before_node(n, sorted_connections, found_nodes)
 
 
-func _find_all_nodes_before_selected(connections: Dictionary, found_nodes: Array):
-	for node in selected_nodes:
-		_find_all_nodes_before_node(node, connections, found_nodes)
+func _find_all_nodes_before_selected(sorted_connections: Dictionary, found_nodes: Array):
+	for node in selected_img_nodes:
+		_find_all_nodes_before_node(node, sorted_connections, found_nodes)
 
 
 func _find_all_nodes_after_node(node: ImageGraphNode, found_nodes: Array):
@@ -384,7 +394,7 @@ func _find_all_nodes_after_node(node: ImageGraphNode, found_nodes: Array):
 
 
 func _find_all_nodes_after_selected(found_nodes: Array):
-	for node in selected_nodes:
+	for node in selected_img_nodes:
 		_find_all_nodes_after_node(node, found_nodes)
 
 
@@ -392,127 +402,123 @@ func _find_terminating_node(node: ImageGraphNode) -> ImageGraphNode:
 	assert(node)
 	while node.next_node:
 		node = node.next_node
-	return node # last node
+	return node
 
 
 ############
 ## SELECT ##
 ############
 
-func get_num_selected_nodes():
-	return selected_nodes.size()
+func get_num_selected_img_nodes():
+	return selected_img_nodes.size()
 
 
-func get_num_copied_nodes():
-	return copied_nodes.size()
+func get_num_copied_img_nodes():
+	return copied_img_nodes.size()
 
 
-# Sélectionne seulement le node donné du graph.
-func select_node_ex(node: ImageGraphNode, exclusive: bool = true):
+func select_img_node(node: ImageGraphNode, exclusive: bool):
 	assert(node)
-	#print("select_node_ex, ", exclusive)
 	if exclusive:
 		deselect_all_nodes()
 	if not node.selected:
-		node.set_selected(true) # /!\ N'émet pas de signal.
-	if not selected_nodes.has(node):
-		selected_nodes.push_back(node)
+		node.set_selected(true) # /!\ No signal emitted
+	if not selected_img_nodes.has(node):
+		selected_img_nodes.push_back(node)
 	update_buttons()
 
 
-func select_all_nodes():
-	selected_nodes.clear()
+func select_all_img_nodes():
+	selected_img_nodes.clear()
 	for node in get_children():
-		if node is ImageGraphNode:# and not node.is_selected():
-			node.set_selected(true) # /!\ N'émet pas de signal.
-			selected_nodes.push_back(node)
+		if node is ImageGraphNode:
+			node.set_selected(true) # /!\ No signal emitted
+			selected_img_nodes.push_back(node)
 	update_buttons()
 
 
-# Désélectionne le node donné.
-func deselect_node(node: ImageGraphNode):
-	#print("deselect_node")
+func deselect_node(node: GraphNode): # image and comment nodes alike
 	assert(node)
 	if node.selected:
-		node.set_selected(false) # /!\ N'émet pas de signal.
-	if selected_nodes.has(node):
-		selected_nodes.erase(node)
+		node.set_selected(false) # /!\ No signal emitted
+	if selected_img_nodes.has(node):
+		selected_img_nodes.erase(node)
 	update_buttons()
 
 
-# Désélectionne tous les nodes du graph.
-func deselect_all_nodes():
-	#print("deselect_all_nodes")
+func deselect_all_nodes(): # image and comment nodes alike
 	for node in get_children():
-		if node is ImageGraphNode and node.is_selected():
-			node.set_selected(false) # /!\ N'émet pas de signal.
-	selected_nodes.clear()
+		if node is GraphNode and node.is_selected():
+			node.set_selected(false) # /!\ No signal emitted
+	selected_img_nodes.clear()
 	update_buttons()
 
 
-func select_all_nodes_before_selected_nodes():
-	if selected_nodes.size() == 0:
+func select_all_img_nodes_before_selected_img_nodes():
+	if selected_img_nodes.size() == 0:
 		return
-	var connections: = _get_connection_info()
+	var sorted_connections: = get_sorted_connections()
 	var found_nodes: = []
-	_find_all_nodes_before_selected(connections, found_nodes)
+	_find_all_nodes_before_selected(sorted_connections, found_nodes)
 	for node in found_nodes:
-		select_node_ex(node, false)
+		select_img_node(node, false)
 	update_buttons()
 
 
-func select_all_nodes_after_selected_nodes():
-	if selected_nodes.size() == 0:
+func select_all_img_nodes_after_selected_img_nodes():
+	if selected_img_nodes.size() == 0:
 		return
 	var found_nodes: = []
 	_find_all_nodes_after_selected(found_nodes)
 	for node in found_nodes:
-		select_node_ex(node, false)
+		select_img_node(node, false)
 	update_buttons()
 
 
-func select_all_nodes_flowing_through_selected_nodes():
-	if selected_nodes.size() == 0:
+func select_all_img_nodes_flowing_through_selected_img_nodes():
+	if selected_img_nodes.size() == 0:
 		return
-	var connections: = _get_connection_info()
+	var sorted_connections: = get_sorted_connections()
 	var found_nodes: = []
-	_find_all_nodes_before_selected(connections, found_nodes)
+	_find_all_nodes_before_selected(sorted_connections, found_nodes)
 	_find_all_nodes_after_selected(found_nodes)
 	for node in found_nodes:
-		select_node_ex(node, false)
+		select_img_node(node, false)
 	update_buttons()
 
 
-func select_all_interconnected_nodes_with_selected_nodes():
-	if selected_nodes.size() == 0:
+func select_all_interconnected_img_nodes_with_selected_img_nodes():
+	if selected_img_nodes.size() == 0:
 		return
 	# Find all terminating nodes from selection.
 	var terminators: = []
-	for node in selected_nodes:
+	for node in selected_img_nodes:
 		var last: = _find_terminating_node(node)
 		if not terminators.has(last):
 			terminators.push_back(last)
 	
-	var connections: = _get_connection_info()
+	var sorted_connections: = get_sorted_connections()
 	var found_nodes: = terminators.duplicate() # Terminators have to be selected too.
 	for node in terminators:
-		_find_all_nodes_before_node(node, connections, found_nodes)
+		_find_all_nodes_before_node(node, sorted_connections, found_nodes)
 	for node in found_nodes:
-		select_node_ex(node, false)
+		select_img_node(node, false)
 	update_buttons()
 
 
-func _on_Graph_node_selected(node: ImageGraphNode):
-	#print("_on_Graph_node_selected")
-	if not selected_nodes.has(node):
-		selected_nodes.push_back(node)
+func _on_Graph_node_selected(node: GraphNode):
+	if not node is ImageGraphNode:
+		return
+	if not selected_img_nodes.has(node):
+		selected_img_nodes.push_back(node)
 		update_buttons()
 
 
-func _on_Graph_node_unselected(node: ImageGraphNode):
-	#print("_on_Graph_node_unselected")
-	if selected_nodes.has(node):
-		selected_nodes.erase(node)
+func _on_Graph_node_unselected(node: GraphNode):
+	if not node is ImageGraphNode:
+		return
+	if selected_img_nodes.has(node):
+		selected_img_nodes.erase(node)
 		update_buttons()
 
 
@@ -520,23 +526,23 @@ func _on_Graph_node_unselected(node: ImageGraphNode):
 ## CONNECT ##
 #############
 
-func _get_connection_info() -> Dictionary:
-	var connections: = {}
+# Returns a dictionary of all connections as {to_node: [from_node]}
+func get_sorted_connections() -> Dictionary:
+	var sorted_connections: = {}
 	for c in get_connection_list():
 		var from_node: ImageGraphNode = get_node(c.from)
 		var to_node: ImageGraphNode = get_node(c.to)
 		assert(from_node)
 		assert(to_node)
 		assert(from_node.next_node == to_node)
-		if connections.has(to_node):
-			connections[to_node].push_back(from_node)
+		if sorted_connections.has(to_node):
+			sorted_connections[to_node].push_back(from_node) # adds to existing array
 		else:
-			connections[to_node] = [from_node] # new array
-	return connections
+			sorted_connections[to_node] = [from_node] # new array
+	return sorted_connections
 
 
-# Supprime toutes les connexions entrantes du node donné.
-func remove_node_input_connections(node: ImageGraphNode):
+func remove_img_node_input_connections(node: ImageGraphNode):
 	assert(node)
 	for connection in get_connection_list():
 		if connection.to == node.name:
@@ -546,93 +552,80 @@ func remove_node_input_connections(node: ImageGraphNode):
 			from_node.next_node = null
 
 
-# Supprime la connexion sortante du node donné.
-func remove_node_output_connection(node: ImageGraphNode):
+func remove_img_node_output_connection(node: ImageGraphNode):
 	assert(node)
 	if node.next_node:
 		disconnect_node(node.name, 0, node.next_node.name, 0)
 		node.next_node = null
 
 
-# Supprime toutes les connexions entrantes et sortantes du node donné.
 func remove_node_connections(node: ImageGraphNode):
 	assert(node)
-	remove_node_input_connections(node)
-	remove_node_output_connection(node)
+	remove_img_node_input_connections(node)
+	remove_img_node_output_connection(node)
 
 
-# Crée une nouvelle connexion entre les nodes de noms donnés 'from' et 'to'.
+# Creates a new connection between 'from' and 'to' nodes.
 func _on_GraphEdit_connection_request(from: String, from_slot: int, to: String, to_slot: int):
-	# Récupère les nodes 'from' et 'to' d'après les noms donnés.
 	var from_node: ImageGraphNode = get_node(from)
 	var to_node: ImageGraphNode = get_node(to)
 	assert(from_node)
 	assert(to_node)
 	
-	# Refuse la nouvelle connexion si le node se connecte à lui-même.
+	# No connection to itself
 	if from == to:
 		return
 	
-	# Refuse la nouvelle connexion si elle existe déjà.
+	# Do nothing if connection already exists.
 	if from_node.next_node == to_node:
 		return
 	
-	# Crée une nouvelle connexion entre les nodes 'from' et 'to'.
 	var err = connect_node(from, from_slot, to, to_slot)
 	if err !=  OK:
 		print(err)
 	
-	# Supprime l'ancienne connexion si elle existe.
+	# Delete existing connection.
 	if from_node.next_node != null:
 		disconnect_node(from, from_slot, from_node.next_node.name, from_node.next_node_slot)
 	
-	# Assigne le node 'from' comme node suivant du node 'to'.
+	# Reference to_node as from_node's next node.
 	from_node.next_node = get_node(to)
 
 
-# Crée un nouveau node si l'utilisateur traîne et relâche sur le graph une nouvelle connexion sortante depuis un node existant.
+# Creates a new connection if user drags out from an existing node's output slot and drops on the graph.
 func _on_GraphEdit_connection_to_empty(from: String, from_slot: int, release_position: Vector2):
-	# Récupère le node 'from' d'après le nom donné.
 	var from_node: ImageGraphNode = get_node(from)
 	assert(from_node)
 	
-	# Crée un nouveau node et le connecte.
-	var new_node = add_new_image_node(convert_viewport_ofs_to_graph_ofs(release_position))
-	assert(new_node)
-	connect_node(from, from_slot, new_node.name, from_slot)
+	var to_node = add_new_image_node(convert_position_in_viewport_to_offset_in_graph(release_position))
+	assert(to_node)
+	connect_node(from, from_slot, to_node.name, from_slot)
 	
-	# Supprime l'ancienne connexion si elle existe.
+	# Delete existing connection.
 	if from_node.next_node != null:
 		disconnect_node(from, from_slot, from_node.next_node.name, from_node.next_node_slot)
 	
-	# Assigne le nouveau node comme node suivant du node 'from'.
-	from_node.next_node = new_node
+	# Reference to_node as from_node's next node.
+	from_node.next_node = to_node
 
 
-# Crée un nouveau node si l'utilisateur traîne et relâche sur le graph une nouvelle connexion entrante depuis un node existant.
+# Creates a new connection if user drags out from an existing node's input slot and drops on the graph.
 func _on_GraphEdit_connection_from_empty(to: String, to_slot: int, release_position: Vector2):
-	# Récupère le node 'to' d'après le nom donné.
 	var to_node: ImageGraphNode = get_node(to)
 	assert(to_node)
-
-	# Crée un nouveau node et le connecte.
-	var new_node: ImageGraphNode = add_new_image_node(convert_viewport_ofs_to_graph_ofs(release_position))
-	assert(new_node)
-	connect_node(new_node.name, to_slot, to, to_slot)
 	
-	# Assigne le node 'to' comme node suivant du nouveau node.
-	new_node.next_node = to_node
+	var from_node: ImageGraphNode = add_new_image_node(convert_position_in_viewport_to_offset_in_graph(release_position))
+	assert(from_node)
+	connect_node(from_node.name, to_slot, to, to_slot)
+	
+	# Reference to_node as from_node's next node.
+	from_node.next_node = to_node
 
 
 func _on_GraphEdit_disconnection_request(from: String, from_slot: int, to: String, to_slot: int):
-	# Récupère le node from d'après le nom donné.
 	var from_node: ImageGraphNode = get_node(from)
 	assert(from_node)
-
-	# Déconnecte le node 'from' du node 'to'.
 	disconnect_node(from, from_slot, to, to_slot)
-	
-	# Assigne null comme node suivant du node 'from'.
 	from_node.next_node = null
 
 
@@ -661,57 +654,53 @@ func connect_duplicated_nodes(old_to_new: Dictionary):
 			node.next_node = next_node
 
 
-func _on_GraphEdit_copy_nodes_request():
-	copied_nodes.clear()
+# Not a real copy, more of a marker for paste.
+func _on_GraphEdit_copy_nodes_request(): # ImageGraphNode only
+	copied_img_nodes.clear()
 	for node in get_children():
 		if node is ImageGraphNode and node.is_selected():
-			copied_nodes.append(node)
-	print("[cop] selected_nodes = ", selected_nodes)
-	print("[cop] copied_nodes = ", copied_nodes)
+			copied_img_nodes.append(node)
 
 
-func get_group_center(nodes: Array) -> Vector2:
+func get_group_center_in_graph_space(nodes: Array) -> Vector2: # offset
 	assert(nodes)
 	assert(nodes.size())
 	var sum: = Vector2.ZERO
 	for node in nodes:
-		sum += node.rect_position
+		sum += node.offset
 	return sum / nodes.size()
 
 
-func _on_GraphEdit_paste_nodes_request():
-	print("[paste] selected_nodes = ", selected_nodes)
-	print("[paste] copied_nodes = ", copied_nodes)
-	if copied_nodes.empty():
+func _on_GraphEdit_paste_nodes_request(): # ImageGraphNode only
+	if copied_img_nodes.empty():
 		return
-	var old_group_center: = get_group_center(copied_nodes)
+	
+	var old_group_center: = get_group_center_in_graph_space(copied_img_nodes)
 	var old_to_new: = {}
 	deselect_all_nodes()
-	var new_group_center: Vector2 = get_global_mouse_position() - rect_position
-	for old_node in copied_nodes:
-		var new_node = duplicate_node(old_node, convert_viewport_ofs_to_graph_ofs(new_group_center + old_node.rect_position - old_group_center))
-		select_node_ex(new_node, false)
+	var new_group_center: Vector2 = convert_position_in_viewport_to_offset_in_graph(get_global_mouse_position() - rect_position)
+	for old_node in copied_img_nodes:
+		var new_node = duplicate_node(old_node, new_group_center - old_group_center + convert_position_in_viewport_to_offset_in_graph(old_node.rect_position))
+		select_img_node(new_node, false)
 		old_to_new[old_node] = new_node
 	
-	# Connecte les nouveaux nodes comme les anciens.
 	connect_duplicated_nodes(old_to_new)
 
 
 func _on_GraphEdit_duplicate_nodes_request():
-	if selected_nodes.empty():
+	if selected_img_nodes.empty():
 		return
-	var old_group_center: = get_group_center(selected_nodes)
+	
+	var old_group_center: = get_group_center_in_graph_space(selected_img_nodes)
 	var old_to_new: = {}
-	var old_nodes = selected_nodes.duplicate()
-	#deselect_all_nodes()
-	var new_group_center: Vector2 = get_global_mouse_position() - rect_position
+	var old_nodes = selected_img_nodes.duplicate()
+	var new_group_center: Vector2 = convert_position_in_viewport_to_offset_in_graph(get_global_mouse_position() - rect_position)
 	for old_node in old_nodes:
 		deselect_node(old_node)
-		var new_node = duplicate_node(old_node, convert_viewport_ofs_to_graph_ofs(new_group_center + old_node.rect_position - old_group_center))
-		select_node_ex(new_node, false)
+		var new_node = duplicate_node(old_node, new_group_center - old_group_center + convert_position_in_viewport_to_offset_in_graph(old_node.rect_position))
+		select_img_node(new_node, false)
 		old_to_new[old_node] = new_node
 	
-	# Connecte les nouveaux nodes comme les anciens.
 	connect_duplicated_nodes(old_to_new)
 
 
@@ -719,25 +708,26 @@ func _on_GraphEdit_duplicate_nodes_request():
 ## DELETE ##
 ############
 
-func delete_image_node(node: ImageGraphNode):
-	assert(node)
-	remove_node_connections(node)
-	deselect_node(node)
-	node.queue_free()
+func delete_img_node(img_node: ImageGraphNode):
+	assert(img_node)
+	remove_node_connections(img_node)
+	deselect_node(img_node)
+	remove_img_node_from_all_comment_nodes(img_node)
+	img_node.queue_free()
 
 
-func delete_comment_node(node: CommentGraphNode):
-	assert(node)
-	node.queue_free()
+func delete_comment_node(comment_node: CommentGraphNode):
+	assert(comment_node)
+	comment_node.queue_free()
 
 
-func _on_GraphEdit_delete_nodes_request(node_names: Array):
+func _on_GraphEdit_delete_nodes_request(node_names: Array): # only when selected then pressing [del] button
 	for node_name in node_names:
 		var node = get_node(node_name)
 		assert(node)
 		if node is ImageGraphNode:
 			deselect_node(node)
-			delete_image_node(node)
+			delete_img_node(node)
 		elif node is CommentGraphNode:
 			delete_comment_node(node)
 
@@ -746,90 +736,103 @@ func _on_GraphEdit_delete_nodes_request(node_names: Array):
 ## COMMENT ##
 #############
 
-# Ajoute un nouveau node au graph. Son centre est positionné à l'offset donné.
-func add_new_comment_node() -> CommentGraphNode:
-	var comment_node = comment_graph_node.instance()
-	add_child(comment_node, true)
-	add_selected_nodes_to_comment_node(comment_node)
+# Creates a new comment node and adds it to the graph, centered on the given offset (in graph space) if no image nodes are selected.
+func add_new_comment_node(ofs: Vector2) -> CommentGraphNode:
+	var comment_node = commentGraphNode.instance()
+	add_child(comment_node, true) # /!\ before set_offset
+	if selected_img_nodes.size() > 0:
+		add_selected_img_nodes_to_comment_node(comment_node)
+	else:
+		comment_node.set_offset(ofs - comment_node.rect_size / 2)
 	return comment_node
 
 
-func add_selected_nodes_to_comment_node(comment_node: CommentGraphNode):
-	for image_node in selected_nodes:
-		if image_node is ImageGraphNode:
-			comment_node.add_image_node(image_node, false)
+func add_selected_img_nodes_to_comment_node(comment_node: CommentGraphNode):
+	assert(comment_node)
+	for img_node in selected_img_nodes:
+		if img_node is ImageGraphNode:
+			comment_node.add_img_node(img_node, false) # update size at the end
 	comment_node.update_size()
 
 
-func remove_selected_nodes_from_comment_node(comment_node: CommentGraphNode):
-	for image_node in selected_nodes:
-		if image_node is ImageGraphNode:
-			comment_node.remove_image_node(image_node, false)
-	comment_node.update_size()
-
-
-func node_offset_changed(node: ImageGraphNode):
+func remove_img_node_from_all_comment_nodes(img_node: ImageGraphNode):
+	assert(img_node)
 	for comment_node in get_children():
-		if not comment_node is CommentGraphNode or not comment_node.contains_image_node(node):
-			continue
-		comment_node.update_size()
+		if comment_node is CommentGraphNode and comment_node.has_img_node(img_node):
+			comment_node.remove_img_node(img_node, true)
+
+
+func remove_selected_img_nodes_from_comment_node(comment_node: CommentGraphNode):
+	for img_node in selected_img_nodes:
+		if img_node is ImageGraphNode:
+			comment_node.remove_img_node(img_node, false)
+	comment_node.update_size()
+
+
+func img_node_offset_changed(node: ImageGraphNode):
+	for comment_node in get_children():
+		if comment_node is CommentGraphNode and comment_node.has_img_node(node):
+			comment_node.update_size()
 
 
 func _on_CommentButton_pressed():
-	add_new_comment_node()
+	add_new_comment_node(convert_global_mouse_position_to_offset_in_graph() + NEW_NODE_DEFAULT_OFFSET)
 
 
 ###############
-## SAVE/LOAD ##
+## LOAD/SAVE ##
 ###############
 
 func clear_graph():
+	copied_img_nodes.clear()
 	deselect_all_nodes()
 	clear_connections()
-	var nodes = get_children()
-	for node in nodes:
-		if node is ImageGraphNode:
+	var all_nodes = get_children()
+	for node in all_nodes:
+		if node is ImageGraphNode or node is CommentGraphNode:
 			remove_child(node)
 			node.queue_free()
 
 
-func new_file():
-	clear_graph()
-	current_file_name = DEFAULT_FILENAME
-	current_path = ""
-	update_main_window_title()
-
-
-func init_graph(graph_data: GraphData):
+func build_graph(graph_data: GraphData):
 	clear_graph()
 	
-	colorpicker.color = graph_data.node_bg_color
-	node_bg_color = graph_data.node_bg_color
+	img_node_bg_color = graph_data.img_node_bg_color
+	colorpicker.color = graph_data.img_node_bg_color
 	
-	# Nodes
-	for node_data in graph_data.nodes:
-		var new_node: ImageGraphNode = image_graph_node.instance()
+	# Image nodes
+	for node_data in graph_data.img_nodes:
+		var new_node: ImageGraphNode = imageGraphNode.instance()
 		new_node.set_name(node_data.name)
 		new_node.rect_size = node_data.rect_size
 		add_child(new_node, true) # /!\ before assigning data
 		new_node.offset = node_data.offset
-		new_node.set_bg_color(graph_data.node_bg_color)
+		new_node.set_bg_color(graph_data.img_node_bg_color)
 		new_node.set_extra_data(node_data.extra_data)
 	
-	# Connexions
+	# Connections
 	for connection in graph_data.connections:
 		var err = connect_node(connection.from, connection.from_port, connection.to, connection.to_port)
 		if err != OK:
 			print("Error loading graph: ", err)
-
+		
 		var from_node: ImageGraphNode = get_node(connection.from)
 		var to_node: ImageGraphNode = get_node(connection.to)
 		assert(from_node)
 		assert(to_node)
 		from_node.next_node = to_node
+	
+	# Comment nodes
+	for node_data in graph_data.comment_nodes:
+		var new_node: CommentGraphNode = commentGraphNode.instance()
+		new_node.set_name(node_data.name)
+		new_node.rect_size = node_data.rect_size
+		add_child(new_node, true) # /!\ before assigning data
+		new_node.offset = node_data.offset
+		new_node.set_extra_data(node_data.extra_data)
 
 
-func load_graph(path: String):
+func load_graph_from_file(path: String):
 	var dir = Directory.new()
 	if not dir.file_exists(path):
 		print("File ", path, " doesn't exist")
@@ -838,27 +841,26 @@ func load_graph(path: String):
 	if ResourceLoader.exists(path):
 		var graph_data = ResourceLoader.load(path)
 		if graph_data is GraphData:
-			if graph_data.version == FILE_VERSION:
-				init_graph(graph_data)
+			if graph_data.version == PROJECT_FILE_VERSION:
+				build_graph(graph_data)
 			else:
 				print("Error, incompatible file version ", graph_data.version)
 				return
 	
-	current_file_name = path.get_file()
-	current_path = path
+	project_file_name = path.get_file()
+	project_file_path = path
 	update_main_window_title()
 
 
-func save_graph(path: String):
-	# Crée et remplit un nouvau GraphData avec les données du grap et de ses nodes.
+func save_graph_to_file(path: String):
 	var graph_data = GraphData.new()
 	assert(graph_data)
 	
 	# Version number
-	graph_data.version = FILE_VERSION
-	graph_data.node_bg_color = node_bg_color
+	graph_data.version = PROJECT_FILE_VERSION
+	graph_data.img_node_bg_color = img_node_bg_color
 	
-	# Graph nodes
+	# Image nodes
 	for node in get_children():
 		if node is ImageGraphNode:
 			var node_data = GraphNodeData.new()
@@ -867,10 +869,21 @@ func save_graph(path: String):
 			node_data.offset = node.offset
 			node_data.rect_size = node.rect_size
 			node_data.extra_data = node.get_extra_data()
-			graph_data.nodes.append(node_data)
+			graph_data.img_nodes.append(node_data)
 	
 	# Connexions
 	graph_data.connections = get_connection_list()
+	
+	# Comment nodes
+	for node in get_children():
+		if node is CommentGraphNode:
+			var node_data = GraphNodeData.new()
+			assert(node_data)
+			node_data.name = node.name
+			node_data.offset = node.offset
+			node_data.rect_size = node.rect_size
+			node_data.extra_data = node.get_extra_data()
+			graph_data.comment_nodes.append(node_data)
 	
 	# Crée le directory s'il n'existe pas.
 	var dir_path: String = path.get_base_dir()
@@ -887,54 +900,57 @@ func save_graph(path: String):
 		print("Error saving graph: ", err)
 		return
 	
-	current_file_name = path.get_file()
-	current_path = path
+	project_file_name = path.get_file()
+	project_file_path = path
 	update_main_window_title()
 
 
-func open_file():
-	open_dlg.popup_centered()
+func new_project():
+	clear_graph()
+	project_file_name = DEFAULT_PROJECT_FILENAME
+	project_file_path = ""
+	update_main_window_title()
 
 
-func save_file():
-	if current_path == "":
-		save_file_as()
+func open_project_file():
+	open_project_file_dlg.popup_centered()
+
+
+func save_project_file():
+	if project_file_path == "":
+		save_project_file_as()
 	else:
-		save_graph(current_path)
+		save_graph_to_file(project_file_path)
 
 
-func save_file_as():
-	save_dlg.popup_centered()
+func save_project_file_as():
+	save_project_file_dlg.popup_centered()
 
 
 func _on_OpenFileDialog_file_selected(path):
-	move_popups_out_of_the_way()
-	#load_graph("user://saves/", "graph.res")
-	# étendre ResourceFormatLoader
-	load_graph(path)
+	load_graph_from_file(path)
+	move_hidden_popups_out_of_the_way()
 
 
 func _on_SaveFileDialog_file_selected(path):
-	move_popups_out_of_the_way()
-	#save_graph("user://saves/", "graph.res")
-	# étendre ResourceFormatSaver
-	save_graph(path)
+	save_graph_to_file(path)
+	move_hidden_popups_out_of_the_way()
 
 
 #############
 ## ANIMATE ##
 #############
 
-func open_load_image_dialog(node: ImageGraphNode):
+func display_open_image_file_dialog(node: ImageGraphNode):
 	assert(node)
-	active_node = node
-	image_dlg.popup_centered()
+	active_img_node = node
+	open_image_file_dlg.popup_centered()
 
 
-func open_load_sound_dialog(node: ImageGraphNode):
+func display_open_sound_dialog(node: ImageGraphNode):
 	assert(node)
-	active_node = node
-	sound_dlg.popup_centered()
+	active_img_node = node
+	open_sound_file_dlg.popup_centered()
 
 
 func reload_node_thumbnail(node: ImageGraphNode):
@@ -955,23 +971,23 @@ func refresh_display_dialog():
 
 
 func _on_OpenImgFileDialog_file_selected(path):
-	assert(active_node)
-	move_popups_out_of_the_way()
-	active_node.load_thumbnail_from_file(path)
+	assert(active_img_node)
+	move_hidden_popups_out_of_the_way()
+	active_img_node.load_thumbnail_from_file(path)
 	refresh_display_dialog()
 
 
 func _on_OpenSndFileDialog_file_selected(path):
-	assert(active_node)
-	move_popups_out_of_the_way()
-	active_node.load_sound_from_file(path)
+	assert(active_img_node)
+	move_hidden_popups_out_of_the_way()
+	active_img_node.load_sound_from_file(path)
 #	refresh_display_dialog()
 
 
 func play_animation():
-	if selected_nodes.size() != 1:
+	if selected_img_nodes.size() != 1:
 		return
-	display_dlg.init_dialog(selected_nodes.front())
+	display_dlg.init_dialog(selected_img_nodes.front())
 	if display_dlg.window_bounds == Rect2():
 		display_dlg.popup_centered()
 	else:
@@ -983,7 +999,7 @@ func _on_PlayButton_pressed():
 
 
 func _on_ColorPicker_color_changed(color):
-	node_bg_color = color
+	img_node_bg_color = color
 	for node in get_children():
 		if node is ImageGraphNode:
-			node.set_bg_color(node_bg_color)
+			node.set_bg_color(color)

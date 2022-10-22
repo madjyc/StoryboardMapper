@@ -55,7 +55,6 @@ margin_left = 142.0
 margin_right = 168.0
 margin_bottom = 24.0
 hint_tooltip = "Add a new frame"
-disabled = true
 icon = ExtResource( 5 )
 flat = true
 
@@ -70,9 +69,10 @@ flat = true
 
 [node name="DebugButton" type="Button" parent="CanvasLayer/HBoxContainer"]
 visible = false
-margin_left = 174.0
-margin_right = 227.0
+margin_left = 204.0
+margin_right = 257.0
 margin_bottom = 24.0
+toggle_mode = true
 text = "Debug"
 
 [node name="DisplayDialog" parent="." instance=ExtResource( 1 )]

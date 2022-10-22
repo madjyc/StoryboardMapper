@@ -18,12 +18,42 @@ onready var thumbnail: = $VBoxContainer/Control/Thumbnail
 onready var subedit: = $VBoxContainer/SubtitleEdit
 onready var spinbox: = $VBoxContainer/HBoxContainer/SpinBox
 
+# Important to know:
+#     rect_position is in viewport space, can't be set directly in code (use offset)
+#     offset is rect_position in graph space (rect_position is automatically derived from offset)
+#     rect_size is in graph space
 
 func _ready():
 	assert(background)
 	assert(thumbnail)
 	assert(subedit)
 	assert(spinbox)
+
+
+# Extra data to be saved
+func get_extra_data() -> Dictionary:
+	var extra_data = {
+			"title": get_title(),
+			"img_path": img_path,
+			"snd_path": snd_path,
+			"subtitle": subedit.text,
+			"duration": spinbox.get_value(),
+	}
+	return extra_data
+
+
+# Extra data to be loaded
+func set_extra_data(extra_data: Dictionary):
+	assert(is_inside_tree())
+	set_title(extra_data["title"])
+	img_path =extra_data["img_path"]
+	snd_path = extra_data["snd_path"]
+	subedit.text = extra_data["subtitle"]
+	spinbox.set_value(extra_data["duration"])
+	if not img_path.empty():
+		load_thumbnail_from_file(img_path)
+	if not snd_path.empty():
+		load_sound_from_file(snd_path)
 
 
 func set_bg_color(color: Color):
@@ -42,29 +72,6 @@ func get_duration() -> float:
 	return spinbox.get_value()
 
 
-func get_extra_data() -> Dictionary:
-	var ret = {
-			"title": get_title(),
-			"img_path": img_path,
-			"snd_path": snd_path,
-			"subtitle": subedit.text,
-			"duration": spinbox.get_value(),
-	}
-	return ret
-
-
-func set_extra_data(node_data: Dictionary):
-	set_title(node_data["title"])
-	img_path = node_data["img_path"]
-	snd_path = node_data["snd_path"]
-	subedit.text = node_data["subtitle"]
-	spinbox.set_value(node_data["duration"])
-	if not img_path.empty():
-		load_thumbnail_from_file(img_path)
-	if not snd_path.empty():
-		load_sound_from_file(snd_path)
-
-
 func _on_GraphNode_resize_request(new_size):
 	var graph = get_parent()
 	assert(graph is GraphEdit)
@@ -77,14 +84,14 @@ func _on_GraphNode_resize_request(new_size):
 func _on_GraphNode_close_request():
 	var graph = get_parent()
 	assert(graph is GraphEdit)
-	assert(graph.has_method("delete_image_node"))
-	graph.delete_image_node(self)
+	assert(graph.has_method("delete_img_node"))
+	graph.delete_img_node(self)
 
 
 func _on_TextureRect_gui_input(event):
 	if not event is InputEventMouseButton:
 		return
-
+	
 	if event.doubleclick:
 		get_parent().play_animation()
 		return
@@ -98,14 +105,14 @@ func _on_TextureRect_gui_input(event):
 				if ctrl_key_was_down:
 					graph.deselect_node(self)
 			else:
-				graph.select_node_ex(self, !ctrl_key_was_down) # /!\ Ne lance pas de signals.
+				graph.select_img_node(self, !ctrl_key_was_down) # /!\ Ne lance pas de signals.
 		
 			if selected:
-				graph.start_dragging_selected_nodes(self)
+				graph.start_dragging_selected_img_nodes(self)
 		else:
-			if not graph.stop_dragging_selected_nodes():
+			if not graph.stop_dragging_selected_img_nodes():
 				if !ctrl_key_was_down:
-					graph.select_node_ex(self, true) # /!\ Ne lance pas de signals.
+					graph.select_img_node(self, true) # /!\ Ne lance pas de signals.
 
 
 func _on_LoadButton_pressed():
@@ -203,6 +210,7 @@ func reload_sound_file():
 
 func _on_GraphNode_offset_changed():
 	var graph = get_parent()
+	if not graph: # node created but not yet added to the graph
+		return
 	assert(graph is GraphEdit)
-	assert(graph.has_method("node_offset_changed")) # signal
-	graph.node_offset_changed(self)
+	graph.img_node_offset_changed(self)

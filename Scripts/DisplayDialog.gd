@@ -29,7 +29,7 @@ func _ready():
 	assert(subedit)
 	assert(play_timer)
 	assert(audio_player)
-	move_popup_out_of_the_way()
+	move_hidden_popup_out_of_the_way()
 
 
 func init_dialog(first: ImageGraphNode):
@@ -39,7 +39,7 @@ func init_dialog(first: ImageGraphNode):
 
 
 # Hack to prevent hidden popups from stealing mouse input.
-func move_popup_out_of_the_way():
+func move_hidden_popup_out_of_the_way():
 	var infinite_pos: = Vector2(-1e6, -1e6)
 	rect_position = infinite_pos
 
@@ -86,7 +86,7 @@ func _on_DisplayDialog_popup_hide():
 	stop_animation()
 	window_bounds.position = rect_position
 	window_bounds.size = rect_size
-	move_popup_out_of_the_way()
+	move_hidden_popup_out_of_the_way()
 
 
 func _on_PlayButton_pressed():

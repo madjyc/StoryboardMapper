@@ -61,7 +61,7 @@ func _ready():
 	assert(help_menu_button)
 	assert(graph)
 	var popup: PopupMenu
-	move_popups_out_of_the_way()
+	move_hidden_popups_out_of_the_way()
 	
 	# --- File Menu ---
 	popup = file_menu_button.get_popup()
@@ -133,13 +133,13 @@ func _ready():
 func _on_FileMenu_item_pressed(item_id: int):
 	match item_id:
 		FILE_MENU_NEW:
-			graph.new_file()
+			graph.new_project()
 		FILE_MENU_OPEN:
-			graph.open_file()
+			graph.open_project_file()
 		FILE_MENU_SAVE:
-			graph.save_file()
+			graph.save_project_file()
 		FILE_MENU_SAVEAS:
-			graph.save_file_as()
+			graph.save_project_file_as()
 		FILE_MENU_QUIT:
 			get_tree().quit()
 
@@ -189,9 +189,9 @@ func _on_EditMenu_item_pressed(item_id: int):
 		EDIT_MENU_DISTRIB_GRID:
 			graph.distribute_grid()
 		EDIT_MENU_STORE_SIZE:
-			graph.set_custom_size_from_selected_node()
+			graph.store_selected_img_node_as_custom_img_node_size()
 		EDIT_MENU_RESIZE_TO_STORED:
-			graph.set_selected_nodes_to_custom_size()
+			graph.resize_selected_img_nodes_to_custom_img_node_size()
 
 
 func _on_SelecMenuButton_about_to_show():
@@ -208,7 +208,7 @@ func _on_SelecMenuButton_about_to_show():
 func _on_SelecMenu_item_pressed(item_id: int):
 	match item_id:
 		SELEC_MENU_SELECT_ALL:
-			graph.select_all_nodes()
+			graph.select_all_img_nodes()
 		SELEC_MENU_DESELECT_ALL:
 			graph.deselect_all_nodes()
 		SELEC_MENU_SELECT_BEFORE:
@@ -232,7 +232,7 @@ func _on_HelpMenu_item_pressed(item_id: int):
 
 
 # Hack to prevent hidden popups from stealing mouse input.
-func move_popups_out_of_the_way():
+func move_hidden_popups_out_of_the_way():
 	var infinite_pos: = Vector2(-1e6, -1e6)
 	if help_dlg and not help_dlg.visible:
 		help_dlg.rect_position = infinite_pos
@@ -241,8 +241,8 @@ func move_popups_out_of_the_way():
 
 
 func _on_HelpDialog_popup_hide():
-	move_popups_out_of_the_way()
+	move_hidden_popups_out_of_the_way()
 
 
 func _on_AboutDialog_popup_hide():
-	move_popups_out_of_the_way()
+	move_hidden_popups_out_of_the_way()
