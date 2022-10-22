@@ -27,7 +27,6 @@ mouse_filter = 2
 theme = ExtResource( 18 )
 custom_styles/commentfocus = ExtResource( 17 )
 custom_styles/comment = ExtResource( 17 )
-title = "Title"
 show_close = true
 resizable = true
 comment = true
@@ -124,7 +123,7 @@ hint_tooltip = "Frame background color"
 [node name="UserText" type="TextEdit" parent="VBoxContainer"]
 margin_top = 28.0
 margin_right = 224.0
-margin_bottom = 48.0
+margin_bottom = 50.0
 rect_min_size = Vector2( 0, 20 )
 size_flags_horizontal = 3
 size_flags_vertical = 3

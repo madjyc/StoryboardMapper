@@ -89,6 +89,10 @@ func _on_GraphNode_resize_request(new_size):
 		rect_size = graph.snap_position(new_size)
 	else:
 		rect_size = new_size
+	
+	var comment_node = graph.find_comment_node_associated_to_node(self)
+	if comment_node:
+		comment_node.update_size()
 
 
 func _on_GraphNode_close_request():

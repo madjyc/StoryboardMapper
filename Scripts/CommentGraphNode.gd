@@ -28,14 +28,24 @@ func _exit_tree():
 	purge_img_nodes(false)
 
 
+#func get_lowest_img_nodes_position_in_parent() -> int:
+#	if img_nodes.empty():
+#		return -1
+#	var min_index: int = img_nodes.front().get_position_in_parent()
+#	for node in img_nodes:
+#		if min_index > node.get_position_in_parent():
+#			min_index = node.get_position_in_parent()
+#	return min_index
+
+
 # Extra data to be saved
 func get_extra_data() -> Dictionary:
 	var extra_data = {
 			"title": get_title(),
 			"color": colorpicker.color,
+			"text": user_text.text,
 			"img_node_names": [] # filled hereafter
 	}
-	
 	for node in img_nodes:
 		extra_data["img_node_names"].push_back(node.name)
 	
@@ -47,9 +57,11 @@ func set_extra_data(extra_data: Dictionary):
 	assert(is_inside_tree())
 	set_title(extra_data["title"])
 	set_color(extra_data["color"])
+	user_text.text = extra_data["text"]
 	img_nodes.clear()
 	for node_name in extra_data["img_node_names"]:
 		img_nodes.push_back(get_node("../" + node_name))
+	update_size_options()
 
 
 func set_color(color: Color):

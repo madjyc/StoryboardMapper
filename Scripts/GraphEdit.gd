@@ -5,7 +5,7 @@ class_name ImageGraph
 
 const APP_NAME: String = "Storyboard Mapper"
 const DEFAULT_PROJECT_FILENAME: String = "Untitled"
-const PROJECT_FILE_VERSION: String = "0.1.1"
+const PROJECT_FILE_VERSION: String = "0.2.0"
 const IMAGE_FILE_EXTENSIONS: Array = ["jpg", "jpeg", "png", "bmp"]
 const DEFAULT_IMG_NODE_SPACING: float = 40.0
 const MIN_DRAG_DISTANCE: float = 5.0
@@ -744,6 +744,7 @@ func add_new_comment_node(ofs: Vector2) -> CommentGraphNode:
 		add_selected_img_nodes_to_comment_node(comment_node)
 	else:
 		comment_node.set_offset(ofs - comment_node.rect_size / 2)
+	move_child(comment_node, 0)
 	return comment_node
 
 
@@ -755,11 +756,19 @@ func add_selected_img_nodes_to_comment_node(comment_node: CommentGraphNode):
 	comment_node.update_size()
 
 
-func remove_img_node_from_all_comment_nodes(img_node: ImageGraphNode):
+func find_comment_node_associated_to_node(img_node: ImageGraphNode) -> CommentGraphNode:
 	assert(img_node)
 	for comment_node in get_children():
 		if comment_node is CommentGraphNode and comment_node.has_img_node(img_node):
-			comment_node.remove_img_node(img_node, true)
+			return comment_node
+	return null # no comment node associated to img_node
+
+
+func remove_img_node_from_all_comment_nodes(img_node: ImageGraphNode):
+	assert(img_node)
+	var comment_node: = find_comment_node_associated_to_node(img_node)
+	if comment_node:
+		comment_node.remove_img_node(img_node, true)
 
 
 func remove_selected_img_nodes_from_comment_node(comment_node: CommentGraphNode):
@@ -828,6 +837,7 @@ func build_graph(graph_data: GraphData):
 		new_node.set_name(node_data.name)
 		new_node.rect_size = node_data.rect_size
 		add_child(new_node, true) # /!\ before assigning data
+		move_child(new_node, 0)
 		new_node.offset = node_data.offset
 		new_node.set_extra_data(node_data.extra_data)
 
