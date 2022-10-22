@@ -15,6 +15,7 @@ var ctrl_key_was_down: bool # Dragging
 
 onready var background: = $VBoxContainer/Control/Background
 onready var thumbnail: = $VBoxContainer/Control/Thumbnail
+onready var subtitle: = $VBoxContainer/Control/Subtitle
 onready var subedit: = $VBoxContainer/SubtitleEdit
 onready var spinbox: = $VBoxContainer/HBoxContainer/SpinBox
 
@@ -48,7 +49,7 @@ func set_extra_data(extra_data: Dictionary):
 	set_title(extra_data["title"])
 	img_path =extra_data["img_path"]
 	snd_path = extra_data["snd_path"]
-	subedit.text = extra_data["subtitle"]
+	set_subtitle(extra_data["subtitle"])
 	spinbox.set_value(extra_data["duration"])
 	if not img_path.empty():
 		load_thumbnail_from_file(img_path)
@@ -62,6 +63,15 @@ func set_bg_color(color: Color):
 
 func get_thumbnail_texture():
 	return thumbnail.texture
+
+
+func set_subtitle(text: String):
+	subedit.text = text
+	update_subtitle()
+
+
+func update_subtitle():
+	subtitle.text = subedit.text
 
 
 func get_subtitle():
@@ -193,11 +203,11 @@ func remove_sound():
 
 
 func open_image_file():
-	get_parent().open_load_image_dialog(self)
+	get_parent().display_open_image_file_dialog(self)
 
 
 func open_sound_file():
-	get_parent().open_load_sound_dialog(self)
+	get_parent().display_open_sound_dialog(self)
 
 
 func reload_image_file():
@@ -214,3 +224,7 @@ func _on_GraphNode_offset_changed():
 		return
 	assert(graph is GraphEdit)
 	graph.img_node_offset_changed(self)
+
+
+func _on_SubtitleEdit_text_changed():
+	update_subtitle()

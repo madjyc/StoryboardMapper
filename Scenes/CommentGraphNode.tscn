@@ -29,6 +29,7 @@ custom_styles/commentfocus = ExtResource( 17 )
 custom_styles/comment = ExtResource( 17 )
 title = "Title"
 show_close = true
+resizable = true
 comment = true
 slot/0/left_enabled = false
 slot/0/left_type = 0
@@ -120,8 +121,18 @@ margin_bottom = 24.0
 rect_min_size = Vector2( 28, 24 )
 hint_tooltip = "Frame background color"
 
+[node name="UserText" type="TextEdit" parent="VBoxContainer"]
+margin_top = 28.0
+margin_right = 224.0
+margin_bottom = 48.0
+rect_min_size = Vector2( 0, 20 )
+size_flags_horizontal = 3
+size_flags_vertical = 3
+wrap_enabled = true
+
 [connection signal="close_request" from="." to="." method="_on_CommentNode_close_request"]
 [connection signal="dragged" from="." to="." method="_on_CommentNode_dragged"]
+[connection signal="resize_request" from="." to="." method="_on_CommentNode_resize_request"]
 [connection signal="pressed" from="VBoxContainer/HBoxContainer/HBoxContainer2/AddButton" to="." method="_on_AddButton_pressed"]
 [connection signal="pressed" from="VBoxContainer/HBoxContainer/HBoxContainer2/SubButton" to="." method="_on_SubButton_pressed"]
 [connection signal="color_changed" from="VBoxContainer/HBoxContainer/HBoxContainer2/ColorPicker" to="." method="_on_ColorPicker_color_changed"]

@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=2]
+[gd_scene load_steps=11 format=2]
 
 [ext_resource path="res://Resources/SelectedFrame.tres" type="StyleBox" id=1]
 [ext_resource path="res://Resources/NormalFrame.tres" type="StyleBox" id=2]
@@ -8,6 +8,16 @@
 [ext_resource path="res://Assets/Icons/VisualShaderPort.svg" type="Texture" id=6]
 [ext_resource path="res://Assets/Icons/SoundFile.svg" type="Texture" id=7]
 [ext_resource path="res://Assets/Icons/Remove.svg" type="Texture" id=8]
+
+[sub_resource type="DynamicFontData" id=1]
+font_path = "res://Assets/Fonts/Roboto-Bold.ttf"
+
+[sub_resource type="DynamicFont" id=2]
+size = 8
+outline_size = 1
+outline_color = Color( 0, 0, 0, 1 )
+use_filter = true
+font_data = SubResource( 1 )
 
 [node name="GraphNode" type="GraphNode"]
 margin_right = 232.0
@@ -59,6 +69,19 @@ size_flags_horizontal = 3
 size_flags_vertical = 3
 expand = true
 stretch_mode = 6
+
+[node name="Subtitle" type="Label" parent="VBoxContainer/Control"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+custom_colors/font_color = Color( 1, 0.976471, 0.87451, 1 )
+custom_colors/font_outline_modulate = Color( 0, 0, 0, 1 )
+custom_colors/font_color_shadow = Color( 0, 0, 0, 1 )
+custom_constants/shadow_as_outline = 1
+custom_fonts/font = SubResource( 2 )
+align = 1
+valign = 2
+autowrap = true
+clip_text = true
 
 [node name="SubtitleEdit" type="TextEdit" parent="VBoxContainer"]
 margin_top = 117.0
@@ -132,6 +155,7 @@ icon_align = 1
 [connection signal="resize_request" from="." to="." method="_on_GraphNode_resize_request"]
 [connection signal="focus_entered" from="VBoxContainer/Control/Thumbnail" to="." method="_on_TextureRect_focus_entered"]
 [connection signal="gui_input" from="VBoxContainer/Control/Thumbnail" to="." method="_on_TextureRect_gui_input"]
+[connection signal="text_changed" from="VBoxContainer/SubtitleEdit" to="." method="_on_SubtitleEdit_text_changed"]
 [connection signal="pressed" from="VBoxContainer/HBoxContainer/LoadButton" to="." method="_on_LoadButton_pressed"]
 [connection signal="pressed" from="VBoxContainer/HBoxContainer/SoundButton" to="." method="_on_SoundButton_pressed"]
 [connection signal="pressed" from="VBoxContainer/HBoxContainer/DelSoundButton" to="." method="_on_DelSoundButton_pressed"]

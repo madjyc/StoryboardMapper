@@ -2,17 +2,16 @@ extends GraphNode
 class_name CommentGraphNode
 
 const DEFAULT_SIZE: = Vector2(230.0, 80.0) # graph space
-const LEFT_MARGIN: = 24.0 # graph space
-const TOP_MARGIN: = 64.0 # graph space
-const RIGHT_MARGIN: = 24.0 # graph space
-const BOTTOM_MARGIN: = 24.0 # graph space
+const LEFT_MARGIN: = 16.0 # graph space
+const TOP_MARGIN: = 80.0 # graph space
+const RIGHT_MARGIN: = 16.0 # graph space
+const BOTTOM_MARGIN: = 16.0 # graph space
 
-var node_color: = Color.gray
 var img_nodes: = [] # array of ImageGraphNode
 var old_offset: Vector2
 
 onready var colorpicker: = $VBoxContainer/HBoxContainer/HBoxContainer2/ColorPicker
-
+onready var user_text: = $VBoxContainer/UserText
 
 # Important to know:
 #     rect_position is in viewport space, can't be set directly in code (use offset)
@@ -20,6 +19,8 @@ onready var colorpicker: = $VBoxContainer/HBoxContainer/HBoxContainer2/ColorPick
 #     rect_size is in graph space
 
 func _ready():
+	assert(colorpicker)
+	assert(user_text)
 	old_offset = offset
 
 
@@ -31,7 +32,7 @@ func _exit_tree():
 func get_extra_data() -> Dictionary:
 	var extra_data = {
 			"title": get_title(),
-			"color": node_color,
+			"color": colorpicker.color,
 			"img_node_names": [] # filled hereafter
 	}
 	
@@ -52,11 +53,10 @@ func set_extra_data(extra_data: Dictionary):
 
 
 func set_color(color: Color):
-	node_color = color
 	colorpicker.color = color
 	var custom_styles: StyleBox = get("custom_styles/comment")
-	custom_styles.bg_color = color
-	custom_styles.border_color = color
+	custom_styles.bg_color = colorpicker.color
+	custom_styles.border_color = colorpicker.color
 
 
 func _on_ColorPicker_color_changed(color):
@@ -74,19 +74,16 @@ func has_img_node(node: ImageGraphNode):
 func add_img_node(node: ImageGraphNode, auto_update: bool):
 	if not img_nodes.has(node):
 		img_nodes.push_back(node)
+	update_size_options()
 	if auto_update:
 		update_size()
 	print("img_nodes: ", img_nodes)
-	#var old_position = node.global_position
-#	get_parent().remove_child(node)
-#	add_child(node)
-	#node.set_owner(self)
-	#node.global_position = old_position
 
 
 func remove_img_node(node: ImageGraphNode, auto_update: bool):
 	if img_nodes.has(node):
 		img_nodes.erase(node)
+	update_size_options()
 	if auto_update:
 		update_size()
 	print("img_nodes: ", img_nodes)
@@ -94,13 +91,24 @@ func remove_img_node(node: ImageGraphNode, auto_update: bool):
 
 func purge_img_nodes(auto_update: bool):
 	img_nodes.clear()
+	update_size_options()
 	if auto_update:
 		update_size()
+
+
+func update_size_options():
+	if img_nodes.empty():
+		resizable = true
+		user_text.size_flags_vertical = SIZE_EXPAND_FILL
+	else:
+		resizable = false
+		user_text.size_flags_vertical = SIZE_FILL
 
 
 func update_size():
 	if img_nodes.empty():
 		set_size(DEFAULT_SIZE) # graph space
+		
 	else:
 		var rect: Rect2
 		var initialized: = false
@@ -114,6 +122,17 @@ func update_size():
 		
 		set_offset(rect.position - Vector2(LEFT_MARGIN, TOP_MARGIN)) # graph space
 		set_size(rect.size + Vector2(LEFT_MARGIN + RIGHT_MARGIN, TOP_MARGIN + BOTTOM_MARGIN)) # graph space
+
+
+func _on_CommentNode_resize_request(new_size):
+	if not img_nodes.empty():
+		return
+	var graph = get_parent()
+	assert(graph is GraphEdit)
+	if graph.is_using_snap():
+		rect_size = graph.snap_position(new_size)
+	else:
+		rect_size = new_size
 
 
 func _on_CommentNode_close_request():
@@ -135,15 +154,6 @@ func _on_SubButton_pressed():
 	assert(graph is GraphEdit)
 #	assert(graph.has_method("remove_selected_nodes_from_comment_node"))
 	graph.remove_selected_img_nodes_from_comment_node(self)
-
-
-func _on_CommentNode_resize_request(new_size):
-	var graph = get_parent()
-	assert(graph is GraphEdit)
-	if graph.is_using_snap():
-		rect_size = graph.snap_position(new_size)
-	else:
-		rect_size = new_size
 
 
 func _on_CommentNode_offset_changed():

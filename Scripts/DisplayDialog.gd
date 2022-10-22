@@ -205,8 +205,11 @@ func display_node(index: int, play_sound: bool):
 	node_chain_index = index
 	var node: ImageGraphNode = node_chain[index]
 	
-	var tex = load_image_from_file(node.img_path)
-	display_rect.texture = tex if tex else node.get_thumbnail_texture()
+	if node.img_path == "":
+		display_rect.texture = null
+	else:
+		var tex = load_image_from_file(node.img_path)
+		display_rect.texture = tex if tex else node.get_thumbnail_texture()
 	
 	if audio_player.is_playing():
 		audio_player.stop()
@@ -243,7 +246,7 @@ func _on_SubtitleEdit_text_changed():
 	var node: ImageGraphNode = node_chain[node_chain_index]
 	assert(node)
 	subtitle.text = subedit.text
-	node.subedit.text = subedit.text
+	node.set_subtitle(subedit.text)
 
 
 func _on_SpinBox_value_changed(value):

@@ -14,7 +14,7 @@
 [ext_resource path="res://Assets/Icons/SoundFile.svg" type="Texture" id=12]
 
 [sub_resource type="DynamicFontData" id=1]
-font_path = "res://Assets/Roboto-Bold.ttf"
+font_path = "res://Assets/Fonts/Roboto-Bold.ttf"
 
 [sub_resource type="DynamicFont" id=2]
 size = 30
@@ -61,20 +61,17 @@ stretch_mode = 6
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-margin_left = 128.0
-margin_top = -132.0
-margin_right = -128.0
+margin_top = -671.0
+margin_bottom = -9.0
 custom_colors/font_color = Color( 1, 0.976471, 0.87451, 1 )
 custom_colors/font_outline_modulate = Color( 0, 0, 0, 1 )
 custom_colors/font_color_shadow = Color( 0, 0, 0, 1 )
 custom_constants/shadow_as_outline = 1
 custom_fonts/font = SubResource( 2 )
-text = "pdvjpnj\\\\npn
-njpn pkn kn pkn "
 align = 1
-valign = 1
+valign = 2
+autowrap = true
 clip_text = true
-max_lines_visible = 2
 
 [node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer"]
 margin_top = 675.0
@@ -83,7 +80,7 @@ margin_bottom = 715.0
 alignment = 1
 
 [node name="SubtitleEdit" type="TextEdit" parent="VBoxContainer/HBoxContainer"]
-margin_right = 679.0
+margin_right = 647.0
 margin_bottom = 40.0
 rect_min_size = Vector2( 0, 22 )
 hint_tooltip = "Subtitles"
@@ -91,65 +88,65 @@ size_flags_horizontal = 3
 wrap_enabled = true
 
 [node name="FirstButton" type="Button" parent="VBoxContainer/HBoxContainer"]
-margin_left = 683.0
-margin_right = 707.0
+margin_left = 651.0
+margin_right = 675.0
 margin_bottom = 40.0
 hint_tooltip = "First frame"
 icon = ExtResource( 8 )
 
 [node name="PrevButton" type="Button" parent="VBoxContainer/HBoxContainer"]
-margin_left = 711.0
-margin_right = 735.0
+margin_left = 679.0
+margin_right = 703.0
 margin_bottom = 40.0
 hint_tooltip = " Previous frame"
 icon = ExtResource( 3 )
 
 [node name="PlayButton" type="Button" parent="VBoxContainer/HBoxContainer"]
-margin_left = 739.0
-margin_right = 767.0
+margin_left = 707.0
+margin_right = 735.0
 margin_bottom = 40.0
 hint_tooltip = "Play/pause"
 icon = ExtResource( 7 )
 
 [node name="StopButton" type="Button" parent="VBoxContainer/HBoxContainer"]
-margin_left = 771.0
-margin_right = 799.0
+margin_left = 739.0
+margin_right = 767.0
 margin_bottom = 40.0
 hint_tooltip = "Stop playback"
 icon = ExtResource( 6 )
 
 [node name="NextButton" type="Button" parent="VBoxContainer/HBoxContainer"]
-margin_left = 803.0
-margin_right = 827.0
+margin_left = 771.0
+margin_right = 795.0
 margin_bottom = 40.0
 hint_tooltip = " Next frame"
 icon = ExtResource( 5 )
 
 [node name="LastButton" type="Button" parent="VBoxContainer/HBoxContainer"]
-margin_left = 831.0
-margin_right = 855.0
+margin_left = 799.0
+margin_right = 823.0
 margin_bottom = 40.0
 hint_tooltip = "Last frame"
 icon = ExtResource( 4 )
 
 [node name="LoopButton" type="CheckButton" parent="VBoxContainer/HBoxContainer"]
-margin_left = 859.0
-margin_right = 951.0
+margin_left = 827.0
+margin_right = 919.0
 margin_bottom = 40.0
 hint_tooltip = "Loop"
 icon = ExtResource( 9 )
 
 [node name="Label" type="Label" parent="VBoxContainer/HBoxContainer"]
-margin_left = 955.0
+margin_left = 923.0
 margin_top = 13.0
-margin_right = 1018.0
+margin_right = 986.0
 margin_bottom = 27.0
 text = "Duration: "
 valign = 1
 
 [node name="SpinBox" type="SpinBox" parent="VBoxContainer/HBoxContainer"]
-margin_left = 1022.0
-margin_right = 1096.0
+margin_left = 990.0
+margin_right = 1064.0
 margin_bottom = 40.0
 hint_tooltip = "Frame duration (in seconds)"
 min_value = 0.1
@@ -161,23 +158,23 @@ align = 3
 suffix = "s"
 
 [node name="LoadButton" type="Button" parent="VBoxContainer/HBoxContainer"]
-margin_left = 1100.0
-margin_right = 1128.0
+margin_left = 1068.0
+margin_right = 1096.0
 margin_bottom = 40.0
 hint_tooltip = "Load image from file"
 icon = ExtResource( 11 )
 
 [node name="SoundButton" type="Button" parent="VBoxContainer/HBoxContainer"]
-margin_left = 1132.0
-margin_right = 1160.0
+margin_left = 1100.0
+margin_right = 1128.0
 margin_bottom = 40.0
 hint_tooltip = "Load sound from file"
 icon = ExtResource( 12 )
 
 [node name="DelSoundButton" type="Button" parent="VBoxContainer/HBoxContainer"]
-margin_left = 209.0
-margin_right = 237.0
-margin_bottom = 24.0
+margin_left = 1132.0
+margin_right = 1160.0
+margin_bottom = 40.0
 hint_tooltip = "Remove sound"
 icon = ExtResource( 2 )
 
