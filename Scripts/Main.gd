@@ -10,7 +10,7 @@ enum {
 }
 
 enum {
-#	EDIT_MENU_CUT,
+	EDIT_MENU_CUT,
 	EDIT_MENU_COPY,
 	EDIT_MENU_PASTE,
 	EDIT_MENU_DUPLICATE,
@@ -78,7 +78,7 @@ func _ready():
 	# --- Edit Menu ---
 	popup = edit_menu_button.get_popup()
 	popup.connect("id_pressed", self, "_on_EditMenu_item_pressed")
-#	popup.add_item("Cut", EDIT_MENU_CUT, KEY_X | KEY_MASK_CTRL)
+	popup.add_item("Cut", EDIT_MENU_CUT, KEY_X | KEY_MASK_CTRL)
 	popup.add_item("Copy", EDIT_MENU_COPY, KEY_C | KEY_MASK_CTRL)
 	popup.add_item("Paste", EDIT_MENU_PASTE, KEY_V | KEY_MASK_CTRL)
 	popup.add_item("Duplicate", EDIT_MENU_DUPLICATE, KEY_D | KEY_MASK_CTRL)
@@ -148,7 +148,7 @@ func _on_EditMenuButton_about_to_show():
 	var popup: PopupMenu = edit_menu_button.get_popup()
 	var num_selected: int = graph.get_num_selected_img_nodes()
 	var num_copied: int = graph.get_num_copied_nodes()
-#	popup.set_item_disabled(EDIT_MENU_CUT, true)
+	popup.set_item_disabled(EDIT_MENU_CUT, num_selected == 0)
 	popup.set_item_disabled(EDIT_MENU_COPY, num_selected == 0)
 	popup.set_item_disabled(EDIT_MENU_PASTE, num_copied == 0)
 	popup.set_item_disabled(EDIT_MENU_DUPLICATE, num_selected == 0)
@@ -164,8 +164,9 @@ func _on_EditMenuButton_about_to_show():
 
 func _on_EditMenu_item_pressed(item_id: int):
 	match item_id:
-#		EDIT_MENU_CUT:
-#			pass
+		EDIT_MENU_CUT:
+#			#OS.set_clipboard(string)
+			graph._on_GraphEdit_cut_nodes_request()
 		EDIT_MENU_COPY:
 #			#OS.set_clipboard(string)
 			#emit_signal("copy_nodes_request")

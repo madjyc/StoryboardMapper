@@ -6,7 +6,7 @@ const LEFT_MARGIN: = 16.0 # graph space
 const TOP_MARGIN: = 80.0 # graph space
 const RIGHT_MARGIN: = 16.0 # graph space
 const BOTTOM_MARGIN: = 16.0 # graph space
-const FOCUS_COLOR_LIGHTEN: = 0.2
+const FOCUS_COLOR_LIGHTEN: = 0.5
 
 var img_nodes: = [] # array of ImageGraphNode
 var old_offset: Vector2
@@ -23,7 +23,7 @@ func _ready():
 	assert(colorpicker)
 	assert(user_text)
 	old_offset = offset
-	set_color(get("custom_styles/comment").bg_color)
+	set_color(colorpicker.color)
 
 
 func _exit_tree():
@@ -72,22 +72,18 @@ func set_extra_data(extra_data: Dictionary, old_to_new: Dictionary, update_size:
 func set_color(color: Color):
 	colorpicker.color = color
 	
+	var custom_styles: StyleBox
+	
 	# Normal
-	var custom_styles: StyleBox = get("custom_styles/comment")
+	custom_styles = get("custom_styles/comment")
 	custom_styles.bg_color = color
 	custom_styles.border_color = color
-	
+
 	# Focused
-#	custom_styles = get("custom_styles/commentfocus")
-#	var focus_color: Color = Color.aqua#color.lightened(FOCUS_COLOR_LIGHTEN)
-#	custom_styles.bg_color = focus_color
-#	custom_styles.border_color = focus_color
-#
-#	# Selected
-#	custom_styles = get("custom_styles/selectedframe")
-#	var selec_color: Color = Color.red#color.lightened(FOCUS_COLOR_LIGHTEN)
-#	custom_styles.bg_color = selec_color
-#	custom_styles.border_color = selec_color
+	custom_styles = get("custom_styles/commentfocus")
+	var focus_color: Color = color.lightened(FOCUS_COLOR_LIGHTEN)
+	custom_styles.bg_color = focus_color
+	custom_styles.border_color = focus_color
 
 
 func _on_ColorPicker_color_changed(color):

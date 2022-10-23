@@ -1,0 +1,16 @@
+[gd_resource type="StyleBoxFlat" format=2]
+
+[resource]
+resource_local_to_scene = true
+content_margin_left = 12.0
+content_margin_right = 12.0
+content_margin_top = 25.0
+content_margin_bottom = 5.0
+bg_color = Color( 0.74902, 0.388235, 0.180392, 1 )
+border_width_top = 24
+border_color = Color( 1, 0.890196, 0.827451, 1 )
+border_blend = true
+corner_radius_top_left = 20
+corner_radius_top_right = 20
+corner_radius_bottom_right = 20
+corner_radius_bottom_left = 20

@@ -670,6 +670,14 @@ func connect_duplicated_nodes(old_to_new: Dictionary):
 			node.next_node = next_node
 
 
+func _on_GraphEdit_cut_nodes_request():
+	_on_GraphEdit_copy_nodes_request()
+	while not selected_img_nodes.empty():
+		delete_node(selected_img_nodes.back())
+	while not selected_com_nodes.empty():
+		delete_node(selected_com_nodes.back())
+
+
 func _on_GraphEdit_copy_nodes_request():
 	if selected_img_nodes.empty() and selected_com_nodes.empty():
 		return
