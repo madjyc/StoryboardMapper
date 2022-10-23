@@ -77,6 +77,7 @@ anchor_bottom = 1.0
 custom_colors/font_color = Color( 1, 0.976471, 0.87451, 1 )
 custom_colors/font_outline_modulate = Color( 0, 0, 0, 1 )
 custom_colors/font_color_shadow = Color( 0, 0, 0, 1 )
+custom_constants/line_spacing = -1
 custom_constants/shadow_as_outline = 1
 custom_fonts/font = SubResource( 2 )
 align = 1

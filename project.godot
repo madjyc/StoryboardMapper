@@ -34,6 +34,11 @@ _global_script_classes=[ {
 "language": "GDScript",
 "path": "res://Scripts/GraphNodeData.gd"
 }, {
+"base": "OptionButton",
+"class": "IconButton",
+"language": "GDScript",
+"path": "res://Scripts/IconButton.gd"
+}, {
 "base": "GraphEdit",
 "class": "ImageGraph",
 "language": "GDScript",
@@ -50,6 +55,7 @@ _global_script_class_icons={
 "DisplayDialog": "",
 "GraphData": "",
 "GraphNodeData": "",
+"IconButton": "",
 "ImageGraph": "",
 "ImageGraphNode": ""
 }

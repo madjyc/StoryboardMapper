@@ -6,11 +6,16 @@ const LEFT_MARGIN: = 16.0 # graph space
 const TOP_MARGIN: = 80.0 # graph space
 const RIGHT_MARGIN: = 16.0 # graph space
 const BOTTOM_MARGIN: = 16.0 # graph space
-const FOCUS_COLOR_LIGHTEN: = 0.5
+const MAX_ICONBUTTON_COUNT: = 6
+const FOCUS_COLOR_S_FACTOR: = 1.2
+const FOCUS_COLOR_V_FACTOR: = 1.3
 
 var img_nodes: = [] # array of ImageGraphNode
 var old_offset: Vector2
 
+onready var iconButton = preload("res://Scenes/IconButton.tscn")
+
+onready var iconbutton_container: = $VBoxContainer/HBoxContainer/HBoxContainer/IconBtnContainer
 onready var colorpicker: = $VBoxContainer/HBoxContainer/HBoxContainer2/ColorPicker
 onready var user_text: = $VBoxContainer/UserText
 
@@ -20,6 +25,7 @@ onready var user_text: = $VBoxContainer/UserText
 #     rect_size is in graph space
 
 func _ready():
+	assert(iconbutton_container)
 	assert(colorpicker)
 	assert(user_text)
 	old_offset = offset
@@ -46,10 +52,16 @@ func get_extra_data() -> Dictionary:
 			"title": get_title(),
 			"color": colorpicker.color,
 			"text": user_text.text,
-			"img_node_names": [] # filled hereafter
+			"img_node_names": [], # filled below
+			"icon_buttons": [], # filled below
 	}
+	
 	for node in img_nodes:
 		extra_data["img_node_names"].push_back(node.name)
+	
+	for icon_button in iconbutton_container.get_children():
+		assert(icon_button is IconButton)
+		extra_data["icon_buttons"].push_back(icon_button.get_selected_id())
 	
 	return extra_data
 
@@ -60,10 +72,17 @@ func set_extra_data(extra_data: Dictionary, old_to_new: Dictionary, update_size:
 	set_title(extra_data["title"])
 	set_color(extra_data["color"])
 	user_text.text = extra_data["text"]
+	
 	img_nodes.clear()
 	for node_name in extra_data["img_node_names"]:
 		if old_to_new.has(node_name): # user might have copied a comment node without all of its image nodes
 			img_nodes.push_back(get_node("../" + old_to_new[node_name]))
+	
+	for selected_id in extra_data["icon_buttons"]:
+		var icon_button = iconButton.instance()
+		iconbutton_container.add_child(icon_button)
+		icon_button.select(selected_id)
+	
 	if update_size:
 		update_size_options()
 		if not img_nodes.empty():
@@ -82,7 +101,7 @@ func set_color(color: Color):
 
 	# Focused
 	custom_styles = get("custom_styles/commentfocus")
-	var focus_color: Color = color.lightened(FOCUS_COLOR_LIGHTEN)
+	var focus_color: Color = color.from_hsv(color.h, color.s * FOCUS_COLOR_S_FACTOR, color.v * FOCUS_COLOR_V_FACTOR, 1.0)
 	custom_styles.bg_color = focus_color
 	custom_styles.border_color = focus_color
 
@@ -190,3 +209,18 @@ func _on_CommentNode_offset_changed():
 func _on_CommentNode_dragged(from, to):
 	if img_nodes.size() > 0:
 		update_size()
+
+
+func _on_NewIconButton_pressed():
+	if iconbutton_container.get_child_count() >= MAX_ICONBUTTON_COUNT:
+		return
+	var icon_button = iconButton.instance()
+	iconbutton_container.add_child(icon_button)
+
+
+func _on_DelIconButton_pressed():
+	if iconbutton_container.get_child_count() == 0:
+		return
+	var icon_button = iconbutton_container.get_child(iconbutton_container.get_child_count()-1)
+	assert(icon_button is IconButton)
+	iconbutton_container.remove_child(icon_button)

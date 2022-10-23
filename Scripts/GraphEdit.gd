@@ -310,7 +310,7 @@ func resize_selected_img_nodes_to_custom_img_node_size():
 
 # Creates a new image node and adds it to the graph, centered on the given offset (in graph space).
 func add_new_image_node(ofs: Vector2, exclusive_select: bool = true, open_image_file: bool = true) -> ImageGraphNode:
-	var node = imageGraphNode.instance()
+	var node: ImageGraphNode = imageGraphNode.instance()
 	add_child(node, true) # /!\ before set_offset
 	node.set_offset(ofs - node.rect_size / 2)
 	node.set_bg_color(img_node_bg_color)
