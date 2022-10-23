@@ -24,11 +24,12 @@ use_filter = true
 font_data = SubResource( 1 )
 
 [node name="DisplayDialog" type="WindowDialog"]
+visible = true
 anchor_right = 1.0
 anchor_bottom = 1.0
 margin_right = -88.0
 margin_bottom = -53.0
-rect_min_size = Vector2( 100, 100 )
+rect_min_size = Vector2( 543, 100 )
 resizable = true
 script = ExtResource( 1 )
 
@@ -39,6 +40,7 @@ anchor_bottom = 1.0
 [node name="Control" type="Control" parent="VBoxContainer"]
 margin_right = 1192.0
 margin_bottom = 671.0
+rect_clip_content = true
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
@@ -58,11 +60,8 @@ expand = true
 stretch_mode = 6
 
 [node name="Subtitle" type="Label" parent="VBoxContainer/Control"]
-anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-margin_top = -671.0
-margin_bottom = -9.0
 custom_colors/font_color = Color( 1, 0.976471, 0.87451, 1 )
 custom_colors/font_outline_modulate = Color( 0, 0, 0, 1 )
 custom_colors/font_color_shadow = Color( 0, 0, 0, 1 )

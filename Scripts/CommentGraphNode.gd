@@ -66,7 +66,8 @@ func set_extra_data(extra_data: Dictionary, old_to_new: Dictionary, update_size:
 			img_nodes.push_back(get_node("../" + old_to_new[node_name]))
 	if update_size:
 		update_size_options()
-		update_size()
+		if not img_nodes.empty():
+			update_size()
 
 
 func set_color(color: Color):
