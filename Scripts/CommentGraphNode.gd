@@ -6,6 +6,7 @@ const LEFT_MARGIN: = 16.0 # graph space
 const TOP_MARGIN: = 80.0 # graph space
 const RIGHT_MARGIN: = 16.0 # graph space
 const BOTTOM_MARGIN: = 16.0 # graph space
+const FOCUS_COLOR_LIGHTEN: = 0.2
 
 var img_nodes: = [] # array of ImageGraphNode
 var old_offset: Vector2
@@ -22,6 +23,7 @@ func _ready():
 	assert(colorpicker)
 	assert(user_text)
 	old_offset = offset
+	set_color(get("custom_styles/comment").bg_color)
 
 
 func _exit_tree():
@@ -53,22 +55,39 @@ func get_extra_data() -> Dictionary:
 
 
 # Extra data to be loaded
-func set_extra_data(extra_data: Dictionary):
+func set_extra_data(extra_data: Dictionary, old_to_new: Dictionary, update_size: bool = true):
 	assert(is_inside_tree())
 	set_title(extra_data["title"])
 	set_color(extra_data["color"])
 	user_text.text = extra_data["text"]
 	img_nodes.clear()
 	for node_name in extra_data["img_node_names"]:
-		img_nodes.push_back(get_node("../" + node_name))
-	update_size_options()
+		if old_to_new.has(node_name): # user might have copied a comment node without all of its image nodes
+			img_nodes.push_back(get_node("../" + old_to_new[node_name]))
+	if update_size:
+		update_size_options()
+		update_size()
 
 
 func set_color(color: Color):
 	colorpicker.color = color
+	
+	# Normal
 	var custom_styles: StyleBox = get("custom_styles/comment")
-	custom_styles.bg_color = colorpicker.color
-	custom_styles.border_color = colorpicker.color
+	custom_styles.bg_color = color
+	custom_styles.border_color = color
+	
+	# Focused
+#	custom_styles = get("custom_styles/commentfocus")
+#	var focus_color: Color = Color.aqua#color.lightened(FOCUS_COLOR_LIGHTEN)
+#	custom_styles.bg_color = focus_color
+#	custom_styles.border_color = focus_color
+#
+#	# Selected
+#	custom_styles = get("custom_styles/selectedframe")
+#	var selec_color: Color = Color.red#color.lightened(FOCUS_COLOR_LIGHTEN)
+#	custom_styles.bg_color = selec_color
+#	custom_styles.border_color = selec_color
 
 
 func _on_ColorPicker_color_changed(color):
@@ -83,28 +102,26 @@ func has_img_node(node: ImageGraphNode):
 	return img_nodes.has(node)
 
 
-func add_img_node(node: ImageGraphNode, auto_update: bool):
+func add_img_node(node: ImageGraphNode, update_size: bool):
 	if not img_nodes.has(node):
 		img_nodes.push_back(node)
 	update_size_options()
-	if auto_update:
+	if update_size:
 		update_size()
-	print("img_nodes: ", img_nodes)
 
 
-func remove_img_node(node: ImageGraphNode, auto_update: bool):
+func remove_img_node(node: ImageGraphNode, update_size: bool):
 	if img_nodes.has(node):
 		img_nodes.erase(node)
 	update_size_options()
-	if auto_update:
+	if update_size:
 		update_size()
-	print("img_nodes: ", img_nodes)
 
 
-func purge_img_nodes(auto_update: bool):
+func purge_img_nodes(update_size: bool):
 	img_nodes.clear()
 	update_size_options()
-	if auto_update:
+	if update_size:
 		update_size()
 
 
@@ -150,22 +167,19 @@ func _on_CommentNode_resize_request(new_size):
 func _on_CommentNode_close_request():
 	var graph = get_parent()
 	assert(graph is GraphEdit)
-#	assert(graph.has_method("delete_comment_node"))
-	graph.delete_comment_node(self)
+	graph.delete_node(self)
 
 
 func _on_AddButton_pressed():
 	var graph = get_parent()
 	assert(graph is GraphEdit)
-#	assert(graph.has_method("add_selected_nodes_to_comment_node"))
-	graph.add_selected_img_nodes_to_comment_node(self)
+	graph.add_selected_img_nodes_to_com_node(self)
 
 
 func _on_SubButton_pressed():
 	var graph = get_parent()
 	assert(graph is GraphEdit)
-#	assert(graph.has_method("remove_selected_nodes_from_comment_node"))
-	graph.remove_selected_img_nodes_from_comment_node(self)
+	graph.remove_selected_img_nodes_from_com_node(self)
 
 
 func _on_CommentNode_offset_changed():

@@ -90,7 +90,7 @@ func _on_GraphNode_resize_request(new_size):
 	else:
 		rect_size = new_size
 	
-	var comment_node = graph.find_comment_node_associated_to_node(self)
+	var comment_node = graph.find_com_node_associated_to_node(self)
 	if comment_node:
 		comment_node.update_size()
 
@@ -98,8 +98,7 @@ func _on_GraphNode_resize_request(new_size):
 func _on_GraphNode_close_request():
 	var graph = get_parent()
 	assert(graph is GraphEdit)
-	assert(graph.has_method("delete_img_node"))
-	graph.delete_img_node(self)
+	graph.delete_node(self)
 
 
 func _on_TextureRect_gui_input(event):
@@ -119,14 +118,14 @@ func _on_TextureRect_gui_input(event):
 				if ctrl_key_was_down:
 					graph.deselect_node(self)
 			else:
-				graph.select_img_node(self, !ctrl_key_was_down) # /!\ Ne lance pas de signals.
+				graph.select_node(self, !ctrl_key_was_down) # /!\ Ne lance pas de signals.
 		
 			if selected:
 				graph.start_dragging_selected_img_nodes(self)
 		else:
 			if not graph.stop_dragging_selected_img_nodes():
 				if !ctrl_key_was_down:
-					graph.select_img_node(self, true) # /!\ Ne lance pas de signals.
+					graph.select_node(self, true) # /!\ Ne lance pas de signals.
 
 
 func _on_LoadButton_pressed():

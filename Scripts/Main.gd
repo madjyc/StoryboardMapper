@@ -146,7 +146,7 @@ func _on_FileMenu_item_pressed(item_id: int):
 
 func _on_EditMenuButton_about_to_show():
 	var popup: PopupMenu = edit_menu_button.get_popup()
-	var num_selected: int = graph.get_num_selected_nodes()
+	var num_selected: int = graph.get_num_selected_img_nodes()
 	var num_copied: int = graph.get_num_copied_nodes()
 #	popup.set_item_disabled(EDIT_MENU_CUT, true)
 	popup.set_item_disabled(EDIT_MENU_COPY, num_selected == 0)
@@ -196,7 +196,7 @@ func _on_EditMenu_item_pressed(item_id: int):
 
 func _on_SelecMenuButton_about_to_show():
 	var popup: PopupMenu = selec_menu_button.get_popup()
-	var num_selected: int = graph.get_num_selected_nodes()
+	var num_selected: int = graph.get_num_selected_img_nodes()
 	#popup.set_item_disabled(SELEC_MENU_SELECT_ALL, false)
 	popup.set_item_disabled(SELEC_MENU_DESELECT_ALL, num_selected == 0)
 	popup.set_item_disabled(SELEC_MENU_SELECT_BEFORE, num_selected == 0)
@@ -226,7 +226,7 @@ func _on_HelpMenu_item_pressed(item_id: int):
 		HELP_MENU_HELP:
 			help_dlg.popup_centered()
 		HELP_MENU_WEBSITE:
-			OS.shell_open("https://godotengine.org")
+			OS.shell_open("https://github.com/madjyc/StoryboardMapper")
 		HELP_MENU_ABOUT:
 			about_dlg.popup_centered()
 

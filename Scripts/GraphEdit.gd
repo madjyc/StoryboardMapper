@@ -15,8 +15,8 @@ var img_node_bg_color: = Color.black
 var custom_img_node_size: Vector2
 var project_file_path: String
 var project_file_name: String
-var selected_img_nodes: Array = []
-var copied_img_nodes: Array = [] # array of ImageGraphNode
+var selected_img_nodes: Array = [] # array of ImageGraphNode
+var selected_com_nodes: Array = [] # array of CommentGraphNode
 var active_img_node: ImageGraphNode = null
 
 var dragging_selected_img_nodes: bool = false
@@ -37,6 +37,9 @@ onready var colorpicker: = $CanvasLayer/HBoxContainer/ColorPicker
 onready var add_button: = $CanvasLayer/HBoxContainer/AddButton
 onready var comment_button: = $CanvasLayer/HBoxContainer/CommentButton
 onready var display_button: = $CanvasLayer/HBoxContainer/PlayButton
+
+onready var copy_graph_data = GraphData.new()
+onready var copy_group_center: = Vector2.ZERO
 
 
 func _ready():
@@ -122,8 +125,8 @@ func stop_dragging_selected_img_nodes() -> bool:
 
 func _on_DebugButton_pressed():
 	print("-----------------------------")
-	print("Selected: ", selected_img_nodes)
-	print("Copied: ", copied_img_nodes)
+	print("Selected image nodes: ", selected_img_nodes)
+	print("Selected comment nodes: ", selected_com_nodes)
 #	print("DisplayDialog: ", display_dlg.rect_position)
 #	print("ImgFileDlg: ", image_dlg.rect_position)
 #	print("OpenFileDialog: ", open_dlg.rect_position)
@@ -311,7 +314,7 @@ func add_new_image_node(ofs: Vector2, exclusive_select: bool = true, open_image_
 	add_child(node, true) # /!\ before set_offset
 	node.set_offset(ofs - node.rect_size / 2)
 	node.set_bg_color(img_node_bg_color)
-	select_img_node(node, exclusive_select)
+	select_node(node, exclusive_select)
 	if open_image_file:
 		display_open_image_file_dialog(node)
 	return node
@@ -409,31 +412,37 @@ func _find_terminating_node(node: ImageGraphNode) -> ImageGraphNode:
 ## SELECT ##
 ############
 
-func get_num_selected_img_nodes():
+func get_num_selected_img_nodes() -> int:
 	return selected_img_nodes.size()
 
 
-func get_num_copied_img_nodes():
-	return copied_img_nodes.size()
+func get_num_selected_com_nodes() -> int:
+	return selected_com_nodes.size()
 
 
-func select_img_node(node: ImageGraphNode, exclusive: bool):
+func select_node(node: GraphNode, exclusive: bool):
 	assert(node)
 	if exclusive:
 		deselect_all_nodes()
 	if not node.selected:
 		node.set_selected(true) # /!\ No signal emitted
-	if not selected_img_nodes.has(node):
+	if node is ImageGraphNode and not selected_img_nodes.has(node):
 		selected_img_nodes.push_back(node)
+	if node is CommentGraphNode and not selected_com_nodes.has(node):
+		selected_com_nodes.push_back(node)
 	update_buttons()
 
 
-func select_all_img_nodes():
+func select_all_nodes():
 	selected_img_nodes.clear()
+	selected_com_nodes.clear()
 	for node in get_children():
-		if node is ImageGraphNode:
+		if node is GraphNode:
 			node.set_selected(true) # /!\ No signal emitted
-			selected_img_nodes.push_back(node)
+			if node is ImageGraphNode:
+				selected_img_nodes.push_back(node)
+			if node is CommentGraphNode:
+				selected_com_nodes.push_back(node)
 	update_buttons()
 
 
@@ -441,8 +450,10 @@ func deselect_node(node: GraphNode): # image and comment nodes alike
 	assert(node)
 	if node.selected:
 		node.set_selected(false) # /!\ No signal emitted
-	if selected_img_nodes.has(node):
+	if node is ImageGraphNode and selected_img_nodes.has(node):
 		selected_img_nodes.erase(node)
+	if node is CommentGraphNode and selected_com_nodes.has(node):
+		selected_com_nodes.erase(node)
 	update_buttons()
 
 
@@ -451,6 +462,7 @@ func deselect_all_nodes(): # image and comment nodes alike
 		if node is GraphNode and node.is_selected():
 			node.set_selected(false) # /!\ No signal emitted
 	selected_img_nodes.clear()
+	selected_com_nodes.clear()
 	update_buttons()
 
 
@@ -461,7 +473,7 @@ func select_all_img_nodes_before_selected_img_nodes():
 	var found_nodes: = []
 	_find_all_nodes_before_selected(sorted_connections, found_nodes)
 	for node in found_nodes:
-		select_img_node(node, false)
+		select_node(node, false)
 	update_buttons()
 
 
@@ -471,7 +483,7 @@ func select_all_img_nodes_after_selected_img_nodes():
 	var found_nodes: = []
 	_find_all_nodes_after_selected(found_nodes)
 	for node in found_nodes:
-		select_img_node(node, false)
+		select_node(node, false)
 	update_buttons()
 
 
@@ -483,7 +495,7 @@ func select_all_img_nodes_flowing_through_selected_img_nodes():
 	_find_all_nodes_before_selected(sorted_connections, found_nodes)
 	_find_all_nodes_after_selected(found_nodes)
 	for node in found_nodes:
-		select_img_node(node, false)
+		select_node(node, false)
 	update_buttons()
 
 
@@ -502,24 +514,24 @@ func select_all_interconnected_img_nodes_with_selected_img_nodes():
 	for node in terminators:
 		_find_all_nodes_before_node(node, sorted_connections, found_nodes)
 	for node in found_nodes:
-		select_img_node(node, false)
+		select_node(node, false)
 	update_buttons()
 
 
 func _on_Graph_node_selected(node: GraphNode):
-	if not node is ImageGraphNode:
-		return
-	if not selected_img_nodes.has(node):
+	if node is ImageGraphNode and not selected_img_nodes.has(node):
 		selected_img_nodes.push_back(node)
-		update_buttons()
+	if node is CommentGraphNode and not selected_com_nodes.has(node):
+		selected_com_nodes.push_back(node)
+	update_buttons()
 
 
 func _on_Graph_node_unselected(node: GraphNode):
-	if not node is ImageGraphNode:
-		return
-	if selected_img_nodes.has(node):
+	if node is ImageGraphNode and selected_img_nodes.has(node):
 		selected_img_nodes.erase(node)
-		update_buttons()
+	if node is CommentGraphNode and selected_com_nodes.has(node):
+		selected_com_nodes.erase(node)
+	update_buttons()
 
 
 #############
@@ -633,6 +645,10 @@ func _on_GraphEdit_disconnection_request(from: String, from_slot: int, to: Strin
 ## DUPLICATE ##
 ###############
 
+func get_num_copied_nodes() -> int:
+	return copy_graph_data.img_nodes.size() + copy_graph_data.com_nodes.size()
+
+
 func duplicate_node(node: ImageGraphNode, ofs: Vector2) -> ImageGraphNode:
 	var new_node: ImageGraphNode = node.duplicate()
 	if new_node.resizable:
@@ -654,82 +670,65 @@ func connect_duplicated_nodes(old_to_new: Dictionary):
 			node.next_node = next_node
 
 
-# Not a real copy, more of a marker for paste.
-func _on_GraphEdit_copy_nodes_request(): # ImageGraphNode only
-	copied_img_nodes.clear()
-	for node in get_children():
-		if node is ImageGraphNode and node.is_selected():
-			copied_img_nodes.append(node)
+func _on_GraphEdit_copy_nodes_request():
+	if selected_img_nodes.empty() and selected_com_nodes.empty():
+		return
+	copy_group_center = get_group_center_in_graph_space(selected_img_nodes + selected_com_nodes)
+	store_graph_nodes(copy_graph_data, true)
 
 
 func get_group_center_in_graph_space(nodes: Array) -> Vector2: # offset
 	assert(nodes)
 	assert(nodes.size())
-	var sum: = Vector2.ZERO
+	var rect: Rect2
+	var initialized: = false
 	for node in nodes:
-		sum += node.offset
-	return sum / nodes.size()
+		if initialized:
+			var node_rect = Rect2(node.offset, node.rect_size) # graph space
+			rect = rect.merge(node_rect)
+		else:
+			rect = Rect2(node.offset, node.rect_size) # graph space
+			initialized = true
+	return rect.get_center()
 
 
-func _on_GraphEdit_paste_nodes_request(): # ImageGraphNode only
-	if copied_img_nodes.empty():
+func _on_GraphEdit_paste_nodes_request():
+	assert(copy_graph_data)
+	if copy_graph_data.img_nodes.empty() and copy_graph_data.com_nodes.empty():
 		return
-	
-	var old_group_center: = get_group_center_in_graph_space(copied_img_nodes)
-	var old_to_new: = {}
-	deselect_all_nodes()
-	var new_group_center: Vector2 = convert_position_in_viewport_to_offset_in_graph(get_global_mouse_position() - rect_position)
-	for old_node in copied_img_nodes:
-		var new_node = duplicate_node(old_node, new_group_center - old_group_center + convert_position_in_viewport_to_offset_in_graph(old_node.rect_position))
-		select_img_node(new_node, false)
-		old_to_new[old_node] = new_node
-	
-	connect_duplicated_nodes(old_to_new)
+	var group_center: Vector2 = convert_position_in_viewport_to_offset_in_graph(get_global_mouse_position() - rect_position)
+	build_graph_nodes(copy_graph_data, false, group_center - copy_group_center)
 
 
 func _on_GraphEdit_duplicate_nodes_request():
-	if selected_img_nodes.empty():
+	if selected_img_nodes.empty() and selected_com_nodes.empty():
 		return
 	
-	var old_group_center: = get_group_center_in_graph_space(selected_img_nodes)
-	var old_to_new: = {}
-	var old_nodes = selected_img_nodes.duplicate()
+	var dup_graph_data = GraphData.new()
+	store_graph_nodes(dup_graph_data, true)
+	var old_group_center: Vector2 = get_group_center_in_graph_space(selected_img_nodes + selected_com_nodes)
 	var new_group_center: Vector2 = convert_position_in_viewport_to_offset_in_graph(get_global_mouse_position() - rect_position)
-	for old_node in old_nodes:
-		deselect_node(old_node)
-		var new_node = duplicate_node(old_node, new_group_center - old_group_center + convert_position_in_viewport_to_offset_in_graph(old_node.rect_position))
-		select_img_node(new_node, false)
-		old_to_new[old_node] = new_node
-	
-	connect_duplicated_nodes(old_to_new)
+	build_graph_nodes(dup_graph_data, false, new_group_center - old_group_center)
 
 
 ############
 ## DELETE ##
 ############
 
-func delete_img_node(img_node: ImageGraphNode):
-	assert(img_node)
-	remove_node_connections(img_node)
-	deselect_node(img_node)
-	remove_img_node_from_all_comment_nodes(img_node)
-	img_node.queue_free()
-
-
-func delete_comment_node(comment_node: CommentGraphNode):
-	assert(comment_node)
-	comment_node.queue_free()
+func delete_node(node: GraphNode):
+	assert(node)
+	deselect_node(node)
+	if node is ImageGraphNode:
+		remove_node_connections(node)
+		remove_img_node_from_all_com_nodes(node)
+	node.queue_free()
 
 
 func _on_GraphEdit_delete_nodes_request(node_names: Array): # only when selected then pressing [del] button
 	for node_name in node_names:
 		var node = get_node(node_name)
 		assert(node)
-		if node is ImageGraphNode:
-			deselect_node(node)
-			delete_img_node(node)
-		elif node is CommentGraphNode:
-			delete_comment_node(node)
+		delete_node(node)
 
 
 #############
@@ -737,55 +736,58 @@ func _on_GraphEdit_delete_nodes_request(node_names: Array): # only when selected
 #############
 
 # Creates a new comment node and adds it to the graph, centered on the given offset (in graph space) if no image nodes are selected.
-func add_new_comment_node(ofs: Vector2) -> CommentGraphNode:
-	var comment_node = commentGraphNode.instance()
-	add_child(comment_node, true) # /!\ before set_offset
+func add_new_com_node(ofs: Vector2) -> CommentGraphNode:
+	var com_node = commentGraphNode.instance()
+	add_child(com_node, true) # /!\ before set_offset
 	if selected_img_nodes.size() > 0:
-		add_selected_img_nodes_to_comment_node(comment_node)
+		add_selected_img_nodes_to_com_node(com_node)
 	else:
-		comment_node.set_offset(ofs - comment_node.rect_size / 2)
-	move_child(comment_node, 0)
-	return comment_node
+		com_node.set_offset(ofs - com_node.rect_size / 2)
+	move_child(com_node, 0)
+	return com_node
 
 
-func add_selected_img_nodes_to_comment_node(comment_node: CommentGraphNode):
-	assert(comment_node)
+func add_selected_img_nodes_to_com_node(com_node: CommentGraphNode):
+	assert(com_node)
+	if selected_img_nodes.empty():
+		return
 	for img_node in selected_img_nodes:
 		if img_node is ImageGraphNode:
-			comment_node.add_img_node(img_node, false) # update size at the end
-	comment_node.update_size()
+			remove_img_node_from_all_com_nodes(img_node)
+			com_node.add_img_node(img_node, false) # update size at the end
+	com_node.update_size()
 
 
-func find_comment_node_associated_to_node(img_node: ImageGraphNode) -> CommentGraphNode:
+func find_com_node_associated_to_node(img_node: ImageGraphNode) -> CommentGraphNode:
 	assert(img_node)
-	for comment_node in get_children():
-		if comment_node is CommentGraphNode and comment_node.has_img_node(img_node):
-			return comment_node
+	for com_node in get_children():
+		if com_node is CommentGraphNode and com_node.has_img_node(img_node):
+			return com_node
 	return null # no comment node associated to img_node
 
 
-func remove_img_node_from_all_comment_nodes(img_node: ImageGraphNode):
+func remove_img_node_from_all_com_nodes(img_node: ImageGraphNode):
 	assert(img_node)
-	var comment_node: = find_comment_node_associated_to_node(img_node)
-	if comment_node:
-		comment_node.remove_img_node(img_node, true)
+	var com_node: = find_com_node_associated_to_node(img_node)
+	if com_node:
+		com_node.remove_img_node(img_node, true)
 
 
-func remove_selected_img_nodes_from_comment_node(comment_node: CommentGraphNode):
+func remove_selected_img_nodes_from_com_node(com_node: CommentGraphNode):
 	for img_node in selected_img_nodes:
 		if img_node is ImageGraphNode:
-			comment_node.remove_img_node(img_node, false)
-	comment_node.update_size()
+			com_node.remove_img_node(img_node, false)
+	com_node.update_size()
 
 
 func img_node_offset_changed(node: ImageGraphNode):
-	for comment_node in get_children():
-		if comment_node is CommentGraphNode and comment_node.has_img_node(node):
-			comment_node.update_size()
+	for com_node in get_children():
+		if com_node is CommentGraphNode and com_node.has_img_node(node):
+			com_node.update_size()
 
 
 func _on_CommentButton_pressed():
-	add_new_comment_node(convert_global_mouse_position_to_offset_in_graph() + NEW_NODE_DEFAULT_OFFSET)
+	add_new_com_node(convert_global_mouse_position_to_offset_in_graph() + NEW_NODE_DEFAULT_OFFSET)
 
 
 ###############
@@ -793,7 +795,6 @@ func _on_CommentButton_pressed():
 ###############
 
 func clear_graph():
-	copied_img_nodes.clear()
 	deselect_all_nodes()
 	clear_connections()
 	var all_nodes = get_children()
@@ -803,43 +804,56 @@ func clear_graph():
 			node.queue_free()
 
 
-func build_graph(graph_data: GraphData):
-	clear_graph()
-	
-	img_node_bg_color = graph_data.img_node_bg_color
-	colorpicker.color = graph_data.img_node_bg_color
-	
+func build_graph_nodes(graph_data: GraphData, keep_names: bool, group_center_diff: Vector2 = Vector2.INF):
+	var old_to_new: = {}
+
 	# Image nodes
 	for node_data in graph_data.img_nodes:
-		var new_node: ImageGraphNode = imageGraphNode.instance()
-		new_node.set_name(node_data.name)
-		new_node.rect_size = node_data.rect_size
-		add_child(new_node, true) # /!\ before assigning data
-		new_node.offset = node_data.offset
-		new_node.set_bg_color(graph_data.img_node_bg_color)
-		new_node.set_extra_data(node_data.extra_data)
+		var img_node: ImageGraphNode = imageGraphNode.instance()
+		if keep_names:
+			img_node.set_name(node_data.name)
+		img_node.rect_size = node_data.rect_size
+		add_child(img_node, true) # /!\ before assigning data
+		old_to_new[node_data.name] = img_node.name # same name if keep_names is true
+		if group_center_diff == Vector2.INF:
+			img_node.offset = node_data.offset
+		else:
+			img_node.offset = group_center_diff + node_data.offset
+		img_node.set_bg_color(graph_data.img_node_bg_color)
+		img_node.set_extra_data(node_data.extra_data)
 	
 	# Connections
 	for connection in graph_data.connections:
-		var err = connect_node(connection.from, connection.from_port, connection.to, connection.to_port)
+		var err = connect_node(old_to_new[connection.from], connection.from_port, old_to_new[connection.to], connection.to_port)
 		if err != OK:
 			print("Error loading graph: ", err)
 		
-		var from_node: ImageGraphNode = get_node(connection.from)
-		var to_node: ImageGraphNode = get_node(connection.to)
+		var from_node: ImageGraphNode = get_node(old_to_new[connection.from])
+		var to_node: ImageGraphNode = get_node(old_to_new[connection.to])
 		assert(from_node)
 		assert(to_node)
 		from_node.next_node = to_node
 	
 	# Comment nodes
-	for node_data in graph_data.comment_nodes:
-		var new_node: CommentGraphNode = commentGraphNode.instance()
-		new_node.set_name(node_data.name)
-		new_node.rect_size = node_data.rect_size
-		add_child(new_node, true) # /!\ before assigning data
-		move_child(new_node, 0)
-		new_node.offset = node_data.offset
-		new_node.set_extra_data(node_data.extra_data)
+	for node_data in graph_data.com_nodes:
+		var com_node: CommentGraphNode = commentGraphNode.instance()
+		if keep_names:
+			com_node.set_name(node_data.name)
+		com_node.rect_size = node_data.rect_size
+		add_child(com_node, true) # /!\ before assigning data
+		move_child(com_node, 0)
+		if group_center_diff == Vector2.INF:
+			com_node.offset = node_data.offset
+		else:
+			com_node.offset = group_center_diff + node_data.offset
+		com_node.set_extra_data(node_data.extra_data, old_to_new)
+
+
+func build_graph(graph_data: GraphData):
+	clear_graph()
+	img_node_bg_color = graph_data.img_node_bg_color
+	colorpicker.color = graph_data.img_node_bg_color
+	build_graph_nodes(graph_data, true)
 
 
 func load_graph_from_file(path: String):
@@ -862,17 +876,15 @@ func load_graph_from_file(path: String):
 	update_main_window_title()
 
 
-func save_graph_to_file(path: String):
-	var graph_data = GraphData.new()
+func store_graph_nodes(graph_data: GraphData, selected_nodes_only: bool = false):
 	assert(graph_data)
-	
-	# Version number
-	graph_data.version = PROJECT_FILE_VERSION
-	graph_data.img_node_bg_color = img_node_bg_color
+	graph_data.img_nodes.clear()
+	graph_data.connections.clear()
+	graph_data.com_nodes.clear()
 	
 	# Image nodes
 	for node in get_children():
-		if node is ImageGraphNode:
+		if node is ImageGraphNode and (!selected_nodes_only or node.selected):
 			var node_data = GraphNodeData.new()
 			assert(node_data)
 			node_data.name = node.name
@@ -882,18 +894,37 @@ func save_graph_to_file(path: String):
 			graph_data.img_nodes.append(node_data)
 	
 	# Connexions
-	graph_data.connections = get_connection_list()
+	var connection_list: = get_connection_list()
+	if selected_nodes_only:
+		for connection in connection_list:
+			if get_node(connection.from).selected and get_node(connection.to).selected:
+				graph_data.connections.push_back(connection)
+	else:
+		graph_data.connections = connection_list
 	
 	# Comment nodes
 	for node in get_children():
-		if node is CommentGraphNode:
+		if node is CommentGraphNode and (!selected_nodes_only or node.selected):
 			var node_data = GraphNodeData.new()
 			assert(node_data)
 			node_data.name = node.name
 			node_data.offset = node.offset
 			node_data.rect_size = node.rect_size
-			node_data.extra_data = node.get_extra_data()
-			graph_data.comment_nodes.append(node_data)
+			node_data.extra_data = node.get_extra_data() # /!\ saves all contained image node names
+			graph_data.com_nodes.append(node_data)
+
+
+func store_graph(graph_data: GraphData, selected_nodes_only: bool):
+	assert(graph_data)
+	graph_data.version = PROJECT_FILE_VERSION
+	graph_data.img_node_bg_color = img_node_bg_color
+	store_graph_nodes(graph_data, selected_nodes_only)
+
+
+func save_graph_to_file(path: String):
+	var graph_data = GraphData.new()
+	assert(graph_data)
+	store_graph(graph_data, false)
 	
 	# Crée le directory s'il n'existe pas.
 	var dir_path: String = path.get_base_dir()

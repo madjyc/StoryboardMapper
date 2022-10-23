@@ -25,7 +25,6 @@ margin_bottom = 80.0
 rect_min_size = Vector2( 230, 80 )
 mouse_filter = 2
 theme = ExtResource( 18 )
-custom_styles/commentfocus = ExtResource( 17 )
 custom_styles/comment = ExtResource( 17 )
 show_close = true
 resizable = true
