@@ -17,7 +17,8 @@ size = 8
 outline_size = 1
 outline_color = Color( 0, 0, 0, 1 )
 use_filter = true
-extra_spacing_bottom = -5
+extra_spacing_top = -2
+extra_spacing_bottom = 2
 font_data = SubResource( 1 )
 
 [node name="GraphNode" type="GraphNode"]
@@ -29,7 +30,6 @@ custom_constants/port_offset = -5
 custom_icons/port = ExtResource( 6 )
 custom_styles/frame = ExtResource( 2 )
 custom_styles/selectedframe = ExtResource( 1 )
-title = "Title"
 show_close = true
 resizable = true
 slot/0/left_enabled = true
