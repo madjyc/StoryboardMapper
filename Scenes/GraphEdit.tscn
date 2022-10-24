@@ -30,7 +30,7 @@ __meta__ = {
 [node name="GridColsSpinBox" type="SpinBox" parent="CanvasLayer/HBoxContainer"]
 margin_right = 74.0
 margin_bottom = 24.0
-hint_tooltip = "Number of columns in grid"
+hint_tooltip = "Number of columns in \"redistribute grid\""
 min_value = 1.0
 value = 5.0
 
@@ -45,7 +45,7 @@ hint_tooltip = "Frame background color"
 margin_left = 110.0
 margin_right = 138.0
 margin_bottom = 24.0
-hint_tooltip = "Add a new frame"
+hint_tooltip = "Add a new frame to this mess already."
 icon = ExtResource( 4 )
 flat = true
 
@@ -53,7 +53,7 @@ flat = true
 margin_left = 142.0
 margin_right = 168.0
 margin_bottom = 24.0
-hint_tooltip = "Add a new frame"
+hint_tooltip = "Add a new comment. Will parent (host) selected frames is any."
 icon = ExtResource( 5 )
 flat = true
 
@@ -61,7 +61,7 @@ flat = true
 margin_left = 172.0
 margin_right = 200.0
 margin_bottom = 24.0
-hint_tooltip = "Play from selected frame"
+hint_tooltip = "Play from selected frame."
 disabled = true
 icon = ExtResource( 3 )
 flat = true
@@ -71,6 +71,7 @@ visible = false
 margin_left = 204.0
 margin_right = 257.0
 margin_bottom = 24.0
+hint_tooltip = "What the @%$* is going on here?"
 toggle_mode = true
 text = "Debug"
 

@@ -123,7 +123,7 @@ suffix = "s"
 margin_left = 145.0
 margin_right = 173.0
 margin_bottom = 24.0
-hint_tooltip = "Load image from file"
+hint_tooltip = "Load image from file."
 icon = ExtResource( 4 )
 flat = true
 
@@ -131,7 +131,7 @@ flat = true
 margin_left = 177.0
 margin_right = 205.0
 margin_bottom = 24.0
-hint_tooltip = "Load sound from file"
+hint_tooltip = "Load sound from file."
 icon = ExtResource( 7 )
 flat = true
 
@@ -139,7 +139,7 @@ flat = true
 margin_left = 209.0
 margin_right = 237.0
 margin_bottom = 24.0
-hint_tooltip = "Remove sound"
+hint_tooltip = "Remove sound."
 icon = ExtResource( 8 )
 flat = true
 
@@ -147,7 +147,7 @@ flat = true
 margin_left = 241.0
 margin_right = 269.0
 margin_bottom = 24.0
-hint_tooltip = "Reload image and sound"
+hint_tooltip = "Reload image and sound."
 icon = ExtResource( 5 )
 flat = true
 icon_align = 1

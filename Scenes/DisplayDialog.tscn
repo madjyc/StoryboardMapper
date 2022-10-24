@@ -160,28 +160,28 @@ suffix = "s"
 margin_left = 1068.0
 margin_right = 1096.0
 margin_bottom = 40.0
-hint_tooltip = "Load image from file"
+hint_tooltip = "Load image from file."
 icon = ExtResource( 11 )
 
 [node name="SoundButton" type="Button" parent="VBoxContainer/HBoxContainer"]
 margin_left = 1100.0
 margin_right = 1128.0
 margin_bottom = 40.0
-hint_tooltip = "Load sound from file"
+hint_tooltip = "Load sound from file."
 icon = ExtResource( 12 )
 
 [node name="DelSoundButton" type="Button" parent="VBoxContainer/HBoxContainer"]
 margin_left = 1132.0
 margin_right = 1160.0
 margin_bottom = 40.0
-hint_tooltip = "Remove sound"
+hint_tooltip = "Remove sound."
 icon = ExtResource( 2 )
 
 [node name="ReloadButton" type="Button" parent="VBoxContainer/HBoxContainer"]
 margin_left = 1164.0
 margin_right = 1192.0
 margin_bottom = 40.0
-hint_tooltip = "Reload image and sound"
+hint_tooltip = "Reload image and sound."
 icon = ExtResource( 10 )
 icon_align = 1
 

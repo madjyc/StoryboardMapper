@@ -45,10 +45,10 @@ enum {
 	HELP_MENU_ABOUT,
 }
 
-onready var file_menu_button: = $HBoxContainer/FileMenuButton
-onready var edit_menu_button: = $HBoxContainer/EditMenuButton
-onready var selec_menu_button: = $HBoxContainer/SelecMenuButton
-onready var help_menu_button: = $HBoxContainer/HelpMenuButton
+onready var file_menu_button: = $CanvasLayer/HBoxContainer/FileMenuButton
+onready var edit_menu_button: = $CanvasLayer/HBoxContainer/EditMenuButton
+onready var selec_menu_button: = $CanvasLayer/HBoxContainer/SelecMenuButton
+onready var help_menu_button: = $CanvasLayer/HBoxContainer/HelpMenuButton
 onready var graph: = $Graph
 onready var help_dlg: = $HelpDialog
 onready var about_dlg: = $AboutDialog
@@ -73,7 +73,7 @@ func _ready():
 	popup.add_separator()
 	popup.add_item("Quit", FILE_MENU_QUIT, KEY_Q | KEY_MASK_CTRL)
 	
-	popup.set_item_tooltip(FILE_MENU_QUIT, "Come on. Really?")
+	popup.set_item_tooltip(FILE_MENU_QUIT, "C'mon. Really?")
 	
 	# --- Edit Menu ---
 	popup = edit_menu_button.get_popup()
@@ -209,17 +209,17 @@ func _on_SelecMenuButton_about_to_show():
 func _on_SelecMenu_item_pressed(item_id: int):
 	match item_id:
 		SELEC_MENU_SELECT_ALL:
-			graph.select_all_img_nodes()
+			graph.select_all_nodes()
 		SELEC_MENU_DESELECT_ALL:
 			graph.deselect_all_nodes()
 		SELEC_MENU_SELECT_BEFORE:
-			graph.select_all_nodes_before_selected_nodes()
+			graph.select_all_img_nodes_before_selected_img_nodes()
 		SELEC_MENU_SELECT_AFTER:
-			graph.select_all_nodes_after_selected_nodes()
+			graph.select_all_img_nodes_after_selected_img_nodes()
 		SELEC_MENU_SELECT_CONNECTED:
-			graph.select_all_nodes_flowing_through_selected_nodes()
+			graph.select_all_img_nodes_flowing_through_selected_img_nodes()
 		SELEC_MENU_SELECT_GRAPH:
-			graph.select_all_interconnected_nodes_with_selected_nodes()
+			graph.select_all_interconnected_img_nodes_with_selected_img_nodes()
 
 
 func _on_HelpMenu_item_pressed(item_id: int):

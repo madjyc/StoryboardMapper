@@ -23,6 +23,7 @@ flags = 0
 margin_right = 48.0
 margin_bottom = 42.0
 rect_min_size = Vector2( 48, 24 )
+hint_tooltip = "Click to choose an icon."
 custom_icons/arrow = SubResource( 1 )
 icon = ExtResource( 1 )
 flat = true

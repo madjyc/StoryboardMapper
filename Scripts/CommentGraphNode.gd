@@ -7,8 +7,8 @@ const TOP_MARGIN: = 120.0 # graph space
 const RIGHT_MARGIN: = 16.0 # graph space
 const BOTTOM_MARGIN: = 16.0 # graph space
 const MAX_ICONBUTTON_COUNT: = 6
-const FOCUS_COLOR_S_FACTOR: = 1.2
-const FOCUS_COLOR_V_FACTOR: = 1.3
+const FOCUS_COLOR_S_FACTOR: = 1.3
+const FOCUS_COLOR_V_FACTOR: = 1.4
 
 var img_nodes: = [] # array of ImageGraphNode
 var old_offset: Vector2

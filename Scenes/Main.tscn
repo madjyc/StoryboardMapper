@@ -19,24 +19,27 @@ color = Color( 0.121569, 0.121569, 0.113725, 1 )
 margin_top = 28.0
 rect_min_size = Vector2( 100, 100 )
 
-[node name="HBoxContainer" type="HBoxContainer" parent="."]
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+layer = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="CanvasLayer"]
 anchor_right = 1.0
 margin_bottom = 24.0
 
-[node name="FileMenuButton" type="MenuButton" parent="HBoxContainer"]
+[node name="FileMenuButton" type="MenuButton" parent="CanvasLayer/HBoxContainer"]
 margin_right = 35.0
 margin_bottom = 24.0
 text = "File"
 align = 0
 
-[node name="EditMenuButton" type="MenuButton" parent="HBoxContainer"]
+[node name="EditMenuButton" type="MenuButton" parent="CanvasLayer/HBoxContainer"]
 margin_left = 39.0
 margin_right = 75.0
 margin_bottom = 24.0
 text = "Edit"
 align = 0
 
-[node name="SelecMenuButton" type="MenuButton" parent="HBoxContainer"]
+[node name="SelecMenuButton" type="MenuButton" parent="CanvasLayer/HBoxContainer"]
 margin_left = 79.0
 margin_right = 130.0
 margin_bottom = 24.0
@@ -44,7 +47,7 @@ focus_mode = 2
 text = "Select"
 align = 0
 
-[node name="HelpMenuButton" type="MenuButton" parent="HBoxContainer"]
+[node name="HelpMenuButton" type="MenuButton" parent="CanvasLayer/HBoxContainer"]
 margin_left = 134.0
 margin_right = 176.0
 margin_bottom = 24.0
@@ -144,7 +147,7 @@ The above copyright notice and this permission notice shall be included in all c
 
 THE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE."
 
-[connection signal="about_to_show" from="HBoxContainer/EditMenuButton" to="." method="_on_EditMenuButton_about_to_show"]
-[connection signal="about_to_show" from="HBoxContainer/SelecMenuButton" to="." method="_on_SelecMenuButton_about_to_show"]
+[connection signal="about_to_show" from="CanvasLayer/HBoxContainer/EditMenuButton" to="." method="_on_EditMenuButton_about_to_show"]
+[connection signal="about_to_show" from="CanvasLayer/HBoxContainer/SelecMenuButton" to="." method="_on_SelecMenuButton_about_to_show"]
 [connection signal="popup_hide" from="HelpDialog" to="." method="_on_HelpDialog_popup_hide"]
 [connection signal="popup_hide" from="AboutDialog" to="." method="_on_AboutDialog_popup_hide"]

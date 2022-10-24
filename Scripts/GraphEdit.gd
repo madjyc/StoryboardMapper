@@ -5,7 +5,9 @@ class_name ImageGraph
 
 const APP_NAME: String = "Storyboard Mapper"
 const DEFAULT_PROJECT_FILENAME: String = "Untitled"
-const PROJECT_FILE_VERSION: String = "0.2.0"
+const PROJECT_FILE_VERSION_MAJOR: int = 0
+const PROJECT_FILE_VERSION_MINOR: int = 2
+const PROJECT_FILE_VERSION_SUBMINOR: int = 0
 const IMAGE_FILE_EXTENSIONS: Array = ["jpg", "jpeg", "png", "bmp"]
 const DEFAULT_IMG_NODE_SPACING: float = 40.0
 const MIN_DRAG_DISTANCE: float = 5.0
@@ -21,6 +23,7 @@ var active_img_node: ImageGraphNode = null
 
 var dragging_selected_img_nodes: bool = false
 var dragged_img_nodes_initial_offsets: Array = [] # offsets are in graph space
+var dragged_com_nodes_initial_offsets: Array = [] # offsets are in graph space
 var old_global_mouse_position: Vector2 # to allow comparison with get_global_mouse_position() during drag
 var dragging_beyond_min_distance: bool = false
 
@@ -96,6 +99,9 @@ func _process(_delta):
 		if dragging_beyond_min_distance:
 			for i in range(selected_img_nodes.size()):
 				selected_img_nodes[i].set_offset(convert_global_mouse_position_to_offset_in_graph() - dragged_img_nodes_initial_offsets[i])
+			for i in range(selected_com_nodes.size()):
+				if selected_com_nodes[i].has_no_img_node():
+					selected_com_nodes[i].set_offset(convert_global_mouse_position_to_offset_in_graph() - dragged_com_nodes_initial_offsets[i])
 
 
 func start_dragging_selected_img_nodes(pointed_node: ImageGraphNode):
@@ -106,16 +112,23 @@ func start_dragging_selected_img_nodes(pointed_node: ImageGraphNode):
 	var global_mouse_position = get_global_mouse_position()
 	old_global_mouse_position = global_mouse_position
 	
-	for node in selected_img_nodes:
-		var ofs: Vector2 = (global_mouse_position - rect_position - node.rect_position) / zoom # viewport to graph space
+	for img_node in selected_img_nodes:
+		var ofs: Vector2 = (global_mouse_position - rect_position - img_node.rect_position) / zoom # viewport to graph space
 		if is_using_snap():
 			ofs = snap_position(ofs)
 		dragged_img_nodes_initial_offsets.push_back(ofs)
+	
+	for com_node in selected_com_nodes:
+		var ofs: Vector2 = (global_mouse_position - rect_position - com_node.rect_position) / zoom # viewport to graph space
+		if is_using_snap():
+			ofs = snap_position(ofs)
+		dragged_com_nodes_initial_offsets.push_back(ofs)
 
 
 func stop_dragging_selected_img_nodes() -> bool:
 	dragging_selected_img_nodes = false
 	dragged_img_nodes_initial_offsets.clear()
+	dragged_com_nodes_initial_offsets.clear()
 	return dragging_beyond_min_distance
 
 
@@ -902,11 +915,12 @@ func load_graph_from_file(path: String):
 	if ResourceLoader.exists(path):
 		var graph_data = ResourceLoader.load(path)
 		if graph_data is GraphData:
-			if graph_data.version == PROJECT_FILE_VERSION:
-				build_graph(graph_data)
-			else:
-				print("Error, incompatible file version ", graph_data.version)
-				return
+#			if graph_data.version_major == PROJECT_FILE_VERSION_MAJOR and graph_data.version_minor == PROJECT_FILE_VERSION_MINOR and graph_data.version_subminor == PROJECT_FILE_VERSION_SUBMINOR:
+#				build_graph(graph_data)
+#			else:
+#				print("Error, incompatible file version ", graph_data.version)
+#				return
+			build_graph(graph_data)
 	
 	project_file_name = path.get_file()
 	project_file_path = path
@@ -953,7 +967,9 @@ func store_graph_nodes(graph_data: GraphData, selected_nodes_only: bool = false)
 
 func store_graph(graph_data: GraphData, selected_nodes_only: bool):
 	assert(graph_data)
-	graph_data.version = PROJECT_FILE_VERSION
+	graph_data.version_major = PROJECT_FILE_VERSION_MAJOR
+	graph_data.version_minor = PROJECT_FILE_VERSION_MINOR
+	graph_data.version_subminor = PROJECT_FILE_VERSION_SUBMINOR
 	graph_data.img_node_bg_color = img_node_bg_color
 	store_graph_nodes(graph_data, selected_nodes_only)
 
