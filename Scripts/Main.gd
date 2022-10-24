@@ -92,7 +92,7 @@ func _ready():
 	popup.add_item("Distribute Grid", EDIT_MENU_DISTRIB_GRID, KEY_G)# | KEY_MASK_CTRL | KEY_MASK_SHIFT)
 	popup.add_separator()
 	popup.add_item("Store Size", EDIT_MENU_STORE_SIZE)#, KEY_G)# | KEY_MASK_CTRL | KEY_MASK_SHIFT)
-	popup.add_item("Resize to Stored", EDIT_MENU_RESIZE_TO_STORED)#, KEY_G)# | KEY_MASK_CTRL | KEY_MASK_SHIFT)
+	popup.add_item("Apply Stored Size", EDIT_MENU_RESIZE_TO_STORED)#, KEY_G)# | KEY_MASK_CTRL | KEY_MASK_SHIFT)
 	
 	popup.set_item_tooltip(EDIT_MENU_DUPLICATE, "Duplicate selected frames.")
 	popup.set_item_tooltip(EDIT_MENU_ALIGN_HORZ, "Align selected frames horizontally.")
@@ -101,8 +101,8 @@ func _ready():
 	popup.set_item_tooltip(EDIT_MENU_DISTRIB_COL, "Distribute all frames downstream of the selected frame on a single column.")
 	popup.set_item_tooltip(EDIT_MENU_DISTRIB_DIAG, "Distribute all frames downstream of the selected frame diagonally.")
 	popup.set_item_tooltip(EDIT_MENU_DISTRIB_GRID, "Distribute all frames downstream of the selected frame in columns. The number of columns is defined in the spinbox at the top of the screen.")
-	popup.set_item_tooltip(EDIT_MENU_STORE_SIZE, "Save the selected frame's size. Compressed vertically by default.")
-	popup.set_item_tooltip(EDIT_MENU_RESIZE_TO_STORED, "Resize selected frames to stored size.")
+	popup.set_item_tooltip(EDIT_MENU_STORE_SIZE, "Store selected frame's size.")
+	popup.set_item_tooltip(EDIT_MENU_RESIZE_TO_STORED, "Apply stored size to selected frames.")
 	
 	# --- Select Menu ---
 	popup = selec_menu_button.get_popup()

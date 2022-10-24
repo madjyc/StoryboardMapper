@@ -3,7 +3,7 @@ class_name CommentGraphNode
 
 const DEFAULT_SIZE: = Vector2(230.0, 80.0) # graph space
 const LEFT_MARGIN: = 16.0 # graph space
-const TOP_MARGIN: = 80.0 # graph space
+const TOP_MARGIN: = 120.0 # graph space
 const RIGHT_MARGIN: = 16.0 # graph space
 const BOTTOM_MARGIN: = 16.0 # graph space
 const MAX_ICONBUTTON_COUNT: = 6
@@ -12,6 +12,7 @@ const FOCUS_COLOR_V_FACTOR: = 1.3
 
 var img_nodes: = [] # array of ImageGraphNode
 var old_offset: Vector2
+var is_clicked: = false
 
 onready var iconButton = preload("res://Scenes/IconButton.tscn")
 
@@ -86,7 +87,7 @@ func set_extra_data(extra_data: Dictionary, old_to_new: Dictionary, update_size:
 	if update_size:
 		update_size_options()
 		if not img_nodes.empty():
-			update_size()
+			update_rect()
 
 
 func set_color(color: Color):
@@ -118,27 +119,27 @@ func has_img_node(node: ImageGraphNode):
 	return img_nodes.has(node)
 
 
-func add_img_node(node: ImageGraphNode, update_size: bool):
+func add_img_node(node: ImageGraphNode, update_rect: bool):
 	if not img_nodes.has(node):
 		img_nodes.push_back(node)
 	update_size_options()
-	if update_size:
-		update_size()
+	if update_rect:
+		update_rect()
 
 
-func remove_img_node(node: ImageGraphNode, update_size: bool):
+func remove_img_node(node: ImageGraphNode, update_rect: bool):
 	if img_nodes.has(node):
 		img_nodes.erase(node)
 	update_size_options()
-	if update_size:
-		update_size()
+	if update_rect:
+		update_rect()
 
 
-func purge_img_nodes(update_size: bool):
+func purge_img_nodes(update_rect: bool):
 	img_nodes.clear()
 	update_size_options()
-	if update_size:
-		update_size()
+	if update_rect:
+		update_rect()
 
 
 func update_size_options():
@@ -150,10 +151,9 @@ func update_size_options():
 		user_text.size_flags_vertical = SIZE_FILL
 
 
-func update_size():
+func update_rect():
 	if img_nodes.empty():
 		set_size(DEFAULT_SIZE) # graph space
-		
 	else:
 		var rect: Rect2
 		var initialized: = false
@@ -198,22 +198,33 @@ func _on_SubButton_pressed():
 	graph.remove_selected_img_nodes_from_com_node(self)
 
 
+func _on_CommentNode_gui_input(event):
+	if not event is InputEventMouseButton:
+		return
+	
+	if event.get_button_index() == 1:
+		is_clicked = event.pressed
+
+
 func _on_CommentNode_offset_changed():
-	var diff = offset - old_offset
-	for img_node in img_nodes:
-		assert(img_node is ImageGraphNode)
-		img_node.offset += diff
+	if is_clicked:
+		var diff = offset - old_offset
+		for img_node in img_nodes:
+			assert(img_node is ImageGraphNode)
+			if not img_node.selected: # selected nodes move by themselves
+				img_node.offset += diff
 	old_offset = offset
 
 
 func _on_CommentNode_dragged(from, to):
 	if img_nodes.size() > 0:
-		update_size()
+		update_rect()
 
 
 func _on_NewIconButton_pressed():
 	if iconbutton_container.get_child_count() >= MAX_ICONBUTTON_COUNT:
 		return
+	
 	var icon_button = iconButton.instance()
 	iconbutton_container.add_child(icon_button)
 
@@ -221,6 +232,7 @@ func _on_NewIconButton_pressed():
 func _on_DelIconButton_pressed():
 	if iconbutton_container.get_child_count() == 0:
 		return
+	
 	var icon_button = iconbutton_container.get_child(iconbutton_container.get_child_count()-1)
 	assert(icon_button is IconButton)
 	iconbutton_container.remove_child(icon_button)
