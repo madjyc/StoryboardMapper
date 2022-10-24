@@ -53,7 +53,7 @@ flat = true
 margin_left = 142.0
 margin_right = 168.0
 margin_bottom = 24.0
-hint_tooltip = "Add a new comment. Will parent (host) selected frames is any."
+hint_tooltip = "Add a new comment box. The comment box will automatically host (i.e. \"parent\") selected frames if any."
 icon = ExtResource( 5 )
 flat = true
 

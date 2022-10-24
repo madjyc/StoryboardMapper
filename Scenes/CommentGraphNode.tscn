@@ -77,7 +77,7 @@ margin_bottom = 24.0
 [node name="AddButton" type="Button" parent="VBoxContainer/HBoxContainer/HBoxContainer2"]
 margin_right = 28.0
 margin_bottom = 24.0
-hint_tooltip = "Parent selected frames."
+hint_tooltip = "Host selected frames."
 icon = ExtResource( 3 )
 flat = true
 
@@ -85,7 +85,7 @@ flat = true
 margin_left = 32.0
 margin_right = 60.0
 margin_bottom = 24.0
-hint_tooltip = "Unparent selected frames."
+hint_tooltip = "Unhost selected frames."
 icon = ExtResource( 2 )
 flat = true
 
@@ -94,7 +94,7 @@ margin_left = 64.0
 margin_right = 92.0
 margin_bottom = 24.0
 rect_min_size = Vector2( 28, 24 )
-hint_tooltip = "Comment background color"
+hint_tooltip = "Comment box background color"
 color = Color( 0.360784, 0.360784, 0.360784, 1 )
 edit_alpha = false
 
@@ -103,7 +103,7 @@ margin_top = 28.0
 margin_right = 198.0
 margin_bottom = 84.0
 rect_min_size = Vector2( 0, 56 )
-hint_tooltip = "Type some text here..."
+hint_tooltip = "Type something clever here..."
 size_flags_horizontal = 3
 size_flags_vertical = 3
 custom_styles/normal = SubResource( 1 )
