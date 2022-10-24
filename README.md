@@ -28,7 +28,7 @@ If for some reason you're not keen on cloning the repository, you can simply dow
 
 OK, super straightforward:
 1. Drag and drop your drawings on the board.
-2. Use your mouse **middle button** to scroll the board, and your **scrollwheel** to zoom in/out.
+2. Use your **middle mouse button** to scroll the board, and your **scrollwheel** to zoom in/out.
 3. Move, duplicate, reconnect the frames as suits you. To disconnect a frame, drag its **input end** and drop it on empty space.
 4. Double-click on the first frame of the sequence and watch the sequence playing in a popup window. The popup window can be resized and moved on the board. Change whatever has to be changed at the bottom of this window (subtitles, duration, image, sound). Click outside the popup window to hide it.
 5. OK back to work. Try connecting your frames differently. Select, duplicate, copy and paste, change subs, make as many sequences as you like. Experiment. You're in charge.
@@ -40,17 +40,18 @@ Happy storyboard mapping!
 
 ## Quick start
 
-* Hit <kbd>F1</kbd> or go to Help > Help to display a short documentation.
-* Add as many images as your RAM can handle. Drag and drop image files from your file explorer, or click on <kbd>+</kbd>, or double-click on empty space.
+* Hit <kbd>F1</kbd> or go to <kbd>Help > Help</kbd> to display a short documentation.
+* Use your **middle mouse button** to scroll the board, and your **scrollwheel** to zoom in/out.
+* Import as many images as your RAM can handle. Drag and drop image files from your file explorer, or click on <kbd>+</kbd>, or double-click on empty space.
 * Drag from the **ouput** pin of a frame to the **input** pin of another frame to connect them. Hey, you're building a sequence already!
-* Drag from the input or output pin of a frame and drop on empty space to create a new node.
-* Drag from the **input** pin of a frame to disconnect it from the previous frame.
-* The **output pin** of a frame can only be connected to one frame (otherwise the player wouldn't know which frame to play next)!
+* Drag from the **input or output** pin of a frame and drop on empty space to create a new node.
+* Drag from the **input** pin of a frame (i.e. its right end) to disconnect it from the previous frame.
+* The **output pin** of a frame can only be connected to one frame (otherwise the player wouldn't know which frame to play next).
 * But... you can connect as many frames as you want to the **input** pin of a frame (that's "many to one"). This lets you experiment with different starting points.
 * Click on a frame to select it. Drag a marquee around several frames to select them.
-* <kbd>ctrl</kbd> click frames to add or subtract them from the selection.
+* <kbd>ctrl</kbd> + click frames to add them to or subtract them from the selection.
 * Drag a frame or a selection of frames to move them.
-* Double-click on a frame to play the sequence starting from that frame.
+* Double-click on a frame to play the sequence starting from that frame. Or click on the <kbd>movie slate</kbd> button at the top of the window.
 * Add subtitles to a frame or change their duration right below the image, or even better, in the player.
 * Use the buttons at the bottom of the frame to load or reload an image and/or a sound.
 * Resize the frame to your liking by dragging the lower-right corner of the frame.
@@ -58,22 +59,22 @@ Happy storyboard mapping!
 * The size of a frame can be stored by clicking <kbd>Edit > Store Size</kbd>. Then select a bunch of frames and click on <kbd>Edit > Apply Stored Size</kbd> to set their size to the stored size.
 * Select a bunch of frames and click on <kbd>Edit > Align Horizontally</kbd> to ...well, align them horizontally. Same for vertically.
 * Btw, if you're picky on alignment, click on the <kbd>grid with magnet</kbd> button at the top-left of the window to display and snap frames to a grid, which can be configured with the spinbox on its right.
-* Select just one frame and click on <kbd>Edit > Distribute Horizontally</kbd> to align horizontally all of its followers. Same for vertically and diagonally.
-* Set the number of columns in the distribute grid before clicking on <kbd>Edit > Distribute Grid</kbd>.
+* Select just one frame and click on <kbd>Edit > Distribute Horizontally</kbd> to align all its followers horizontally. Same for vertically and diagonally.
+* Set the number of columns in the distribute grid before clicking on <kbd>Edit > Distribute Grid</kbd>!
 * Clicking on the menu <kbd>Select > Select Before</kbd> selects all frames upstream to the selected frame. For <kbd>Select After</kbd>, <kbd>Select Connected</kbd> and <kbd>Select Graph</kbd>, well you get the idea.
 * If needed, you can change the background color of all frames' images by clicking on the <kbd>colorpicker</kbd> button (black by default) at the top of the window.
 * To add a comment box, click on the <kbd>#</kbd> button at the top of the window. Resize it by dragging its bottom-right corner. Click in its empy space, then type a text. That's a comment box.
 * Change the color of a comment box by clicking on its <kbd>colorpicker</kbd> button.
 * Comment boxes can also host (or "parent") frames! Select a bunch of frames, then click on the <kbd>+</kbd> button at the upper-right of the comment box. Or merely select frames **before** you click on the <kbd>+</kbd> button.
-* Select hosted frames, them click on the </kbd>trash can</kbd> button to unhost (or "unparent) them.
+* Select hosted frames, them click on the <kbd>trash can</kbd> button to unhost (or "unparent") them.
 * Moving a comment box moves its hosted frames. Moving or resizing one or more hosted frames deforms their hosting comment box automatically.
-* When hosting frames, comment boxes cannot be resized manually, they always conform to their content. And only 3 lines of text are displayed, use the scrollbar to read on.
+* When hosting frames, comment boxes cannot be resized manually, they always conform to their content. And only 3 lines of text are displayed, use the scrollbar to read the rest.
 
 * ***KNOWN BUG***: Sometimes, frames inside a comment box won't let you connect or disconnect them. Just **zoom out** a bit to get things back to normal.
 
-## My... That's an UGLY peace of code!
+## My... What an UGLY piece of code!
 
-Yes it is. But hey, it works! The project started as a proof of concept and somehow made its way to this page. I'll do something about it. I promise. When I have time...
+Err... yeah, sure. But hey, it works! The project started as a proof of concept and somehow made its way to this page. I'll do something about it. I promise. When I have time...
 
 ## Thanks
 
