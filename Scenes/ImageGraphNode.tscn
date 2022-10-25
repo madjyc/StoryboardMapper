@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=2]
+[gd_scene load_steps=12 format=2]
 
 [ext_resource path="res://Resources/SelectedFrame.tres" type="StyleBox" id=1]
 [ext_resource path="res://Resources/NormalFrame.tres" type="StyleBox" id=2]
@@ -8,6 +8,7 @@
 [ext_resource path="res://Assets/Icons/VisualShaderPort.svg" type="Texture" id=6]
 [ext_resource path="res://Assets/Icons/SoundFile.svg" type="Texture" id=7]
 [ext_resource path="res://Assets/Icons/Remove.svg" type="Texture" id=8]
+[ext_resource path="res://Scenes/Particles.tscn" type="PackedScene" id=9]
 
 [sub_resource type="DynamicFontData" id=1]
 font_path = "res://Assets/Fonts/Roboto-Bold.ttf"
@@ -151,6 +152,9 @@ hint_tooltip = "Reload image and sound."
 icon = ExtResource( 5 )
 flat = true
 icon_align = 1
+
+[node name="Particles" parent="." instance=ExtResource( 9 )]
+visible = false
 
 [connection signal="close_request" from="." to="." method="_on_GraphNode_close_request"]
 [connection signal="offset_changed" from="." to="." method="_on_GraphNode_offset_changed"]

@@ -19,6 +19,7 @@ onready var thumbnail: = $VBoxContainer/Control/Thumbnail
 onready var subtitle: = $VBoxContainer/Control/Subtitle
 onready var subedit: = $VBoxContainer/SubtitleEdit
 onready var spinbox: = $VBoxContainer/HBoxContainer/SpinBox
+onready var particles: = $Particles
 
 # Important to know:
 #     rect_position is in viewport space, can't be set directly in code (use offset)
@@ -28,8 +29,12 @@ onready var spinbox: = $VBoxContainer/HBoxContainer/SpinBox
 func _ready():
 	assert(background)
 	assert(thumbnail)
+	assert(subtitle)
 	assert(subedit)
 	assert(spinbox)
+	assert(particles)
+#	particles.one_shot = true # Security
+#	particles.emitting = true
 
 
 # Extra data to be saved
