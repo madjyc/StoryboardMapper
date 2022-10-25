@@ -1,4 +1,4 @@
-[gd_scene load_steps=6 format=2]
+[gd_scene load_steps=7 format=2]
 
 [ext_resource path="res://Scenes/DisplayDialog.tscn" type="PackedScene" id=1]
 [ext_resource path="res://Scripts/GraphEdit.gd" type="Script" id=2]
@@ -6,11 +6,15 @@
 [ext_resource path="res://Assets/Icons/Add.svg" type="Texture" id=4]
 [ext_resource path="res://Assets/Icons/VisualShaderNodeComment.svg" type="Texture" id=5]
 
+[sub_resource type="StyleBoxFlat" id=1]
+bg_color = Color( 0.172549, 0.164706, 0.196078, 1 )
+
 [node name="Graph" type="GraphEdit"]
 anchor_right = 1.0
 anchor_bottom = 1.0
 custom_constants/port_grab_distance_vertical = 26
 custom_constants/port_grab_distance_horizontal = 30
+custom_styles/bg = SubResource( 1 )
 right_disconnects = true
 use_snap = false
 zoom_min = 0.162
@@ -34,32 +38,41 @@ hint_tooltip = "Number of columns in \"redistribute grid\""
 min_value = 1.0
 value = 5.0
 
-[node name="ColorPicker" type="ColorPickerButton" parent="CanvasLayer/HBoxContainer"]
+[node name="GraphBgColorPicker" type="ColorPickerButton" parent="CanvasLayer/HBoxContainer"]
 margin_left = 78.0
 margin_right = 106.0
 margin_bottom = 24.0
 rect_min_size = Vector2( 28, 24 )
-hint_tooltip = "Frame background color"
+hint_tooltip = "Window background color"
+edit_alpha = false
 
-[node name="AddButton" type="Button" parent="CanvasLayer/HBoxContainer"]
+[node name="ImgNodeColorPicker" type="ColorPickerButton" parent="CanvasLayer/HBoxContainer"]
 margin_left = 110.0
 margin_right = 138.0
+margin_bottom = 24.0
+rect_min_size = Vector2( 28, 24 )
+hint_tooltip = "Frame background color"
+flat = true
+
+[node name="AddButton" type="Button" parent="CanvasLayer/HBoxContainer"]
+margin_left = 142.0
+margin_right = 170.0
 margin_bottom = 24.0
 hint_tooltip = "Add a new frame to this mess already."
 icon = ExtResource( 4 )
 flat = true
 
 [node name="CommentButton" type="Button" parent="CanvasLayer/HBoxContainer"]
-margin_left = 142.0
-margin_right = 168.0
+margin_left = 174.0
+margin_right = 200.0
 margin_bottom = 24.0
 hint_tooltip = "Add a new comment box. The comment box will automatically host (i.e. \"parent\") selected frames if any."
 icon = ExtResource( 5 )
 flat = true
 
 [node name="PlayButton" type="Button" parent="CanvasLayer/HBoxContainer"]
-margin_left = 172.0
-margin_right = 200.0
+margin_left = 204.0
+margin_right = 232.0
 margin_bottom = 24.0
 hint_tooltip = "Play from selected frame."
 disabled = true
@@ -133,7 +146,8 @@ filters = PoolStringArray( "*.res" )
 [connection signal="node_selected" from="." to="." method="_on_Graph_node_selected"]
 [connection signal="node_unselected" from="." to="." method="_on_Graph_node_unselected"]
 [connection signal="paste_nodes_request" from="." to="." method="_on_GraphEdit_paste_nodes_request"]
-[connection signal="color_changed" from="CanvasLayer/HBoxContainer/ColorPicker" to="." method="_on_ColorPicker_color_changed"]
+[connection signal="color_changed" from="CanvasLayer/HBoxContainer/GraphBgColorPicker" to="." method="_on_GraphBgColorPicker_color_changed"]
+[connection signal="color_changed" from="CanvasLayer/HBoxContainer/ImgNodeColorPicker" to="." method="_on_ImgNodeColorPicker_color_changed"]
 [connection signal="pressed" from="CanvasLayer/HBoxContainer/AddButton" to="." method="_on_AddButton_pressed"]
 [connection signal="pressed" from="CanvasLayer/HBoxContainer/CommentButton" to="." method="_on_CommentButton_pressed"]
 [connection signal="pressed" from="CanvasLayer/HBoxContainer/PlayButton" to="." method="_on_PlayButton_pressed"]

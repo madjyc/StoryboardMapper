@@ -7,7 +7,7 @@ const APP_NAME: String = "Storyboard Mapper"
 const DEFAULT_PROJECT_FILENAME: String = "Untitled"
 const PROJECT_FILE_VERSION_MAJOR: int = 0
 const PROJECT_FILE_VERSION_MINOR: int = 2
-const PROJECT_FILE_VERSION_SUBMINOR: int = 0
+const PROJECT_FILE_VERSION_SUBMINOR: int = 1
 const IMAGE_FILE_EXTENSIONS: Array = ["jpg", "jpeg", "png", "bmp"]
 const DEFAULT_IMG_NODE_SPACING: float = 40.0
 const MIN_DRAG_DISTANCE: float = 5.0
@@ -36,7 +36,8 @@ onready var open_sound_file_dlg: = $OpenSndFileDialog
 onready var open_project_file_dlg: = $OpenFileDialog
 onready var save_project_file_dlg: = $SaveFileDialog
 onready var grid_num_columns: = $CanvasLayer/HBoxContainer/GridColsSpinBox
-onready var colorpicker: = $CanvasLayer/HBoxContainer/ColorPicker
+onready var graph_bg_colorpicker: = $CanvasLayer/HBoxContainer/GraphBgColorPicker
+onready var img_node_colorpicker: = $CanvasLayer/HBoxContainer/ImgNodeColorPicker
 onready var add_button: = $CanvasLayer/HBoxContainer/AddButton
 onready var comment_button: = $CanvasLayer/HBoxContainer/CommentButton
 onready var display_button: = $CanvasLayer/HBoxContainer/PlayButton
@@ -48,9 +49,14 @@ onready var copy_group_center: = Vector2.ZERO
 func _ready():
 	OS.set_low_processor_usage_mode(true) # Saves mobile batteries.
 	$CanvasLayer.offset.y = rect_position.y
+	
+	var custom_styles: StyleBox = get("custom_styles/bg")
+	graph_bg_colorpicker.color = custom_styles.bg_color
+	
 	project_file_name = DEFAULT_PROJECT_FILENAME
 	project_file_path = ""
 	update_main_window_title()
+	
 	get_tree().connect("files_dropped", self, "_on_files_dropped")
 	move_hidden_popups_out_of_the_way()
 	update_buttons()
@@ -203,6 +209,18 @@ func move_hidden_popups_out_of_the_way():
 #	assert(parent)
 #	if parent.has_method("move_popups_out_of_the_way"):
 #		parent.move_popups_out_of_the_way()
+
+
+func _on_GraphBgColorPicker_color_changed(color: Color):
+	var custom_styles: StyleBox = get("custom_styles/bg")
+	custom_styles.bg_color = color
+
+
+func _on_ImgNodeColorPicker_color_changed(color: Color):
+	img_node_bg_color = color
+	for node in get_children():
+		if node is ImageGraphNode:
+			node.set_bg_color(color)
 
 
 func _on_OpenImgFileDialog_popup_hide():
@@ -430,6 +448,7 @@ func _find_terminating_node(node: ImageGraphNode) -> ImageGraphNode:
 ## SELECT ##
 ############
 
+
 func get_num_selected_img_nodes() -> int:
 	return selected_img_nodes.size()
 
@@ -503,6 +522,37 @@ func select_all_img_nodes_after_selected_img_nodes():
 	for node in found_nodes:
 		select_node(node, false)
 	update_buttons()
+
+
+func select_from_img_node_to_img_node_forward(from_node: ImageGraphNode, to_node: ImageGraphNode, stop_on_selected: bool):
+	var node = from_node
+	if not node.selected:
+		select_node(node, false)
+	while node != to_node:
+		node = node.next_node
+		assert(node) # error, to_node has not been visited
+		if not node or (stop_on_selected and node.selected):
+			break
+		select_node(node, false)
+
+
+func select_from_selected_img_nodes_to_img_node(to_node: ImageGraphNode):
+	if selected_img_nodes.has(to_node):
+		return
+	
+	var old_selected_img_nodes: = selected_img_nodes.duplicate()
+	for from_node in old_selected_img_nodes:
+		var found_nodes: = []
+		_find_all_nodes_after_node(from_node, found_nodes)
+		if found_nodes.has(to_node):
+			select_from_img_node_to_img_node_forward(from_node, to_node, true)
+		else: # inverse order (i.e. from_node is downstream to to_node)?
+			found_nodes.clear()
+			_find_all_nodes_after_node(to_node, found_nodes)
+			if found_nodes.has(from_node):
+				select_from_img_node_to_img_node_forward(to_node, from_node, true)
+			else:
+				select_node(to_node, false)
 
 
 func select_all_img_nodes_flowing_through_selected_img_nodes():
@@ -901,8 +951,14 @@ func build_graph_nodes(graph_data: GraphData, keep_names: bool, select: bool, gr
 
 func build_graph(graph_data: GraphData):
 	clear_graph()
+	
+	graph_bg_colorpicker.color = graph_data.graph_bg_color
+	var custom_styles: StyleBox = get("custom_styles/bg")
+	custom_styles.bg_color = graph_data.graph_bg_color
+	
+	img_node_colorpicker.color = graph_data.img_node_bg_color
 	img_node_bg_color = graph_data.img_node_bg_color
-	colorpicker.color = graph_data.img_node_bg_color
+	
 	build_graph_nodes(graph_data, true, false)
 
 
@@ -970,7 +1026,10 @@ func store_graph(graph_data: GraphData, selected_nodes_only: bool):
 	graph_data.version_major = PROJECT_FILE_VERSION_MAJOR
 	graph_data.version_minor = PROJECT_FILE_VERSION_MINOR
 	graph_data.version_subminor = PROJECT_FILE_VERSION_SUBMINOR
+	
+	graph_data.graph_bg_color = graph_bg_colorpicker.color
 	graph_data.img_node_bg_color = img_node_bg_color
+	
 	store_graph_nodes(graph_data, selected_nodes_only)
 
 
@@ -1090,10 +1149,3 @@ func play_animation():
 
 func _on_PlayButton_pressed():
 	play_animation()
-
-
-func _on_ColorPicker_color_changed(color):
-	img_node_bg_color = color
-	for node in get_children():
-		if node is ImageGraphNode:
-			node.set_bg_color(color)

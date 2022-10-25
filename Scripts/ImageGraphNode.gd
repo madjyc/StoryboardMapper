@@ -11,6 +11,7 @@ var snd_path: String
 var img_texture: ImageTexture = null
 var sound: AudioStream = null
 
+var shift_key_was_down: bool # Selecting from one image node to another one.
 var ctrl_key_was_down: bool # Dragging
 
 onready var background: = $VBoxContainer/Control/Background
@@ -92,7 +93,7 @@ func _on_GraphNode_resize_request(new_size):
 	
 	var comment_node = graph.find_com_node_associated_to_node(self)
 	if comment_node:
-		comment_node.update_size()
+		comment_node.update_rect()
 
 
 func _on_GraphNode_close_request():
@@ -111,21 +112,33 @@ func _on_TextureRect_gui_input(event):
 	
 	if event.get_button_index() == 1:
 		var graph: GraphEdit = get_parent()
+		assert(graph)
 		if event.pressed:
-			assert(graph)
+			# Selecting from one image node to another one.
+			shift_key_was_down = Input.is_key_pressed(KEY_SHIFT)
+			if shift_key_was_down:
+				graph.select_from_selected_img_nodes_to_img_node(self)
+				return
+			
+			# Dragging
 			ctrl_key_was_down = Input.is_key_pressed(KEY_CONTROL)
 			if selected:
 				if ctrl_key_was_down:
 					graph.deselect_node(self)
 			else:
-				graph.select_node(self, !ctrl_key_was_down) # /!\ Ne lance pas de signals.
+				graph.select_node(self, !ctrl_key_was_down) # /!\ No signal emitted
 		
 			if selected:
 				graph.start_dragging_selected_img_nodes(self)
 		else:
+			# Selecting from one image node to another one.
+			if shift_key_was_down:
+				return
+			
+			# Dragging
 			if not graph.stop_dragging_selected_img_nodes():
 				if !ctrl_key_was_down:
-					graph.select_node(self, true) # /!\ Ne lance pas de signals.
+					graph.select_node(self, true) # /!\ No signal emitted
 
 
 func _on_LoadButton_pressed():

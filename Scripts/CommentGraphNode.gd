@@ -7,8 +7,11 @@ const TOP_MARGIN: = 120.0 # graph space
 const RIGHT_MARGIN: = 16.0 # graph space
 const BOTTOM_MARGIN: = 16.0 # graph space
 const MAX_ICONBUTTON_COUNT: = 6
-const FOCUS_COLOR_S_FACTOR: = 1.3
-const FOCUS_COLOR_V_FACTOR: = 1.4
+#const FOCUS_COLOR_S_FACTOR: = 1.3
+#const FOCUS_COLOR_V_FACTOR: = 1.4
+const TITLEBAR_V_FACTOR: = 1.4
+const BG_ALPHA: = 0.75
+const BORDER_ALPHA: = 0.9
 
 var img_nodes: = [] # array of ImageGraphNode
 var old_offset: Vector2
@@ -50,11 +53,11 @@ func _exit_tree():
 # Extra data to be saved
 func get_extra_data() -> Dictionary:
 	var extra_data = {
-			"title": get_title(),
-			"color": colorpicker.color,
-			"text": user_text.text,
-			"img_node_names": [], # filled below
-			"icon_buttons": [], # filled below
+		"title": get_title(),
+		"color": colorpicker.color,
+		"text": user_text.text,
+		"img_node_names": [], # filled below
+		"icon_buttons": [], # filled below
 	}
 	
 	for node in img_nodes:
@@ -97,14 +100,13 @@ func set_color(color: Color):
 	
 	# Normal
 	custom_styles = get("custom_styles/comment")
-	custom_styles.bg_color = color
-	custom_styles.border_color = color
+	custom_styles.bg_color = color.from_hsv(color.h, color.s, color.v, BG_ALPHA)
+	custom_styles.border_color = color.from_hsv(color.h, color.s, color.v * TITLEBAR_V_FACTOR, BORDER_ALPHA)
 
 	# Focused
-	custom_styles = get("custom_styles/commentfocus")
-	var focus_color: Color = color.from_hsv(color.h, color.s * FOCUS_COLOR_S_FACTOR, color.v * FOCUS_COLOR_V_FACTOR, 1.0)
-	custom_styles.bg_color = focus_color
-	custom_styles.border_color = focus_color
+#	custom_styles = get("custom_styles/commentfocus")
+#	custom_styles.bg_color = color.from_hsv(color.h, color.s * FOCUS_COLOR_S_FACTOR, color.v * FOCUS_COLOR_V_FACTOR, BG_ALPHA)
+#	custom_styles.border_color = color.from_hsv(color.h, color.s * FOCUS_COLOR_S_FACTOR, color.v * FOCUS_COLOR_V_FACTOR, BORDER_ALPHA)
 
 
 func _on_ColorPicker_color_changed(color):

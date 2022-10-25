@@ -9,6 +9,7 @@ content_margin_bottom = 5.0
 bg_color = Color( 0.498039, 0.498039, 0.498039, 0.498039 )
 border_width_top = 24
 border_color = Color( 0.498039, 0.498039, 0.498039, 0.498039 )
+border_blend = true
 corner_radius_top_left = 20
 corner_radius_top_right = 20
 corner_radius_bottom_right = 20

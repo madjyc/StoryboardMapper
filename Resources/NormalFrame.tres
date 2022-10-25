@@ -14,5 +14,5 @@ corner_radius_top_right = 4
 corner_radius_bottom_right = 4
 corner_radius_bottom_left = 4
 shadow_color = Color( 0, 0, 0, 0.392157 )
-shadow_size = 3
-shadow_offset = Vector2( 2, 3 )
+shadow_size = 4
+shadow_offset = Vector2( 2, 2 )
