@@ -1,8 +1,8 @@
 ![License](https://img.shields.io/badge/license-MIT-orange.svg)
 ![Godot Version](https://img.shields.io/badge/godot-3.5-blue.svg)
-![Version](https://img.shields.io/badge/version-v0.2.0-green.svg)
+![Version](https://img.shields.io/badge/version-v0.2.1-green.svg)
 
-# Storyboard Mapper v0.2.0
+# Storyboard Mapper v0.2.1
 
 **Mind-mapping for storyboarders**, made in **Godot Engine 3.5**.
 
@@ -10,19 +10,20 @@
 
 ![screenshot](../Images/Screencopies/StoryboardMapper.jpg)
 
-Simple as 1-2-3.
+As simple as 1-2-3:
 
-## 1. Download and install Godot Engine 3.5
+## 1. Download Godot Engine 3.5
 
-### [Click here to download Godot Engine 3.5](https://godotengine.org/download)
+### [Click here to download Godot Engine 3.5 (Standard version)](https://godotengine.org/download)
+You don't need to install **Godot Engine**, it's an executable file. Just unzip it and you're done.
 
 ## 2. Download Storyboard Mapper
 
 If for some reason you're not keen on cloning the repository, you can simply download the project in a ZIP file:
 1. Click on the green <kbd>Code</kbd> button at the top of this page, then on <kbd>Download ZIP</kbd>.
 2. Unzip it wherever you fancy.
-3. Run **Godot Engine**, click on <kbd>Import</kbd> and find **Storyboard Mapper** wherever your fancy unzipped it, select the project file "**project.godot**", click on <kbd>Open</kbd>, then <kbd>Import & Edit</kbd>.
-4. Hit <kbd>F5</kbd> and there you go.
+3. Run **Godot Engine**. The first time you run it, you'll need to import **Storyboard Mapper**. Click on <kbd>Import</kbd> and find **Storyboard Mapper** wherever your fancy unzipped it, select the project file "**project.godot**", and click on <kbd>Open</kbd>.
+4. Select **Storyboard Mapper** in the list, then click on <kbd>Run</kbd>. And there you go.
 
 ## 3. Now use it!
 
@@ -38,7 +39,7 @@ And that's it!
 
 Happy storyboard mapping!
 
-## Quick start
+## Features
 
 * Hit <kbd>F1</kbd> or go to <kbd>Help > Help</kbd> to display a short documentation.
 * Use your **middle mouse button** to scroll the board, and your **scrollwheel** to zoom in/out.
@@ -50,12 +51,13 @@ Happy storyboard mapping!
 * But... you can connect as many frames as you want to the **input** pin of a frame (that's "many to one"). This lets you experiment with different starting points.
 * Click on a frame to select it. Drag a marquee around several frames to select them.
 * <kbd>ctrl</kbd> + click frames to add them to or subtract them from the selection.
-* Drag a frame or a selection of frames to move them.
+* <kbd>shift</kbd> + click a frame to add all connected frames between this frame and selected frames frames to the selection ("path" selection).
+* Drag a frame or a selection of frames to move them (stating the obvious, I know).
 * Double-click on a frame to play the sequence starting from that frame. Or click on the <kbd>movie slate</kbd> button at the top of the window.
 * Add subtitles to a frame or change their duration right below the image, or even better, in the player.
 * Use the buttons at the bottom of the frame to load or reload an image and/or a sound.
 * Resize the frame to your liking by dragging the lower-right corner of the frame.
-* Click on <kbd>X</kbd> at the upper-right corner of the frame to discard it. Or select it and press <kbd>Del</kbd>.
+* Click on <kbd>X</kbd> at the upper-right corner of the frame to delete it. Or select a bunch of frames and press <kbd>Del</kbd>.
 * The size of a frame can be stored by clicking <kbd>Edit > Store Size</kbd>. Then select a bunch of frames and click on <kbd>Edit > Apply Stored Size</kbd> to set their size to the stored size.
 * Select a bunch of frames and click on <kbd>Edit > Align Horizontally</kbd> to ...well, align them horizontally. Same for vertically.
 * Btw, if you're picky on alignment, click on the <kbd>grid with magnet</kbd> button at the top-left of the window to display and snap frames to a grid, which can be configured with the spinbox on its right.
@@ -63,18 +65,15 @@ Happy storyboard mapping!
 * Set the number of columns in the distribute grid before clicking on <kbd>Edit > Distribute Grid</kbd>!
 * Clicking on the menu <kbd>Select > Select Before</kbd> selects all frames upstream to the selected frame. For <kbd>Select After</kbd>, <kbd>Select Connected</kbd> and <kbd>Select Graph</kbd>, well you get the idea.
 * If needed, you can change the background color of all frames' images by clicking on the <kbd>colorpicker</kbd> button (black by default) at the top of the window.
-* To add a comment box, click on the <kbd>#</kbd> button at the top of the window. Resize it by dragging its bottom-right corner. Click in its empy space, then type a text. That's a comment box.
+* To add a comment box, click on the <kbd>#</kbd> button at the top of the window. Resize the comment box by dragging its bottom-right corner. Click on empy space inside the comment box, then type some text. You've made yourself a comment box.
 * Change the color of a comment box by clicking on its <kbd>colorpicker</kbd> button.
-* Comment boxes can also host (or "parent") frames! Select a bunch of frames, then click on the <kbd>+</kbd> button at the upper-right of the comment box. Or merely select frames **before** you click on the <kbd>+</kbd> button.
-* Select hosted frames, them click on the <kbd>trash can</kbd> button to unhost (or "unparent") them.
-* Moving a comment box moves its hosted frames. Moving or resizing one or more hosted frames deforms their hosting comment box automatically.
-* When hosting frames, comment boxes cannot be resized manually, they always conform to their content. And only 3 lines of text are displayed, use the scrollbar to read the rest.
+* Add up to 6 icons to the comment box by clicking on its top-left <kbd>light bulb</kbd> button. Remove them by clicking on its top-left <kbd>trash can</kbd> button.
+* But wait! Comment boxes can also host (or "parent") frames. Select a bunch of frames, then click on the <kbd>+</kbd> button at the top right of the comment box. Even better, select frames **before** you click on the <kbd>#</kbd> button to let the new comment box host them right off the bat.
+* To unhost (or "unparent") hosted frames, select them, then click on the <kbd>trash can</kbd> button at the top-righ of the comment box.
+* Moving a comment box moves its hosted frames. A comment box also automatically deforms to fit the frames that host it, even when you move or resize them.
+* As a result, comment boxes hosting frames cannot be resized manually, they automatically conform to their content. And only 3 lines of text are displayed, use the scrollbar to read the rest.
 
 * ***KNOWN BUG***: Sometimes, frames inside a comment box won't let you connect or disconnect them. Just **zoom out** a bit to get things back to normal.
-
-## My... What an UGLY piece of code!
-
-Err... yeah, sure. But hey, it works! The project started as a proof of concept and somehow made its way to this page. I'll do something about it. I promise. When I have time...
 
 ## Thanks
 
