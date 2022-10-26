@@ -347,15 +347,15 @@ func resize_selected_img_nodes_to_custom_img_node_size():
 		com_node.update_rect()
 
 
-############
-## CREATE ##
-############
+###############
+## PARTICLES ##
+###############
 
 func enable_particles(enable: bool):
 	display_particles = enable
 
 
-func throw_particles(node: GraphNode, particles_type: int):
+func throw_particles(node: GraphNode, particles_type: int, selected: bool):
 	if not display_particles:
 		return
 	var particles = null
@@ -369,19 +369,33 @@ func throw_particles(node: GraphNode, particles_type: int):
 	particles.position = convert_offset_in_graph_to_position_in_viewport(node.offset + Vector2(node.rect_size.x / 2, 0))
 	particles.emission_rect_extents = Vector2(node.rect_size.x / 2, 0)
 	particles.scale = Vector2.ONE * zoom
+
+	var custom_styles: StyleBox
+	if node is ImageGraphNode:
+		custom_styles = node.get("custom_styles/selectedframe" if selected else "custom_styles/frame")
+	elif node is CommentGraphNode:
+		custom_styles = node.get("custom_styles/commentfocus" if selected else "custom_styles/comment")
+	if custom_styles:
+		particles.color = custom_styles.bg_color
+
 	add_child(particles)
 
+
+############
+## CREATE ##
+############
 
 # Creates a new image node and adds it to the graph, centered on the given offset (in graph space).
 func add_new_image_node(ofs: Vector2, exclusive_select: bool = true, open_image_file: bool = true) -> ImageGraphNode:
 	var node: ImageGraphNode = imageGraphNode.instance()
 	add_child(node, true) # /!\ before set_offset
+	node.connect("node_close_request", self, "delete_node")
 	node.set_offset(ofs - node.rect_size / 2)
 	node.set_bg_color(img_node_bg_color)
 	select_node(node, exclusive_select)
 	if open_image_file:
 		display_open_image_file_dialog(node)
-	throw_particles(node, PARTICLES_IN)
+	throw_particles(node, PARTICLES_IN, node.selected)
 	return node
 
 
@@ -753,6 +767,7 @@ func duplicate_node(node: ImageGraphNode, ofs: Vector2) -> ImageGraphNode:
 	new_node.set_offset(ofs - node.rect_size / 2)
 	new_node.img_path = node.img_path
 	add_child(new_node, true)
+	new_node.connect("node_close_request", self, "delete_node")
 	return new_node
 
 
@@ -822,11 +837,12 @@ func _on_GraphEdit_duplicate_nodes_request():
 
 func delete_node(node: GraphNode):
 	assert(node)
+	var was_selected: = node.selected
 	deselect_node(node)
 	if node is ImageGraphNode:
 		remove_node_connections(node)
 		remove_img_node_from_all_com_nodes(node)
-	throw_particles(node, PARTICLES_OUT)
+	throw_particles(node, PARTICLES_OUT, was_selected)
 	node.queue_free()
 
 
@@ -845,12 +861,15 @@ func _on_GraphEdit_delete_nodes_request(node_names: Array): # only when selected
 func add_new_com_node(ofs: Vector2) -> CommentGraphNode:
 	var com_node = commentGraphNode.instance()
 	add_child(com_node, true) # /!\ before set_offset
+	com_node.connect("add_selected_img_nodes_to_com_node_request", self, "add_selected_img_nodes_to_com_node")
+	com_node.connect("remove_selected_img_nodes_from_com_node_request", self, "remove_selected_img_nodes_from_com_node")
+	com_node.connect("node_close_request", self, "delete_node")
 	if selected_img_nodes.size() > 0:
 		add_selected_img_nodes_to_com_node(com_node)
 	else:
 		com_node.set_offset(ofs - com_node.rect_size / 2)
 	move_child(com_node, 0)
-	throw_particles(com_node, PARTICLES_IN)
+	throw_particles(com_node, PARTICLES_IN, com_node.selected)
 	return com_node
 
 
@@ -941,6 +960,7 @@ func build_graph_nodes(graph_data: GraphData, keep_names: bool, select: bool, gr
 			img_node.set_name(node_data.name)
 		img_node.rect_size = node_data.rect_size
 		add_child(img_node, true) # /!\ before assigning data
+		img_node.connect("node_close_request", self, "delete_node")
 		old_to_new[node_data.name] = img_node.name # same name if keep_names is true
 		if group_center_diff == Vector2.INF:
 			img_node.offset = node_data.offset
@@ -950,7 +970,7 @@ func build_graph_nodes(graph_data: GraphData, keep_names: bool, select: bool, gr
 		img_node.set_extra_data(node_data.extra_data)
 		if select:
 			select_node(img_node, false)
-		throw_particles(img_node, PARTICLES_IN)
+		throw_particles(img_node, PARTICLES_IN, img_node.selected)
 	
 	# Connections
 	for connection in graph_data.connections:
@@ -971,6 +991,7 @@ func build_graph_nodes(graph_data: GraphData, keep_names: bool, select: bool, gr
 			com_node.set_name(node_data.name)
 		com_node.rect_size = node_data.rect_size
 		add_child(com_node, true) # /!\ before assigning data
+		com_node.connect("node_close_request", self, "delete_node")
 		move_child(com_node, 0)
 		if group_center_diff == Vector2.INF:
 			com_node.offset = node_data.offset
@@ -979,7 +1000,7 @@ func build_graph_nodes(graph_data: GraphData, keep_names: bool, select: bool, gr
 		com_node.set_extra_data(node_data.extra_data, old_to_new)
 		if select:
 			select_node(com_node, false)
-		throw_particles(com_node, PARTICLES_IN)
+		throw_particles(com_node, PARTICLES_IN, com_node.selected)
 
 
 func build_graph(graph_data: GraphData):

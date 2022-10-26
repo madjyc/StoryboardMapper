@@ -8,7 +8,7 @@ colors = PoolColorArray( 1, 1, 1, 1, 1, 1, 1, 0 )
 
 [node name="Particles" type="CPUParticles2D"]
 amount = 12
-lifetime = 0.8
+lifetime = 0.6
 explosiveness = 0.8
 randomness = 1.0
 emission_shape = 2

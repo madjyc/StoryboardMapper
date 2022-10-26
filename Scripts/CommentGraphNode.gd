@@ -1,5 +1,8 @@
-extends GraphNode
+extends GraphNodeBase
 class_name CommentGraphNode
+
+signal add_selected_img_nodes_to_com_node_request(node)
+signal remove_selected_img_nodes_from_com_node_request(node)
 
 const DEFAULT_SIZE: = Vector2(230.0, 80.0) # graph space
 const LEFT_MARGIN: = 16.0 # graph space
@@ -7,11 +10,9 @@ const TOP_MARGIN: = 120.0 # graph space
 const RIGHT_MARGIN: = 16.0 # graph space
 const BOTTOM_MARGIN: = 16.0 # graph space
 const MAX_ICONBUTTON_COUNT: = 6
-#const FOCUS_COLOR_S_FACTOR: = 1.3
-#const FOCUS_COLOR_V_FACTOR: = 1.4
 const TITLEBAR_V_FACTOR: = 1.4
 const BG_ALPHA: = 0.75
-const BORDER_ALPHA: = 0.9
+const BORDER_ALPHA: = 0.95
 
 var img_nodes: = [] # array of ImageGraphNode
 var old_offset: Vector2
@@ -96,17 +97,9 @@ func set_extra_data(extra_data: Dictionary, old_to_new: Dictionary, update_size:
 func set_color(color: Color):
 	colorpicker.color = color
 	
-	var custom_styles: StyleBox
-	
-	# Normal
-	custom_styles = get("custom_styles/comment")
+	var custom_styles: StyleBox = get("custom_styles/comment")
 	custom_styles.bg_color = color.from_hsv(color.h, color.s, color.v, BG_ALPHA)
 	custom_styles.border_color = color.from_hsv(color.h, color.s, color.v * TITLEBAR_V_FACTOR, BORDER_ALPHA)
-
-	# Focused
-#	custom_styles = get("custom_styles/commentfocus")
-#	custom_styles.bg_color = color.from_hsv(color.h, color.s * FOCUS_COLOR_S_FACTOR, color.v * FOCUS_COLOR_V_FACTOR, BG_ALPHA)
-#	custom_styles.border_color = color.from_hsv(color.h, color.s * FOCUS_COLOR_S_FACTOR, color.v * FOCUS_COLOR_V_FACTOR, BORDER_ALPHA)
 
 
 func _on_ColorPicker_color_changed(color):
@@ -183,21 +176,15 @@ func _on_CommentNode_resize_request(new_size):
 
 
 func _on_CommentNode_close_request():
-	var graph = get_parent()
-	assert(graph is GraphEdit)
-	graph.delete_node(self)
+	emit_signal("node_close_request", self)
 
 
 func _on_AddButton_pressed():
-	var graph = get_parent()
-	assert(graph is GraphEdit)
-	graph.add_selected_img_nodes_to_com_node(self)
+	emit_signal("add_selected_img_nodes_to_com_node_request", self)
 
 
 func _on_SubButton_pressed():
-	var graph = get_parent()
-	assert(graph is GraphEdit)
-	graph.remove_selected_img_nodes_from_com_node(self)
+	emit_signal("remove_selected_img_nodes_from_com_node_request", self)
 
 
 func _on_CommentNode_gui_input(event):

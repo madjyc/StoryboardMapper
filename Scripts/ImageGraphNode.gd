@@ -1,4 +1,4 @@
-extends GraphNode
+extends GraphNodeBase
 class_name ImageGraphNode
 
 const THUMBNAIL_WIDTH: int = 160
@@ -102,9 +102,7 @@ func _on_GraphNode_resize_request(new_size):
 
 
 func _on_GraphNode_close_request():
-	var graph = get_parent()
-	assert(graph is GraphEdit)
-	graph.delete_node(self)
+	emit_signal("node_close_request", self)
 
 
 func _on_TextureRect_gui_input(event):
