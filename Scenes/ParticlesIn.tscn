@@ -1,10 +1,10 @@
 [gd_scene load_steps=3 format=2]
 
-[ext_resource path="res://Scenes/Particles.gd" type="Script" id=1]
+[ext_resource path="res://Scripts/Particles.gd" type="Script" id=1]
 
 [sub_resource type="Gradient" id=3]
-offsets = PoolRealArray( 0, 0.146018, 0.522124, 0.716814, 1 )
-colors = PoolColorArray( 1, 0.45098, 0, 0.243137, 1, 0.345703, 0, 1, 0.74902, 0.388235, 0.180392, 1, 1, 0.719971, 0.515625, 0.333333, 1, 1, 1, 0 )
+offsets = PoolRealArray( 0.29646, 1 )
+colors = PoolColorArray( 1, 1, 1, 1, 1, 1, 1, 0 )
 
 [node name="Particles" type="CPUParticles2D"]
 amount = 12
@@ -25,5 +25,6 @@ angle = 90.0
 angle_random = 1.0
 scale_amount = 10.0
 scale_amount_random = 0.85
+color = Color( 1, 0.4865, 0.21, 1 )
 color_ramp = SubResource( 3 )
 script = ExtResource( 1 )

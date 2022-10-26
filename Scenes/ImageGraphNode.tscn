@@ -8,7 +8,7 @@
 [ext_resource path="res://Assets/Icons/VisualShaderPort.svg" type="Texture" id=6]
 [ext_resource path="res://Assets/Icons/SoundFile.svg" type="Texture" id=7]
 [ext_resource path="res://Assets/Icons/Remove.svg" type="Texture" id=8]
-[ext_resource path="res://Scenes/Particles.tscn" type="PackedScene" id=9]
+[ext_resource path="res://Scenes/ParticlesIn.tscn" type="PackedScene" id=9]
 
 [sub_resource type="DynamicFontData" id=1]
 font_path = "res://Assets/Fonts/Roboto-Bold.ttf"

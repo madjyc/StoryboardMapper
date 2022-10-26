@@ -4,8 +4,8 @@ class_name ImageGraph
 #export(NodePath) var popup
 
 enum {
-	PARTICLES_TOP,
-	PARTICLES_CENTER,
+	PARTICLES_IN,
+	PARTICLES_OUT,
 }
 
 const APP_NAME: String = "Storyboard Mapper"
@@ -35,7 +35,8 @@ var dragging_beyond_min_distance: bool = false
 
 onready var imageGraphNode = preload("res://Scenes/ImageGraphNode.tscn")
 onready var commentGraphNode = preload("res://Scenes/CommentGraphNode.tscn")
-onready var particleSystem = preload("res://Scenes/Particles.tscn")
+onready var particlesIn = preload("res://Scenes/ParticlesIn.tscn")
+onready var particlesOut = preload("res://Scenes/ParticlesOut.tscn")
 	
 onready var display_dlg: = $DisplayDialog
 onready var open_image_file_dlg: = $OpenImgFileDialog
@@ -354,21 +355,19 @@ func enable_particles(enable: bool):
 	display_particles = enable
 
 
-func throw_particles(node: GraphNode, location: int):
+func throw_particles(node: GraphNode, particles_type: int):
 	if not display_particles:
 		return
-	var particles = particleSystem.instance()
-	var default_extents_x = particles.emission_rect_extents.x
-	match location:
-		PARTICLES_TOP:
-			particles.position = convert_offset_in_graph_to_position_in_viewport(node.offset + Vector2(node.rect_size.x / 2, 0))
-			particles.emission_rect_extents = Vector2(node.rect_size.x / 2, 0)
-			particles.amount *= node.rect_size.x / default_extents_x
-		PARTICLES_CENTER:
-			particles.position = convert_offset_in_graph_to_position_in_viewport(node.offset + node.rect_size / 2)
-			particles.emission_rect_extents = Vector2.ZERO
-			particles.initial_velocity *= 1.5
-		_: assert(true)
+	var particles = null
+	match particles_type:
+		PARTICLES_IN:
+			particles = particlesIn.instance()
+		PARTICLES_OUT:
+			particles = particlesOut.instance()
+		_: assert(false)
+	particles.amount *= node.rect_size.x / particles.emission_rect_extents.x
+	particles.position = convert_offset_in_graph_to_position_in_viewport(node.offset + Vector2(node.rect_size.x / 2, 0))
+	particles.emission_rect_extents = Vector2(node.rect_size.x / 2, 0)
 	particles.scale = Vector2.ONE * zoom
 	add_child(particles)
 
@@ -382,7 +381,7 @@ func add_new_image_node(ofs: Vector2, exclusive_select: bool = true, open_image_
 	select_node(node, exclusive_select)
 	if open_image_file:
 		display_open_image_file_dialog(node)
-	throw_particles(node, PARTICLES_TOP)
+	throw_particles(node, PARTICLES_IN)
 	return node
 
 
@@ -827,7 +826,7 @@ func delete_node(node: GraphNode):
 	if node is ImageGraphNode:
 		remove_node_connections(node)
 		remove_img_node_from_all_com_nodes(node)
-	throw_particles(node, PARTICLES_CENTER)
+	throw_particles(node, PARTICLES_OUT)
 	node.queue_free()
 
 
@@ -851,7 +850,7 @@ func add_new_com_node(ofs: Vector2) -> CommentGraphNode:
 	else:
 		com_node.set_offset(ofs - com_node.rect_size / 2)
 	move_child(com_node, 0)
-	throw_particles(com_node, PARTICLES_TOP)
+	throw_particles(com_node, PARTICLES_IN)
 	return com_node
 
 
@@ -951,7 +950,7 @@ func build_graph_nodes(graph_data: GraphData, keep_names: bool, select: bool, gr
 		img_node.set_extra_data(node_data.extra_data)
 		if select:
 			select_node(img_node, false)
-		throw_particles(img_node, PARTICLES_TOP)
+		throw_particles(img_node, PARTICLES_IN)
 	
 	# Connections
 	for connection in graph_data.connections:
@@ -980,7 +979,7 @@ func build_graph_nodes(graph_data: GraphData, keep_names: bool, select: bool, gr
 		com_node.set_extra_data(node_data.extra_data, old_to_new)
 		if select:
 			select_node(com_node, false)
-		throw_particles(com_node, PARTICLES_TOP)
+		throw_particles(com_node, PARTICLES_IN)
 
 
 func build_graph(graph_data: GraphData):
