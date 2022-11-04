@@ -53,6 +53,7 @@ margin_bottom = 24.0
 rect_min_size = Vector2( 28, 24 )
 hint_tooltip = "Frame background color"
 flat = true
+edit_alpha = false
 
 [node name="AddButton" type="Button" parent="CanvasLayer/HBoxContainer"]
 margin_left = 142.0
@@ -135,6 +136,15 @@ window_title = "Save File"
 access = 2
 filters = PoolStringArray( "*.res" )
 
+[node name="ExportVideoFileDialog" type="FileDialog" parent="."]
+margin_left = -664.0
+margin_top = -24.0
+margin_right = -80.0
+margin_bottom = 438.0
+popup_exclusive = true
+access = 2
+filters = PoolStringArray( "*.mp4" )
+
 [connection signal="connection_from_empty" from="." to="." method="_on_GraphEdit_connection_from_empty"]
 [connection signal="connection_request" from="." to="." method="_on_GraphEdit_connection_request"]
 [connection signal="connection_to_empty" from="." to="." method="_on_GraphEdit_connection_to_empty"]
@@ -160,3 +170,6 @@ filters = PoolStringArray( "*.res" )
 [connection signal="popup_hide" from="OpenFileDialog" to="." method="_on_OpenFileDialog_popup_hide"]
 [connection signal="file_selected" from="SaveFileDialog" to="." method="_on_SaveFileDialog_file_selected"]
 [connection signal="popup_hide" from="SaveFileDialog" to="." method="_on_SaveFileDialog_popup_hide"]
+[connection signal="dir_selected" from="ExportVideoFileDialog" to="." method="_on_ExportVideoFileDialog_dir_selected"]
+[connection signal="file_selected" from="ExportVideoFileDialog" to="." method="_on_ExportVideoFileDialog_file_selected"]
+[connection signal="popup_hide" from="ExportVideoFileDialog" to="." method="_on_ExportVideoFileDialog_popup_hide"]

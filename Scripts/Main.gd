@@ -6,6 +6,8 @@ enum {
 	FILE_MENU_SAVE,
 	FILE_MENU_SAVEAS,
 	FILE_MENU_SEPARATOR_1,
+	FILE_EXPORT_VIDEO,
+	FILE_MENU_SEPARATOR_2,
 	FILE_MENU_QUIT,
 }
 
@@ -71,8 +73,11 @@ func _ready():
 	popup.add_item("Save", FILE_MENU_SAVE, KEY_S | KEY_MASK_CTRL)
 	popup.add_item("Save As...", FILE_MENU_SAVEAS, KEY_S | KEY_MASK_CTRL | KEY_MASK_SHIFT)
 	popup.add_separator()
+	popup.add_item("Export to Video", FILE_EXPORT_VIDEO)
+	popup.add_separator()
 	popup.add_item("Quit", FILE_MENU_QUIT, KEY_Q | KEY_MASK_CTRL)
 	
+	popup.set_item_tooltip(FILE_EXPORT_VIDEO, "Export sequence to video, starting from selected frame.")
 	popup.set_item_tooltip(FILE_MENU_QUIT, "C'mon. Really?")
 	
 	# --- Edit Menu ---
@@ -130,6 +135,13 @@ func _ready():
 	popup.add_item("About", HELP_MENU_ABOUT)
 
 
+func _on_FileMenuButton_about_to_show():
+	var popup: PopupMenu = file_menu_button.get_popup()
+	var num_selected: int = graph.get_num_selected_img_nodes()
+	var dir = Directory.new()
+	popup.set_item_disabled(FILE_EXPORT_VIDEO, num_selected != 1 or not dir.file_exists("res://ffmpeg.exe"))
+
+
 func _on_FileMenu_item_pressed(item_id: int):
 	match item_id:
 		FILE_MENU_NEW:
@@ -140,6 +152,8 @@ func _on_FileMenu_item_pressed(item_id: int):
 			graph.save_project_file()
 		FILE_MENU_SAVEAS:
 			graph.save_project_file_as()
+		FILE_EXPORT_VIDEO:
+			graph.display_export_video_file_dialog()
 		FILE_MENU_QUIT:
 			get_tree().quit()
 

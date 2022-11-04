@@ -10,7 +10,7 @@
 
 ![screenshot](../Images/Screencopies/StoryboardMapper.jpg)
 
-As simple as 1-2-3:
+**As simple as 1-2-3:**
 
 ## 1. Download Godot Engine 3.5
 

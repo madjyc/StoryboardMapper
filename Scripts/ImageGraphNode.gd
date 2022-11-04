@@ -9,6 +9,8 @@ var next_node_slot: int = 0
 var img_path: String
 var snd_path: String
 var img_texture: ImageTexture = null
+var image_width: int
+var image_height: int
 var sound: AudioStream = null
 
 var shift_key_was_down: bool # Selecting from one image node to another one.
@@ -177,7 +179,9 @@ func load_thumbnail_from_file(path: String):
 	if err != OK:
 		print("Error loading image ", path, " : ", err)
 		return
-	var img_ratio: float = float(img.get_width()) / float(img.get_height())
+	image_width = img.get_width()
+	image_height = img.get_height()
+	var img_ratio: float = float(image_width) / float(image_height)
 	img.resize(THUMBNAIL_WIDTH, round(float(THUMBNAIL_WIDTH) / img_ratio), Image.INTERPOLATE_LANCZOS)
 	var tex = ImageTexture.new()
 	tex.create_from_image(img)

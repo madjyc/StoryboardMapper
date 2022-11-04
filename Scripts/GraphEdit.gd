@@ -8,17 +8,16 @@ enum {
 	PARTICLES_OUT,
 }
 
-const APP_NAME: String = "Storyboard Mapper"
+const APP_NAME: String = "StoryboardMapper"
 const DEFAULT_PROJECT_FILENAME: String = "Untitled"
 const PROJECT_FILE_VERSION_MAJOR: int = 0
 const PROJECT_FILE_VERSION_MINOR: int = 2
-const PROJECT_FILE_VERSION_SUBMINOR: int = 1
+const PROJECT_FILE_VERSION_SUBMINOR: int = 2
 const IMAGE_FILE_EXTENSIONS: Array = ["jpg", "jpeg", "png", "bmp"]
 const DEFAULT_IMG_NODE_SPACING: float = 40.0
 const MIN_DRAG_DISTANCE: float = 5.0
 const NEW_NODE_DEFAULT_OFFSET: = Vector2(0.0, 200.0) # graph space
 
-var img_node_bg_color: = Color.black
 var custom_img_node_size: Vector2
 var project_file_path: String
 var project_file_name: String
@@ -32,17 +31,20 @@ var dragged_img_nodes_initial_offsets: Array = [] # offsets are in graph space
 var dragged_com_nodes_initial_offsets: Array = [] # offsets are in graph space
 var old_global_mouse_position: Vector2 # to allow comparison with get_global_mouse_position() during drag
 var dragging_beyond_min_distance: bool = false
+var image_width: int = 0 # default
+var image_height: int = 0 # default
 
 onready var imageGraphNode = preload("res://Scenes/ImageGraphNode.tscn")
 onready var commentGraphNode = preload("res://Scenes/CommentGraphNode.tscn")
 onready var particlesIn = preload("res://Scenes/ParticlesIn.tscn")
 onready var particlesOut = preload("res://Scenes/ParticlesOut.tscn")
-	
+
 onready var display_dlg: = $DisplayDialog
 onready var open_image_file_dlg: = $OpenImgFileDialog
 onready var open_sound_file_dlg: = $OpenSndFileDialog
 onready var open_project_file_dlg: = $OpenFileDialog
 onready var save_project_file_dlg: = $SaveFileDialog
+onready var export_video_file_dlg := $ExportVideoFileDialog
 onready var grid_num_columns: = $CanvasLayer/HBoxContainer/GridColsSpinBox
 onready var graph_bg_colorpicker: = $CanvasLayer/HBoxContainer/GraphBgColorPicker
 onready var img_node_colorpicker: = $CanvasLayer/HBoxContainer/ImgNodeColorPicker
@@ -52,6 +54,7 @@ onready var display_button: = $CanvasLayer/HBoxContainer/PlayButton
 
 onready var copy_graph_data = GraphData.new()
 onready var copy_group_center: = Vector2.ZERO
+onready var ffmpeg_path: String = ProjectSettings.globalize_path("res://") + "ffmpeg"
 
 
 func _ready():
@@ -213,6 +216,8 @@ func move_hidden_popups_out_of_the_way():
 		open_project_file_dlg.rect_position = infinite_pos
 	if not save_project_file_dlg.visible:
 		save_project_file_dlg.rect_position = infinite_pos
+	if not export_video_file_dlg.visible:
+		export_video_file_dlg.rect_position = infinite_pos
 #	var parent = get_parent()
 #	assert(parent)
 #	if parent.has_method("move_popups_out_of_the_way"):
@@ -225,7 +230,6 @@ func _on_GraphBgColorPicker_color_changed(color: Color):
 
 
 func _on_ImgNodeColorPicker_color_changed(color: Color):
-	img_node_bg_color = color
 	for node in get_children():
 		if node is ImageGraphNode:
 			node.set_bg_color(color)
@@ -391,7 +395,7 @@ func add_new_image_node(ofs: Vector2, exclusive_select: bool = true, open_image_
 	add_child(node, true) # /!\ before set_offset
 	node.connect("node_close_request", self, "delete_node")
 	node.set_offset(ofs - node.rect_size / 2)
-	node.set_bg_color(img_node_bg_color)
+	node.set_bg_color(img_node_colorpicker.color)
 	select_node(node, exclusive_select)
 	if open_image_file:
 		display_open_image_file_dialog(node)
@@ -1011,7 +1015,6 @@ func build_graph(graph_data: GraphData):
 	custom_styles.bg_color = graph_data.graph_bg_color
 	
 	img_node_colorpicker.color = graph_data.img_node_bg_color
-	img_node_bg_color = graph_data.img_node_bg_color
 	
 	build_graph_nodes(graph_data, true, false)
 
@@ -1082,7 +1085,7 @@ func store_graph(graph_data: GraphData, selected_nodes_only: bool):
 	graph_data.version_subminor = PROJECT_FILE_VERSION_SUBMINOR
 	
 	graph_data.graph_bg_color = graph_bg_colorpicker.color
-	graph_data.img_node_bg_color = img_node_bg_color
+	graph_data.img_node_bg_color = img_node_colorpicker.color
 	
 	store_graph_nodes(graph_data, selected_nodes_only)
 
@@ -1141,6 +1144,170 @@ func _on_OpenFileDialog_file_selected(path):
 
 func _on_SaveFileDialog_file_selected(path):
 	save_graph_to_file(path)
+	move_hidden_popups_out_of_the_way()
+
+
+############
+## EXPORT ##
+############
+
+func get_safe_path(path: String) -> String:
+	return '\"' + path + '\"'
+
+
+# Converts time in seconds to string "HH:MM:SS,MLS".
+func time_sec_to_HMSMS(time_in_sec: float) -> String:
+	var time_in_sec_int: int = floor(time_in_sec)
+	var msecs: int = round((time_in_sec - time_in_sec_int) * 1000)
+	var seconds: int = time_in_sec_int%60
+	var minutes: int = (time_in_sec_int/60)%60
+	var hours: int = (time_in_sec_int/60)/60
+	
+	return "%02d:%02d:%02d.%03d" % [hours, minutes, seconds, msecs]
+
+
+# Creates and saves a solid color png file to be used in place of images when there are no images.
+func save_solid_color(png_path: String, color: Color, width: int, height: int):
+	var ffmpeg_path_safe: String = get_safe_path(ffmpeg_path)
+#	void Image.fill(color: Color)
+#	Error Image.save_png(path: String) const
+	var color_info: String = "color=size=" + str(width) + "x" + str(height) + ":color=0x" + color.to_html(false)
+	var exit_code = OS.execute(ffmpeg_path_safe, ["-y", "-f", "lavfi", "-i", color_info, "-frames:v", "1", png_path], true)
+	print("(save_solid_color) exit_code ", exit_code)
+
+
+# Creates and saves a 1/10th second blank mp3 file.
+func save_blank_sound(mp3_path: String):
+	var ffmpeg_path_safe: String = get_safe_path(ffmpeg_path)
+	var exit_code = OS.execute(ffmpeg_path_safe, ["-y", "-f", "lavfi", "-i", "anullsrc=r=44100:cl=mono", "-t", "0.1", "-q:a", "9", "-acodec", "libmp3lame", mp3_path], true)
+	print("(save_blank_sound) exit_code ", exit_code)
+
+
+func save_image_list(path: String, starting_node: ImageGraphNode, png_path: String):
+	var file = File.new()
+	file.open(path, File.WRITE)
+	
+	var img_node: = starting_node
+	while img_node:
+		if img_node.img_path.empty():
+			file.store_line("file '" + png_path.get_file() + "'\r")
+		else:
+			file.store_line("file '" + img_node.img_path.get_file() + "'\r")
+		file.store_line("duration " + time_sec_to_HMSMS(img_node.get_duration()) + "\r")
+		
+		if not img_node.next_node:
+			file.store_line("file '" + img_node.img_path.get_file())
+		
+		img_node = img_node.next_node
+	
+	file.close()
+
+
+func save_sound_list(path: String, starting_node: ImageGraphNode, mp3_path: String):
+	var file = File.new()
+	file.open(path, File.WRITE)
+	
+	var elapsed_time: float = 0.0
+	var img_node: = starting_node
+	while img_node:
+		var dur: float = img_node.get_duration()
+		if img_node.snd_path.empty():
+			file.store_line("file '" + mp3_path.get_file() + "'\r")
+		else:
+			file.store_line("file '" + img_node.snd_path.get_file() + "'\r")
+		file.store_line("duration " + time_sec_to_HMSMS(dur) + "\r")
+#		file.store_line("outpoint " + time_sec_to_HMSMS(dur) + "\r")
+		
+		elapsed_time += dur
+		img_node = img_node.next_node
+	
+	file.close()
+
+
+func save_subtitles(path: String, starting_node: ImageGraphNode):
+	var file = File.new()
+	file.open(path, File.WRITE)
+	
+	var index = 1
+	var elapsed_time: float = 0.0
+	var img_node: = starting_node
+	while img_node:
+		var sub: String = img_node.get_subtitle().replace('\n', '\r\n')
+		var dur: float = img_node.get_duration()
+		if not sub.empty():
+			file.store_line(str(index) + '\r')
+			file.store_line(time_sec_to_HMSMS(elapsed_time) + " --> " + time_sec_to_HMSMS(elapsed_time + dur - 0.005) + '\r')
+			file.store_line(sub + '\r')
+			file.store_line('\r')
+		index += 1
+		elapsed_time += dur
+		img_node = img_node.next_node
+	
+	file.close()
+
+
+func export_to_video(video_path: String):
+	assert(video_path)
+	assert(selected_img_nodes.size() == 1)
+	
+	var starting_node: ImageGraphNode = selected_img_nodes.front()
+	
+	var output_dir: String = video_path.get_base_dir()
+	var video_filename: String = video_path.get_file()
+	var video_name: String = video_filename.rstrip('.' + video_filename.get_extension())
+	
+	# Write a png file used when image nodes have no image.
+	var png_path: String = output_dir + "/bg_color.png"
+	save_solid_color(png_path, img_node_colorpicker.color, starting_node.image_width, starting_node.image_height)
+	
+	# Write blank mp3
+	var mp3_path: String = output_dir + "/blank.mp3"
+	save_blank_sound(mp3_path)
+	
+	# Write a text file containing a list of images and durations in the same directory as the output video.
+	var img_list_path: String = output_dir + "/images.txt"
+	save_image_list(img_list_path, starting_node, png_path)
+	
+	# Write a text file containing a list of sounds and durations in the same directory as the output video.
+	var snd_list_path: String = output_dir + "/sounds.txt"
+	save_sound_list(snd_list_path, starting_node, mp3_path)
+	
+	# Subtiltles
+	var sub_path: String = output_dir + "/" + video_name + ".srt"
+	save_subtitles(sub_path, starting_node)
+	
+	# Export a video from the image list.
+	var ffmpeg_path_safe: String = get_safe_path(ffmpeg_path)
+	var img_list_path_safe: String = get_safe_path(img_list_path)
+	var snd_list_path_safe: String = get_safe_path(snd_list_path)
+	var output_path_safe: String = get_safe_path(video_path)
+	var exit_code = OS.execute(ffmpeg_path_safe, ["-y", "-f", "concat", "-safe", "0", "-i", img_list_path_safe, "-f", "concat", "-i", snd_list_path_safe, "-pix_fmt", "yuv420p", "-movflags", "+faststart", output_path_safe], true)
+	print("(export_to_video) exit_code ", exit_code)
+	
+	# Delete temporary files.
+	var dir = Directory.new()
+	dir.remove(png_path)
+	dir.remove(mp3_path)
+	dir.remove(img_list_path)
+	dir.remove(snd_list_path)
+	
+	# Play the output video.
+	OS.shell_open(video_path)
+
+
+func display_export_video_file_dialog():
+	var dir = Directory.new()
+	assert(dir.file_exists("res://ffmpeg.exe"))
+	export_video_file_dlg.popup_centered()
+
+
+func _on_ExportVideoFileDialog_file_selected(path):
+	if not path.empty():
+		export_to_video(path)
+	move_hidden_popups_out_of_the_way()
+
+
+func _on_ExportVideoFileDialog_popup_hide():
 	move_hidden_popups_out_of_the_way()
 
 
