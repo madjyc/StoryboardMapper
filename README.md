@@ -1,8 +1,8 @@
 ![License](https://img.shields.io/badge/license-MIT-orange.svg)
 ![Godot Version](https://img.shields.io/badge/godot-3.5-blue.svg)
-![Version](https://img.shields.io/badge/version-v0.2.2-green.svg)
+![Version](https://img.shields.io/badge/version-v0.2.3-green.svg)
 
-# Storyboard Mapper v0.2.2
+# Storyboard Mapper v0.2.3
 
 **Mind-mapping for storyboarders**, made in **Godot Engine 3.5**.
 
@@ -46,12 +46,11 @@ And that's it!
 
 Happy storyboard mapping!
 
-## Features
+## Quick guide
 
-* ***KNOWN BUG***: Sometimes, frames inside a comment box won't let you connect or disconnect them. Just **zoom out** a bit to get things back to normal.
-* ***KNOWN LIMITATION***: You can only export videos in the folder containing your images and sounds. This will be fixed later.
+* ***KNOWN BUG***: Sometimes, frames inside a comment box won't let you connect or disconnect them. Just **zoom out** a bit and you'll be able to drag connections normally.
 ##
-* Hit <kbd>F1</kbd> or go to <kbd>Help > Help</kbd> to display a short documentation.
+* Hit <kbd>F1</kbd> or click on <kbd>Help > Quick Guide</kbd> to display a short documentation.
 * Use your **middle mouse button** to scroll the board, and your **scrollwheel** to zoom in/out.
 * Import as many images as your RAM can handle. Drag and drop image files from your file explorer, or click on <kbd>+</kbd>, or double-click on empty space.
 * Drag from the **ouput** pin of a frame to the **input** pin of another frame to connect them. Hey, you're building a sequence already!
