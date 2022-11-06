@@ -1,7 +1,0 @@
-file DrumsOfTumbalku_Seq001_Sht020_Prt50_Ver01.png
-duration 1
-file bg_color.png
-duration 1
-file DrumsOfTumbalku_Seq001_Sht020_Prt51_Ver01.png
-duration 1
-file DrumsOfTumbalku_Seq001_Sht020_Prt51_Ver01.png
