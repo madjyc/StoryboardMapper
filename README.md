@@ -2,13 +2,19 @@
 ![Godot Version](https://img.shields.io/badge/godot-3.5-blue.svg)
 ![Version](https://img.shields.io/badge/version-v0.2.3-green.svg)
 
-# Storyboard Mapper v0.2.3
+# StoryboardMapper v0.2.3
 
 **Mind-mapping for storyboarders**, made in **Godot Engine 3.5**.
 
-**Storyboard Mapper** helps to organize your images in sequences, like connected **Post-It**s, and play them in realtime in a slideshow. Give each image a duration, add subtitles or even a sound file if you want to. You're done.
+**StoryboardMapper** helps you organize your frames in sequences, like connected **Post-It**s, and play them in realtime in a slideshow. Give each image a duration, add subtitles or even a sound file. You're done.
 
 ![screenshot](../Images/Screencopies/StoryboardMapper.jpg)
+
+## Download the latest executable for Windows 7+
+
+![StoryboardMapper_0_2_3.exe (36.6 Mb)](../binaries/win64/StoryboardMapper_win64_0_2_3.exe)
+
+## Or run StoryboardMapper directly in Godot Engine 3.5
 
 **As simple as 1-2-3:**
 
@@ -17,20 +23,20 @@
 ### [Click here to download Godot Engine 3.5 (Standard version)](https://godotengine.org/download)
 You don't need to install **Godot Engine**, it's an executable file. Just unzip it and you're done.
 
-## 2. Download Storyboard Mapper
+## 2. Download StoryboardMapper
 
 If for some reason you're not keen on cloning the repository, you can simply download the project in a ZIP file:
 1. Click on the green <kbd>Code</kbd> button at the top of this page, then on <kbd>Download ZIP</kbd>.
 2. Unzip it wherever you fancy.
-3. Run **Godot Engine**. The first time you run it, you'll need to tell **Godot Engine** where you unzipped **Storyboard Mapper**. Click on <kbd>Import</kbd> and find **Storyboard Mapper** wherever you unzipped it, select the project file "**project.godot**", and click on <kbd>Open</kbd>.
-4. Select **Storyboard Mapper** in the list, then click on <kbd>Run</kbd>. And there you go. Easy peasy.
+3. Run **Godot Engine**. The first time you run it, you'll need to tell **Godot Engine** where you unzipped **StoryboardMapper**. Click on <kbd>Import</kbd> and find **StoryboardMapper** wherever you unzipped it, select the project file "**project.godot**", and click on <kbd>Open</kbd>.
+4. Select **StoryboardMapper** in the list, then click on <kbd>Run</kbd>. And there you go. Easy peasy.
 
 ## 3. Install FFMpeg (optional)
 
-**Storyboard Mapper** will work fine as is, but if you want to be able to export image sequences as MP4 videos, you'll need to "install" FFMpeg properly.
+**StoryboardMapper** will work fine as is, but if you want to be able to export image sequences as MP4 videos, you'll need to "install" FFMpeg properly.
 1. Download **FFMpeg** from the [official FFMpeg website](https://ffmpeg.org/download.html). For example, Windows users will click on the Windows logo, then on one of the two available depositaries (e.g. "Windows builds from gyan.dev"). Download the smallest version (e.g. "ffmpeg-release-essentials.7z" from gyan.dev, in the "release builds" section).
 2. Unzip it wherever you like. You will delete this folder anyways, you just need one of its files.
-3. Copy the file named **ffmpeg** from the <kbd>bin</kbd> folder to your project folder (i.e. where you unzipped **Storyboard Mapper**, next to the "**project.godot**" file). Done. You can now safely delete both the FFMpeg zip file you have downloaded and its unzipped folder.
+3. Copy the file named **ffmpeg** from the <kbd>bin</kbd> folder to your project folder (i.e. where you unzipped **StoryboardMapper**, next to the "**project.godot**" file). Done. You can now safely delete both the FFMpeg zip file you have downloaded and its unzipped folder.
 
 ## Now use it!
 
