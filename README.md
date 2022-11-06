@@ -49,7 +49,8 @@ Happy storyboard mapping!
 ## Features
 
 * ***KNOWN BUG***: Sometimes, frames inside a comment box won't let you connect or disconnect them. Just **zoom out** a bit to get things back to normal.
-
+* ***KNOWN LIMITATION***: You can only export videos in the folder containing your images and sounds. This will be fixed later.
+##
 * Hit <kbd>F1</kbd> or go to <kbd>Help > Help</kbd> to display a short documentation.
 * Use your **middle mouse button** to scroll the board, and your **scrollwheel** to zoom in/out.
 * Import as many images as your RAM can handle. Drag and drop image files from your file explorer, or click on <kbd>+</kbd>, or double-click on empty space.
