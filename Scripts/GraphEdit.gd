@@ -12,7 +12,7 @@ const APP_NAME: String = "StoryboardMapper"
 const DEFAULT_PROJECT_FILENAME: String = "Untitled"
 const PROJECT_FILE_VERSION_MAJOR: int = 0
 const PROJECT_FILE_VERSION_MINOR: int = 2
-const PROJECT_FILE_VERSION_SUBMINOR: int = 2
+const PROJECT_FILE_VERSION_SUBMINOR: int = 3
 const IMAGE_FILE_EXTENSIONS: Array = ["jpg", "jpeg", "png", "bmp"]
 const DEFAULT_IMG_NODE_SPACING: float = 40.0
 const MIN_DRAG_DISTANCE: float = 5.0
@@ -1190,13 +1190,13 @@ func save_image_list(path: String, starting_node: ImageGraphNode, png_path: Stri
 	var img_node: = starting_node
 	while img_node:
 		if img_node.img_path.empty():
-			file.store_line("file '" + png_path.get_file() + "'\r")
+			file.store_line("file '" + png_path + "'\r")
 		else:
-			file.store_line("file '" + img_node.img_path.get_file() + "'\r")
+			file.store_line("file '" + img_node.img_path.replacen('\\', '/') + "'\r")
 		file.store_line("duration " + time_sec_to_HMSMS(img_node.get_duration()) + "\r")
 		
 		if not img_node.next_node:
-			file.store_line("file '" + img_node.img_path.get_file())
+			file.store_line("file '" + img_node.img_path.replacen('\\', '/') + "'\r")
 		
 		img_node = img_node.next_node
 	
@@ -1212,9 +1212,9 @@ func save_sound_list(path: String, starting_node: ImageGraphNode, mp3_path: Stri
 	while img_node:
 		var dur: float = img_node.get_duration()
 		if img_node.snd_path.empty():
-			file.store_line("file '" + mp3_path.get_file() + "'\r")
+			file.store_line("file '" + mp3_path + "'\r")
 		else:
-			file.store_line("file '" + img_node.snd_path.get_file() + "'\r")
+			file.store_line("file '" + img_node.snd_path.replacen('\\', '/') + "'\r")
 		file.store_line("duration " + time_sec_to_HMSMS(dur) + "\r")
 #		file.store_line("outpoint " + time_sec_to_HMSMS(dur) + "\r")
 		
@@ -1252,36 +1252,36 @@ func export_to_video(video_path: String):
 	
 	var starting_node: ImageGraphNode = selected_img_nodes.front()
 	
-	var output_dir: String = video_path.get_base_dir()
+	var video_output_dir: String = video_path.get_base_dir()
 	var video_filename: String = video_path.get_file()
 	var video_name: String = video_filename.rstrip('.' + video_filename.get_extension())
 	
 	# Write a png file used when image nodes have no image.
-	var png_path: String = output_dir + "/bg_color.png"
+	var png_path: String = video_output_dir + "/bg_color.png"
 	save_solid_color(png_path, img_node_colorpicker.color, starting_node.image_width, starting_node.image_height)
 	
 	# Write blank mp3
-	var mp3_path: String = output_dir + "/blank.mp3"
+	var mp3_path: String = video_output_dir + "/blank.mp3"
 	save_blank_sound(mp3_path)
 	
 	# Write a text file containing a list of images and durations in the same directory as the output video.
-	var img_list_path: String = output_dir + "/images.txt"
+	var img_list_path: String = video_output_dir + "/images.txt"
 	save_image_list(img_list_path, starting_node, png_path)
 	
 	# Write a text file containing a list of sounds and durations in the same directory as the output video.
-	var snd_list_path: String = output_dir + "/sounds.txt"
+	var snd_list_path: String = video_output_dir + "/sounds.txt"
 	save_sound_list(snd_list_path, starting_node, mp3_path)
 	
 	# Subtiltles
-	var sub_path: String = output_dir + "/" + video_name + ".srt"
+	var sub_path: String = video_output_dir + "/" + video_name + ".srt"
 	save_subtitles(sub_path, starting_node)
 	
 	# Export a video from the image list.
 	var ffmpeg_path_safe: String = get_safe_path(ffmpeg_path)
 	var img_list_path_safe: String = get_safe_path(img_list_path)
 	var snd_list_path_safe: String = get_safe_path(snd_list_path)
-	var output_path_safe: String = get_safe_path(video_path)
-	var exit_code = OS.execute(ffmpeg_path_safe, ["-y", "-f", "concat", "-safe", "0", "-i", img_list_path_safe, "-f", "concat", "-i", snd_list_path_safe, "-pix_fmt", "yuv420p", "-movflags", "+faststart", output_path_safe], true)
+	var video_path_safe: String = get_safe_path(video_path)
+	var exit_code = OS.execute(ffmpeg_path_safe, ["-y", "-f", "concat", "-safe", "0", "-i", img_list_path_safe, "-f", "concat", "-safe", "0", "-i", snd_list_path_safe, "-pix_fmt", "yuv420p", "-movflags", "+faststart", video_path_safe], true)
 	print("(export_to_video) exit_code ", exit_code)
 	
 	# Delete temporary files.
@@ -1361,7 +1361,7 @@ func _on_OpenSndFileDialog_file_selected(path):
 func play_animation():
 	if selected_img_nodes.size() != 1:
 		return
-	display_dlg.init_dialog(selected_img_nodes.front())
+	display_dlg.init_dialog(img_node_colorpicker.color, selected_img_nodes.front())
 	if display_dlg.window_bounds == Rect2():
 		display_dlg.popup_centered()
 	else:

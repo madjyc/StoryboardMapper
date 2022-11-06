@@ -71,43 +71,174 @@ margin_top = 8.0
 margin_right = -8.0
 margin_bottom = -36.0
 bbcode_enabled = true
-bbcode_text = "[center][shake rate=10
- level=8][color=white]STORYBOARD MAPPER[/color][/shake]
+bbcode_text = "[center][color=white]QUICK GUIDE[/color][/center]
 
-[color=aqua]Import images[/color]
-    [color=silver]Drag & drop images from your file explorer on empty space. If you are dragging multiple files at once, pay attention to the file your mouse cursor is on when dragging, this will be the first node of the sequence.[/color]
-    [color=silver]Tip: Set the number of columns (in the upper right corner) before dragging the files.[/color]
+[center][color=aqua]Moving and zooming in/out[/color][/center]
+  [color=silver]Use your [color=white]middle mouse button[/color] to scroll the board. Use your [color=white]scrollwheel[/color] to zoom in/out.[/color]
 
-[color=aqua]Add a new node[/color]
-    [color=silver]Click on the + button, or double-click on empty space, or start dragging from a node's input or output pin, then release on empty space.[/color]
+[center][color=aqua]Importing images[/color][/center]
+  [color=silver]Drag image files from your file explorer and drop them on the board. The images will automatically be sorted and connected in alphabetical order.[/color]
 
-[color=aqua]Connect two nodes[/color]
-    [color=silver]Drag from the first node's output pin to the second node's input pin (or vice-versa).[/color]
+[center][color=aqua]Adding a new frame[/color][/center]
+  [color=silver]Click on the [color=white]+[/color] button, or double-click on empty space. Or drag from the input or output pin of a frame and release on empty space.[/color]
 
-[color=aqua]Disconnect two nodes[/color]
-    [color=silver]Drag the connection's end (the second node's input pin), then release on empty space.[/color]
+[center][color=aqua]Selecting frames[/color][/center]
+  [color=silver]Click on a frame to select it. Drag a marquee around several frames to select them.
+  [color=white]Ctrl + click[/color] frames to add them to or subtract them from the selection.
+  [color=white]Shift + click[/color] a frame to add all connected frames between this frame and the selected frames to the selection.
+  To select all frames upstream to the selected frame, open the [color=white]Select[/color] menu and click on [color=white]Select Before[/color]. To select its downstream frames, click on [color=white]Select After[/color]. [color=white]Select Connected[/color] selects both. [color=white]Select Graph[/color] selects all nodes belonging to the same connection network.[/color]
 
-[color=aqua]Play sequence[/color]
-    [color=silver]Select the first node of the sequence, then click on the play button, or double-click on the first node of the sequence.[/color]
-[/center]"
-text = "STORYBOARD MAPPER
+[center][color=aqua]Connecting two frames[/color][/center]
+  [color=silver]Drag from the ouput pin of a frame to the input pin of another frame to connect them.[/color]
 
-Import images
-    Drag & drop images from your file explorer on empty space. If you are dragging multiple files at once, pay attention to the file your mouse cursor is on when dragging, this will be the first node of the sequence.
-    Tip: Set the number of columns (in the upper right corner) before dragging the files.
+[center][color=aqua]Disconnecting two frames[/color][/center]
+  [color=silver]Drag from the input pin of a frame (i.e. the right end of the connection) to disconnect it from the previous frame.[/color]
 
-Add a new node
-    Click on the + button, or double-click on empty space, or start dragging from a node's input or output pin, then release on empty space.
+[center][color=aqua]Playing a sequence[/color][/center]
+  [color=silver]Double-click on a frame to play the sequence from that frame. Or click on the [color=white]movie slate[/color] button in the tool bar.
+Tip: From the player window, you can adjust each frame's duration, subtitles, sound, reload its image, etc.[/color]
 
-Connect two nodes
-    Drag from the first node's output pin to the second node's input pin (or vice-versa).
+[center][color=aqua]Exporting a sequence to video[/color][/center]
+  [color=silver]Select the first frame of the sequence, then open the [color=white]File[/color] menu and click on [color=white]Export to Video[/color].[/color]
+[color=silver]Important: All images must have the same size to be exported as a video.[/color]
+[color=lime]Tip: If this option is not available, you will have to install [color=white]FFMpeg[/color] as described in the [color=white]Help[/color] menu.[/color]
 
-Disconnect two nodes
-    Drag the connection's end (the second node's input pin), then release on empty space.
+[center][color=aqua]Changing background colors[/color][/center]
+  [color=silver]You can customize the window background color, or all frames background color, by clicking on their respective colorpicker button in the tool bar.[/color]
 
-Play sequence
-    Select the first node of the sequence, then click on the play button, or double-click on the first node of the sequence.
-"
+[center][color=aqua]Resizing frames[/color][/center]
+  [color=silver]Resize a frame by dragging its lower-right corner.
+Tip: To change the size of multiple frames, resize one frame, select it, open the [color=white]Edit[/color] menu, choose [color=white]Store Size[/color], then select a group of frames, open the [color=white]Edit[/color] menu again and choose [color=white]Apply Stored Size[/color].[/color]
+
+[center][color=aqua]Aligning/distributing frames[/color][/center]
+  [color=silver]Select a bunch of frames, open the [color=white]Edit[/color] menu and click on [color=white]Align Horizontally[/color] or [color=white]Align Vertically[/color] to align them.
+  If you're picky on alignment, click on the [color=white]grid with magnet[/color] button in the tool bar to display a grid, which can be configured via the spinbox on its right. Frames and comments will automatically snap to the grid.
+  To evenly distribute all frames downstream of the selected frame, open the [color=white]Edit[/color] menu and click on [color=white]Distribute Horizontally[/color], or [color=white]Distribute Vertically[/color], or any of the distribution options.
+Tip: Remember to set the number of columns in the distribute grid before clicking on [color=white]Distribute Grid[/color]![/color]
+
+[center][color=aqua]Adding a comment box[/color][/center]
+  [color=silver]Click on the [color=white]#[/color] button in the tool bar to add a comment box. Resize the comment box by dragging its bottom-right corner. Click on empy space inside the comment box and type some text. You've made yourself a comment box.[/color]
+
+[center][color=aqua]Customizing a comment box[/color][/center]
+  [color=silver]Change the color of a comment box by clicking on its colorpicker button. Add up to 6 icons to the comment box by clicking on its top-left [color=white]light bulb[/color] button. Remove them one by one by clicking on the top-left [color=white]trash can[/color] button of the comment box.
+
+[center][color=aqua]Hosting frames in a comment box[/color][/center]
+  [color=silver]Comment boxes can host (or \"parent\") frames. Select a bunch of frames, then click on the [color=white]+[/color] button at the top right of the comment box. Even better, select frames before you click on the [color=white]#[/color] button to let the new comment box host them right off the bat.
+  To unhost (or \"unparent\") hosted frames, select them, then click on the [color=white]trash can[/color] button at the top-righ of the comment box.
+  Moving a comment box moves its hosted frames. A comment box automatically deforms to fit the frames that host it, even when you move or resize them. As a result, comment boxes hosting frames cannot be resized manually, they automatically conform to their content. And only 3 lines of text are displayed, use the scrollbar to read the rest.[/color]
+
+[center][color=red]KNOWN BUG[/color][/center]
+  [color=silver]Sometimes, frames inside a comment box won't let you connect or disconnect them. Just [color=white]zoom out a bit[/color] and you will be able to drag connections normally.[/color]"
+text = "QUICK GUIDE
+
+Moving and zooming in/out
+  Use your middle mouse button to scroll the board. Use your scrollwheel to zoom in/out.
+
+Importing images
+  Drag image files from your file explorer and drop them on the board. The images will automatically be sorted and connected in alphabetical order.
+
+Adding a new frame
+  Click on the + button, or double-click on empty space. Or drag from the input or output pin of a frame and release on empty space.
+
+Selecting frames
+  Click on a frame to select it. Drag a marquee around several frames to select them.
+  Ctrl + click frames to add them to or subtract them from the selection.
+  Shift + click a frame to add all connected frames between this frame and the selected frames to the selection.
+  To select all frames upstream to the selected frame, open the Select menu and click on Select Before. To select its downstream frames, click on Select After. Select Connected selects both. Select Graph selects all nodes belonging to the same connection network.
+
+Connecting two frames
+  Drag from the ouput pin of a frame to the input pin of another frame to connect them.
+
+Disconnecting two frames
+  Drag from the input pin of a frame (i.e. the right end of the connection) to disconnect it from the previous frame.
+
+Playing a sequence
+  Double-click on a frame to play the sequence from that frame. Or click on the movie slate button in the tool bar.
+Tip: From the player window, you can adjust each frame's duration, subtitles, sound, reload its image, etc.
+
+Exporting a sequence to video
+  Select the first frame of the sequence, then open the File menu and click on Export to Video.
+Important: All images must have the same size to be exported as a video.
+Tip: If this option is not available, you will have to install FFMpeg as described in the Help menu.
+
+Changing background colors
+  You can customize the window background color, or all frames background color, by clicking on their respective colorpicker button in the tool bar.
+
+Resizing frames
+  Resize a frame by dragging its lower-right corner.
+Tip: To change the size of multiple frames, resize one frame, select it, open the Edit menu, choose Store Size, then select a group of frames, open the Edit menu again and choose Apply Stored Size.
+
+Aligning/distributing frames
+  Select a bunch of frames, open the Edit menu and click on Align Horizontally or Align Vertically to align them.
+  If you're picky on alignment, click on the grid with magnet button in the tool bar to display a grid, which can be configured via the spinbox on its right. Frames and comments will automatically snap to the grid.
+  To evenly distribute all frames downstream of the selected frame, open the Edit menu and click on Distribute Horizontally, or Distribute Vertically, or any of the distribution options.
+Tip: Remember to set the number of columns in the distribute grid before clicking on Distribute Grid!
+
+Adding a comment box
+  Click on the # button in the tool bar to add a comment box. Resize the comment box by dragging its bottom-right corner. Click on empy space inside the comment box and type some text. You've made yourself a comment box.
+
+Customizing a comment box
+  Change the color of a comment box by clicking on its colorpicker button. Add up to 6 icons to the comment box by clicking on its top-left light bulb button. Remove them one by one by clicking on the top-left trash can button of the comment box.
+
+Hosting frames in a comment box
+  Comment boxes can host (or \"parent\") frames. Select a bunch of frames, then click on the + button at the top right of the comment box. Even better, select frames before you click on the # button to let the new comment box host them right off the bat.
+  To unhost (or \"unparent\") hosted frames, select them, then click on the trash can button at the top-righ of the comment box.
+  Moving a comment box moves its hosted frames. A comment box automatically deforms to fit the frames that host it, even when you move or resize them. As a result, comment boxes hosting frames cannot be resized manually, they automatically conform to their content. And only 3 lines of text are displayed, use the scrollbar to read the rest.
+
+KNOWN BUG
+  Sometimes, frames inside a comment box won't let you connect or disconnect them. Just zoom out a bit and you will be able to drag connections normally."
+
+[node name="FFMpegDialog" type="AcceptDialog" parent="."]
+visible = true
+margin_left = -592.0
+margin_top = 890.0
+margin_right = -41.0
+margin_bottom = 1312.0
+popup_exclusive = true
+window_title = "How to install FFMpeg"
+
+[node name="Label2" type="RichTextLabel" parent="FFMpegDialog"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = 8.0
+margin_top = 8.0
+margin_right = -8.0
+margin_bottom = -36.0
+bbcode_enabled = true
+bbcode_text = "
+If you want to be able to export image sequences as MP4 videos, you will need FFMpeg. This free software has to be downloaded and installed separately due to licensing issues.
+
+[color=lime]1. Download FFMpeg.[/color]
+[color=silver]For Windows users, that would mean:
+    1. Go to the official website [color=white][url]https://ffmpeg.org[/url][/color].
+    2. Click on the big green \"Download\" button.
+    3. Move your mouse cursor over the Windows logo, then click on [color=white]\"Windows builds from gyan.dev\"[/color] just below.
+    4. Scroll down to the \"release builds\" section, right-click on [color=white]\"ffmpeg-release-essentials.7z\"[/color] and choose \"Save target As\" to download it.[/color]
+
+[color=lime]2. Install the one file you really need.[/color]
+    [color=silver]1. Unzip the downloaded file.
+    2. Copy the file [color=white]ffmpeg.exe[/color] from the [color=white]bin[/color] folder to your project folder (i.e. where you unzipped StoryboardMapper). And that's it.
+    3. You can now safely delete the downloaded zip file and its unzipped folder. All you needed was that one single file.[/color]
+
+
+[center]Congratulations! You can now export a sequence of frames to a video file.[/center]"
+text = "
+If you want to be able to export image sequences as MP4 videos, you will need FFMpeg. This free software has to be downloaded and installed separately due to licensing issues.
+
+1. Download FFMpeg.
+For Windows users, that would mean:
+    1. Go to the official website https://ffmpeg.org.
+    2. Click on the big green \"Download\" button.
+    3. Move your mouse cursor over the Windows logo, then click on \"Windows builds from gyan.dev\" just below.
+    4. Scroll down to the \"release builds\" section, right-click on \"ffmpeg-release-essentials.7z\" and choose \"Save target As\" to download it.
+
+2. Install the one file you really need.
+    1. Unzip the downloaded file.
+    2. Copy the file ffmpeg.exe from the bin folder to your project folder (i.e. where you unzipped StoryboardMapper). And that's it.
+    3. You can now safely delete the downloaded zip file and its unzipped folder. All you needed was that one single file.
+
+
+Congratulations! You can now export a sequence of frames to a video file."
 
 [node name="AboutDialog" type="AcceptDialog" parent="."]
 visible = true
@@ -128,7 +259,7 @@ margin_bottom = -36.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
 bbcode_enabled = true
-bbcode_text = "[center][shake rate=10 level=8][color=white]STORYBOARD MAPPER v0.2.2[/color][/shake]
+bbcode_text = "[center][shake rate=10 level=7][color=white]STORYBOARD MAPPER v0.2.3[/color][/shake]
 
 Copyright (c) 2022 Jean-Yves Chasle[/center]
 
@@ -137,7 +268,7 @@ Permission is hereby granted, free of charge, to any person obtaining a copy of 
 The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
 THE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE."
-text = "STORYBOARD MAPPER v0.2.2
+text = "STORYBOARD MAPPER v0.2.3
 
 Copyright (c) 2022 Jean-Yves Chasle
 
@@ -151,4 +282,6 @@ THE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMP
 [connection signal="about_to_show" from="CanvasLayer/HBoxContainer/EditMenuButton" to="." method="_on_EditMenuButton_about_to_show"]
 [connection signal="about_to_show" from="CanvasLayer/HBoxContainer/SelecMenuButton" to="." method="_on_SelecMenuButton_about_to_show"]
 [connection signal="popup_hide" from="HelpDialog" to="." method="_on_HelpDialog_popup_hide"]
+[connection signal="popup_hide" from="FFMpegDialog" to="." method="_on_FFMpegDialog_popup_hide"]
+[connection signal="meta_clicked" from="FFMpegDialog/Label2" to="." method="_on_Label2_meta_clicked"]
 [connection signal="popup_hide" from="AboutDialog" to="." method="_on_AboutDialog_popup_hide"]

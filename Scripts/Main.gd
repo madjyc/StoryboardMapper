@@ -41,6 +41,7 @@ enum {
 
 enum {
 	HELP_MENU_HELP,
+	HELP_MENU_FFMPEG,
 	HELP_MENU_SEPARATOR_1,
 	HELP_MENU_WEBSITE,
 	HELP_MENU_SEPARATOR_2,
@@ -53,6 +54,7 @@ onready var selec_menu_button: = $CanvasLayer/HBoxContainer/SelecMenuButton
 onready var help_menu_button: = $CanvasLayer/HBoxContainer/HelpMenuButton
 onready var graph: = $Graph
 onready var help_dlg: = $HelpDialog
+onready var ffmpeg_dlg: = $FFMpegDialog
 onready var about_dlg: = $AboutDialog
 
 
@@ -77,7 +79,7 @@ func _ready():
 	popup.add_separator()
 	popup.add_item("Quit", FILE_MENU_QUIT, KEY_Q | KEY_MASK_CTRL)
 	
-	popup.set_item_tooltip(FILE_EXPORT_VIDEO, "Export sequence to video, starting from selected frame.")
+	popup.set_item_tooltip(FILE_EXPORT_VIDEO, "Export sequence to video, starting from selected frame. To enable this option, please download and install FFMpeg as explained in the Help menu.")
 	popup.set_item_tooltip(FILE_MENU_QUIT, "C'mon. Really?")
 	
 	# --- Edit Menu ---
@@ -128,7 +130,8 @@ func _ready():
 	# --- Help Menu ---
 	popup = help_menu_button.get_popup()
 	popup.connect("id_pressed", self, "_on_HelpMenu_item_pressed")
-	popup.add_item("Help", HELP_MENU_HELP, KEY_F1)
+	popup.add_item("Quick Guide", HELP_MENU_HELP, KEY_F1)
+	popup.add_item("How to install FFMpeg", HELP_MENU_FFMPEG)
 	popup.add_separator()
 	popup.add_item("Website", HELP_MENU_WEBSITE)
 	popup.add_separator()
@@ -240,6 +243,8 @@ func _on_HelpMenu_item_pressed(item_id: int):
 	match item_id:
 		HELP_MENU_HELP:
 			help_dlg.popup_centered()
+		HELP_MENU_FFMPEG:
+			ffmpeg_dlg.popup_centered()
 		HELP_MENU_WEBSITE:
 			OS.shell_open("https://github.com/madjyc/StoryboardMapper")
 		HELP_MENU_ABOUT:
@@ -251,6 +256,8 @@ func move_hidden_popups_out_of_the_way():
 	var infinite_pos: = Vector2(-1e6, -1e6)
 	if help_dlg and not help_dlg.visible:
 		help_dlg.rect_position = infinite_pos
+	if ffmpeg_dlg and not ffmpeg_dlg.visible:
+		ffmpeg_dlg.rect_position = infinite_pos
 	if about_dlg and not about_dlg.visible:
 		about_dlg.rect_position = infinite_pos
 
@@ -259,5 +266,13 @@ func _on_HelpDialog_popup_hide():
 	move_hidden_popups_out_of_the_way()
 
 
+func _on_FFMpegDialog_popup_hide():
+	move_hidden_popups_out_of_the_way()
+
+
 func _on_AboutDialog_popup_hide():
 	move_hidden_popups_out_of_the_way()
+
+
+func _on_Label2_meta_clicked(meta):
+	OS.shell_open(str(meta))

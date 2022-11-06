@@ -14,13 +14,14 @@ var state: int = STOPPED
 var is_looping = false
 
 onready var graph_node = preload("res://Scenes/ImageGraphNode.tscn")
+
+onready var bg_color_rect: = $VBoxContainer/Control/ColorRect
 onready var display_rect: = $VBoxContainer/Control/TextureRect
 onready var subtitle: = $VBoxContainer/Control/Subtitle
 onready var subedit: = $VBoxContainer/HBoxContainer/SubtitleEdit
 onready var spinbox: = $VBoxContainer/HBoxContainer/SpinBox
 onready var play_timer: = $PlayTimer
 onready var audio_player: = $AudioStreamPlayer
-
 
 func _ready():
 	assert(graph_node)
@@ -32,10 +33,11 @@ func _ready():
 	move_hidden_popup_out_of_the_way()
 
 
-func init_dialog(first: ImageGraphNode):
-	assert(first)
+func init_dialog(bg_color: Color, first_node: ImageGraphNode):
+	assert(first_node)
 	state = STOPPED
-	update_node_chain(first)
+	bg_color_rect.color = bg_color
+	update_node_chain(first_node)
 
 
 # Hack to prevent hidden popups from stealing mouse input.
