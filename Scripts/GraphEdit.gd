@@ -1000,11 +1000,22 @@ func build_graph_nodes(graph_data: GraphData, keep_names: bool, select: bool, gr
 func build_graph(graph_data: GraphData):
 	clear_graph()
 	
-	graph_bg_colorpicker.color = graph_data.graph_bg_color
-	var custom_styles: StyleBox = get("custom_styles/bg")
-	custom_styles.bg_color = graph_data.graph_bg_color
+	if graph_data.get("scroll_offset"):
+		scroll_offset = graph_data.scroll_offset
+	if graph_data.get("zoom"):
+		zoom = graph_data.zoom
+	if graph_data.get("use_snap"):
+		use_snap = graph_data.use_snap
+	if graph_data.get("snap_distance"):
+		snap_distance = graph_data.snap_distance
+
+	if graph_data.get("graph_bg_color"):
+		graph_bg_colorpicker.color = graph_data.graph_bg_color
+		var custom_styles: StyleBox = get("custom_styles/bg")
+		custom_styles.bg_color = graph_data.graph_bg_color
 	
-	img_node_colorpicker.color = graph_data.img_node_bg_color
+	if graph_data.get("img_node_bg_color"):
+		img_node_colorpicker.color = graph_data.img_node_bg_color
 	
 	build_graph_nodes(graph_data, true, false)
 
@@ -1071,6 +1082,11 @@ func store_graph(graph_data: GraphData, selected_nodes_only: bool):
 	graph_data.version_minor = PROJECT_FILE_VERSION_MINOR
 	graph_data.version_subminor = PROJECT_FILE_VERSION_SUBMINOR
 	
+	graph_data.scroll_offset = scroll_offset
+	graph_data.zoom = zoom
+	graph_data.use_snap = use_snap
+	graph_data.snap_distance = snap_distance
+
 	graph_data.graph_bg_color = graph_bg_colorpicker.color
 	graph_data.img_node_bg_color = img_node_colorpicker.color
 	
