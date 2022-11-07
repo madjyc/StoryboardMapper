@@ -91,8 +91,8 @@ bbcode_text = "[center][color=white]QUICK GUIDE[/color][/center]
 [center][color=aqua]Connecting two frames[/color][/center]
   [color=silver]Drag from the ouput pin of a frame to the input pin of another frame to connect them.[/color]
 
-[center][color=aqua]Disconnecting two frames[/color][/center]
-  [color=silver]Drag from the input pin of a frame (i.e. the right end of the connection) to disconnect it from the previous frame.[/color]
+[center][color=aqua]Disconnecting frames[/color][/center]
+  [color=silver]Drag from the input pin of a frame (i.e. the connection's right end) to disconnect it from the previous frame. To disconnect several frames at once, select them, open the [color=white]Edit[/color] menu and click on [color=white]Disconnect[/color].[/color]
 
 [center][color=aqua]Playing a sequence[/color][/center]
   [color=silver]Double-click on a frame to play the sequence from that frame. Or click on the [color=white]movie slate[/color] button in the tool bar.
@@ -149,8 +149,8 @@ Selecting frames
 Connecting two frames
   Drag from the ouput pin of a frame to the input pin of another frame to connect them.
 
-Disconnecting two frames
-  Drag from the input pin of a frame (i.e. the right end of the connection) to disconnect it from the previous frame.
+Disconnecting frames
+  Drag from the input pin of a frame (i.e. the connection's right end) to disconnect it from the previous frame. To disconnect several frames at once, select them, open the Edit menu and click on Disconnect.
 
 Playing a sequence
   Double-click on a frame to play the sequence from that frame. Or click on the movie slate button in the tool bar.
@@ -259,7 +259,7 @@ margin_bottom = -36.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
 bbcode_enabled = true
-bbcode_text = "[center][shake rate=10 level=7][color=white]STORYBOARD MAPPER v0.2.3[/color][/shake]
+bbcode_text = "[center][shake rate=10 level=7][color=white]STORYBOARD MAPPER v0.2.4[/color][/shake]
 
 Copyright (c) 2022 Jean-Yves Chasle[/center]
 
@@ -268,7 +268,7 @@ Permission is hereby granted, free of charge, to any person obtaining a copy of 
 The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
 THE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE."
-text = "STORYBOARD MAPPER v0.2.3
+text = "STORYBOARD MAPPER v0.2.4
 
 Copyright (c) 2022 Jean-Yves Chasle
 

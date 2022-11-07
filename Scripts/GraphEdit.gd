@@ -12,7 +12,7 @@ const APP_NAME: String = "StoryboardMapper"
 const DEFAULT_PROJECT_FILENAME: String = "Untitled"
 const PROJECT_FILE_VERSION_MAJOR: int = 0
 const PROJECT_FILE_VERSION_MINOR: int = 2
-const PROJECT_FILE_VERSION_SUBMINOR: int = 3
+const PROJECT_FILE_VERSION_SUBMINOR: int = 4
 const IMAGE_FILE_EXTENSIONS: Array = ["jpg", "jpeg", "png", "bmp"]
 const DEFAULT_IMG_NODE_SPACING: float = 40.0
 const MIN_DRAG_DISTANCE: float = 5.0
@@ -686,10 +686,18 @@ func remove_img_node_output_connection(node: ImageGraphNode):
 		node.next_node = null
 
 
-func remove_node_connections(node: ImageGraphNode):
+func remove_img_node_connections(node: ImageGraphNode):
 	assert(node)
 	remove_img_node_input_connections(node)
 	remove_img_node_output_connection(node)
+
+
+func remove_selected_img_nodes_connections():
+	if selected_img_nodes.empty():
+		return
+	
+	for img_node in selected_img_nodes:
+		remove_img_node_connections(img_node)
 
 
 # Creates a new connection between 'from' and 'to' nodes.
@@ -844,7 +852,7 @@ func delete_node(node: GraphNode):
 	var was_selected: = node.selected
 	deselect_node(node)
 	if node is ImageGraphNode:
-		remove_node_connections(node)
+		remove_img_node_connections(node)
 		remove_img_node_from_all_com_nodes(node)
 	throw_particles(node, PARTICLES_OUT, was_selected)
 	node.queue_free()

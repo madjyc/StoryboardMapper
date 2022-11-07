@@ -27,6 +27,8 @@ enum {
 	EDIT_MENU_SEPARATOR_3,
 	EDIT_MENU_STORE_SIZE,
 	EDIT_MENU_RESIZE_TO_STORED,
+	EDIT_MENU_SEPARATOR_4,
+	EDIT_MENU_DISCONNECT,
 }
 
 enum {
@@ -100,6 +102,8 @@ func _ready():
 	popup.add_separator()
 	popup.add_item("Store Size", EDIT_MENU_STORE_SIZE)#, KEY_G)# | KEY_MASK_CTRL | KEY_MASK_SHIFT)
 	popup.add_item("Apply Stored Size", EDIT_MENU_RESIZE_TO_STORED)#, KEY_G)# | KEY_MASK_CTRL | KEY_MASK_SHIFT)
+	popup.add_separator()
+	popup.add_item("Disconnect", EDIT_MENU_DISCONNECT)
 	
 	popup.set_item_tooltip(EDIT_MENU_DUPLICATE, "Duplicate selected frames.")
 	popup.set_item_tooltip(EDIT_MENU_ALIGN_HORZ, "Align selected frames horizontally.")
@@ -110,6 +114,7 @@ func _ready():
 	popup.set_item_tooltip(EDIT_MENU_DISTRIB_GRID, "Distribute all frames downstream of the selected frame in columns. The number of columns is defined in the spinbox at the top of the screen.")
 	popup.set_item_tooltip(EDIT_MENU_STORE_SIZE, "Store selected frame's size.")
 	popup.set_item_tooltip(EDIT_MENU_RESIZE_TO_STORED, "Apply stored size to selected frames.")
+	popup.set_item_tooltip(EDIT_MENU_DISCONNECT, "Disconnect selected frames.")
 	
 	# --- Select Menu ---
 	popup = selec_menu_button.get_popup()
@@ -210,6 +215,8 @@ func _on_EditMenu_item_pressed(item_id: int):
 			graph.store_selected_img_node_as_custom_img_node_size()
 		EDIT_MENU_RESIZE_TO_STORED:
 			graph.resize_selected_img_nodes_to_custom_img_node_size()
+		EDIT_MENU_DISCONNECT:
+			graph.remove_selected_img_nodes_connections()
 
 
 func _on_SelecMenuButton_about_to_show():
