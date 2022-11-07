@@ -67,6 +67,8 @@ enum {
 
 const APP_NAME: String = "StoryboardMapper"
 const DEFAULT_PROJECT_FILENAME: String = "Untitled"
+const RECENT_FILES_PATH: String = "user://recent.txt"
+const RECENT_FILES_PATH_MAX_LENGTH: int = 50
 
 var recent_submenu = PopupMenu.new()
 var recent_files: = []
@@ -181,12 +183,11 @@ func _ready():
 func populate_recent_submenu():
 	load_recent_paths()
 	recent_submenu.clear()
-	recent_files.push_back("DrumsOfTumbalku_Seq001_Sht020_Prt50_Ver01.png")
-	recent_files.push_back("DrumsOfTumbalku_Seq001_Sht026_Prt03_Ver01.png")
 	for i in range(recent_files.size()):
 		var url: String = recent_files[i]
 		url = url.rstrip('.' + url.get_extension())
-		url = url.right(url.length() - 10)
+		if url.length() >= RECENT_FILES_PATH_MAX_LENGTH:
+			url = "..." + url.right(url.length() - (RECENT_FILES_PATH_MAX_LENGTH - 3))
 		recent_submenu.add_item(url, i)
 	
 	recent_submenu.add_separator()
@@ -194,21 +195,12 @@ func populate_recent_submenu():
 #	recent_submenu.set_item_tooltip(FILE_RECENT_SUBMENU_CLEAR, "Clear the list of recent files.")
 
 
-func load_recent_paths():
-	pass
-
-
-func save_path_to_recent(path: String):
-	pass
-
-
 func _on_FileMenuButton_about_to_show():
 	var popup: PopupMenu = file_menu_button.get_popup()
 	var num_selected: int = graph.get_num_selected_img_nodes()
 	var dir = Directory.new()
 	popup.set_item_disabled(FILE_EXPORT_VIDEO, num_selected != 1 or not dir.file_exists("res://ffmpeg.exe"))
-	
-	# Recent files submenu
+	populate_recent_submenu()
 
 
 func _on_FileMenu_item_pressed(item_id: int):
@@ -228,10 +220,12 @@ func _on_FileMenu_item_pressed(item_id: int):
 
 
 func _on_FileRecentSubmenu_item_pressed(item_id: int):
+	if item_id < recent_files.size():
+		_on_OpenFileDialog_file_selected(recent_files[item_id])
 	match item_id:
 		FILE_RECENT_SUBMENU_CLEAR:
 			recent_files.clear()
-			populate_recent_submenu()
+			save_recent_files()
 
 
 func _on_EditMenuButton_about_to_show():
@@ -387,6 +381,7 @@ func _on_OpenFileDialog_file_selected(path):
 	project_file_name = path.get_file()
 	project_file_path = path
 	update_main_window_title()
+	store_path_to_recent_files(path)
 	graph.load_graph_from_file(path)
 
 
@@ -394,4 +389,39 @@ func _on_SaveFileDialog_file_selected(path):
 	project_file_name = path.get_file()
 	project_file_path = path
 	update_main_window_title()
+	store_path_to_recent_files(path)
 	graph.save_graph_to_file(path)
+
+
+func load_recent_paths():
+	recent_files.clear()
+	var file = File.new()
+	if file.file_exists(RECENT_FILES_PATH):
+		file.open(RECENT_FILES_PATH, File.READ)
+		var file_as_string: String = file.get_as_text(true)
+		var paths: PoolStringArray = file_as_string.split('\n')
+		for path in paths:
+			if not path.empty():
+				recent_files.push_back(path)
+				if recent_files.size() >= 10:
+					break
+		file.close()
+	else:
+		save_recent_files()
+
+
+func store_path_to_recent_files(path: String):
+	if path.empty() or recent_files.has(path):
+		return
+	recent_files.push_front(path)
+	while recent_files.size() > 10:
+		recent_files.pop_back()
+	save_recent_files()
+
+
+func save_recent_files():
+	var file = File.new()
+	file.open(RECENT_FILES_PATH, File.WRITE)
+	for path in recent_files:
+		file.store_line(path)
+	file.close()
