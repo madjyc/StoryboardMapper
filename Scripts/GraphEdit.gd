@@ -1008,7 +1008,7 @@ func build_graph(graph_data: GraphData):
 		use_snap = graph_data.use_snap
 	if graph_data.get("snap_distance"):
 		snap_distance = graph_data.snap_distance
-
+	
 	if graph_data.get("graph_bg_color"):
 		graph_bg_colorpicker.color = graph_data.graph_bg_color
 		var custom_styles: StyleBox = get("custom_styles/bg")

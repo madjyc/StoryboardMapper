@@ -206,7 +206,10 @@ func _on_FileMenu_item_pressed(item_id: int):
 
 func _on_FileRecentSubmenu_item_pressed(item_id: int):
 	if item_id < recent_files.size():
-		_on_OpenFileDialog_file_selected(recent_files[item_id])
+		var path: String = recent_files[item_id]
+		_on_OpenFileDialog_file_selected(path)
+		open_project_file_dlg.set_current_path(path)
+		save_project_file_dlg.set_current_path(path)
 	else: # Clear recent files
 		recent_files.clear()
 		save_recent_files()
@@ -362,6 +365,7 @@ func save_project_file_as():
 
 
 func _on_OpenFileDialog_file_selected(path):
+	save_project_file_dlg.set_current_path(path)
 	project_file_name = path.get_file()
 	project_file_path = path
 	update_main_window_title()
@@ -370,6 +374,7 @@ func _on_OpenFileDialog_file_selected(path):
 
 
 func _on_SaveFileDialog_file_selected(path):
+	open_project_file_dlg.set_current_path(path)
 	project_file_name = path.get_file()
 	project_file_path = path
 	update_main_window_title()
