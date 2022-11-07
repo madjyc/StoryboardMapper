@@ -12,21 +12,6 @@ enum {
 }
 
 enum {
-	FILE_RECENT_SUBMENU_URL0,
-	FILE_RECENT_SUBMENU_URL1,
-	FILE_RECENT_SUBMENU_URL2,
-	FILE_RECENT_SUBMENU_URL3,
-	FILE_RECENT_SUBMENU_URL4,
-	FILE_RECENT_SUBMENU_URL5,
-	FILE_RECENT_SUBMENU_URL6,
-	FILE_RECENT_SUBMENU_URL7,
-	FILE_RECENT_SUBMENU_URL8,
-	FILE_RECENT_SUBMENU_URL9,
-	FILE_RECENT_SUBMENU_SEPARATOR_1,
-	FILE_RECENT_SUBMENU_CLEAR,
-}
-
-enum {
 	EDIT_MENU_CUT,
 	EDIT_MENU_COPY,
 	EDIT_MENU_PASTE,
@@ -222,10 +207,9 @@ func _on_FileMenu_item_pressed(item_id: int):
 func _on_FileRecentSubmenu_item_pressed(item_id: int):
 	if item_id < recent_files.size():
 		_on_OpenFileDialog_file_selected(recent_files[item_id])
-	match item_id:
-		FILE_RECENT_SUBMENU_CLEAR:
-			recent_files.clear()
-			save_recent_files()
+	else: # Clear recent files
+		recent_files.clear()
+		save_recent_files()
 
 
 func _on_EditMenuButton_about_to_show():
