@@ -12,6 +12,21 @@ enum {
 }
 
 enum {
+	FILE_RECENT_SUBMENU_URL0,
+	FILE_RECENT_SUBMENU_URL1,
+	FILE_RECENT_SUBMENU_URL2,
+	FILE_RECENT_SUBMENU_URL3,
+	FILE_RECENT_SUBMENU_URL4,
+	FILE_RECENT_SUBMENU_URL5,
+	FILE_RECENT_SUBMENU_URL6,
+	FILE_RECENT_SUBMENU_URL7,
+	FILE_RECENT_SUBMENU_URL8,
+	FILE_RECENT_SUBMENU_URL9,
+	FILE_RECENT_SUBMENU_SEPARATOR_1,
+	FILE_RECENT_SUBMENU_CLEAR,
+}
+
+enum {
 	EDIT_MENU_CUT,
 	EDIT_MENU_COPY,
 	EDIT_MENU_PASTE,
@@ -50,6 +65,14 @@ enum {
 	HELP_MENU_ABOUT,
 }
 
+const APP_NAME: String = "StoryboardMapper"
+const DEFAULT_PROJECT_FILENAME: String = "Untitled"
+
+var recent_submenu = PopupMenu.new()
+var recent_files: = []
+var project_file_path: String
+var project_file_name: String
+
 onready var file_menu_button: = $CanvasLayer/HBoxContainer/FileMenuButton
 onready var edit_menu_button: = $CanvasLayer/HBoxContainer/EditMenuButton
 onready var selec_menu_button: = $CanvasLayer/HBoxContainer/SelecMenuButton
@@ -58,6 +81,8 @@ onready var graph: = $Graph
 onready var help_dlg: = $HelpDialog
 onready var ffmpeg_dlg: = $FFMpegDialog
 onready var about_dlg: = $AboutDialog
+onready var open_project_file_dlg: = $OpenFileDialog
+onready var save_project_file_dlg: = $SaveFileDialog
 
 
 func _ready():
@@ -69,11 +94,21 @@ func _ready():
 	var popup: PopupMenu
 	move_hidden_popups_out_of_the_way()
 	
+	project_file_name = DEFAULT_PROJECT_FILENAME
+	project_file_path = ""
+	update_main_window_title()
+	
 	# --- File Menu ---
+	recent_submenu.connect("id_pressed", self, "_on_FileRecentSubmenu_item_pressed")
+	recent_submenu.set_name("recent_submenu")
+	populate_recent_submenu()
+
 	popup = file_menu_button.get_popup()
 	popup.connect("id_pressed", self, "_on_FileMenu_item_pressed")
 	popup.add_item("New", FILE_MENU_NEW, KEY_N | KEY_MASK_CTRL)
 	popup.add_item("Open...", FILE_MENU_OPEN, KEY_O | KEY_MASK_CTRL)
+	popup.add_child(recent_submenu)
+	popup.add_submenu_item("Open Recent", "recent_submenu")
 	popup.add_item("Save", FILE_MENU_SAVE, KEY_S | KEY_MASK_CTRL)
 	popup.add_item("Save As...", FILE_MENU_SAVEAS, KEY_S | KEY_MASK_CTRL | KEY_MASK_SHIFT)
 	popup.add_separator()
@@ -143,27 +178,60 @@ func _ready():
 	popup.add_item("About", HELP_MENU_ABOUT)
 
 
+func populate_recent_submenu():
+	load_recent_paths()
+	recent_submenu.clear()
+	recent_files.push_back("DrumsOfTumbalku_Seq001_Sht020_Prt50_Ver01.png")
+	recent_files.push_back("DrumsOfTumbalku_Seq001_Sht026_Prt03_Ver01.png")
+	for i in range(recent_files.size()):
+		var url: String = recent_files[i]
+		url = url.rstrip('.' + url.get_extension())
+		url = url.right(url.length() - 10)
+		recent_submenu.add_item(url, i)
+	
+	recent_submenu.add_separator()
+	recent_submenu.add_item("Clear Recent Files")#, FILE_RECENT_SUBMENU_CLEAR)
+#	recent_submenu.set_item_tooltip(FILE_RECENT_SUBMENU_CLEAR, "Clear the list of recent files.")
+
+
+func load_recent_paths():
+	pass
+
+
+func save_path_to_recent(path: String):
+	pass
+
+
 func _on_FileMenuButton_about_to_show():
 	var popup: PopupMenu = file_menu_button.get_popup()
 	var num_selected: int = graph.get_num_selected_img_nodes()
 	var dir = Directory.new()
 	popup.set_item_disabled(FILE_EXPORT_VIDEO, num_selected != 1 or not dir.file_exists("res://ffmpeg.exe"))
+	
+	# Recent files submenu
 
 
 func _on_FileMenu_item_pressed(item_id: int):
 	match item_id:
 		FILE_MENU_NEW:
-			graph.new_project()
+			new_project()
 		FILE_MENU_OPEN:
-			graph.open_project_file()
+			open_project_file()
 		FILE_MENU_SAVE:
-			graph.save_project_file()
+			save_project_file()
 		FILE_MENU_SAVEAS:
-			graph.save_project_file_as()
+			save_project_file_as()
 		FILE_EXPORT_VIDEO:
 			graph.display_export_video_file_dialog()
 		FILE_MENU_QUIT:
 			get_tree().quit()
+
+
+func _on_FileRecentSubmenu_item_pressed(item_id: int):
+	match item_id:
+		FILE_RECENT_SUBMENU_CLEAR:
+			recent_files.clear()
+			populate_recent_submenu()
 
 
 func _on_EditMenuButton_about_to_show():
@@ -267,6 +335,10 @@ func move_hidden_popups_out_of_the_way():
 		ffmpeg_dlg.rect_position = infinite_pos
 	if about_dlg and not about_dlg.visible:
 		about_dlg.rect_position = infinite_pos
+	if not open_project_file_dlg.visible:
+		open_project_file_dlg.rect_position = infinite_pos
+	if not save_project_file_dlg.visible:
+		save_project_file_dlg.rect_position = infinite_pos
 
 
 func _on_HelpDialog_popup_hide():
@@ -283,3 +355,43 @@ func _on_AboutDialog_popup_hide():
 
 func _on_Label2_meta_clicked(meta):
 	OS.shell_open(str(meta))
+
+
+func update_main_window_title():
+	OS.set_window_title(project_file_name + " - " + APP_NAME)
+
+
+func new_project():
+	project_file_name = DEFAULT_PROJECT_FILENAME
+	project_file_path = ""
+	update_main_window_title()
+	graph.clear_graph()
+
+
+func open_project_file():
+	open_project_file_dlg.popup_centered()
+
+
+func save_project_file():
+	if project_file_path == "":
+		save_project_file_as()
+	else:
+		graph.save_graph_to_file(project_file_path)
+
+
+func save_project_file_as():
+	save_project_file_dlg.popup_centered()
+
+
+func _on_OpenFileDialog_file_selected(path):
+	project_file_name = path.get_file()
+	project_file_path = path
+	update_main_window_title()
+	graph.load_graph_from_file(path)
+
+
+func _on_SaveFileDialog_file_selected(path):
+	project_file_name = path.get_file()
+	project_file_path = path
+	update_main_window_title()
+	graph.save_graph_to_file(path)

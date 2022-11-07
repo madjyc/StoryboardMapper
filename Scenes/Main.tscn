@@ -278,6 +278,27 @@ The above copyright notice and this permission notice shall be included in all c
 
 THE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE."
 
+[node name="OpenFileDialog" type="FileDialog" parent="."]
+margin_left = -696.0
+margin_top = 8.0
+margin_right = -112.0
+margin_bottom = 470.0
+popup_exclusive = true
+window_title = "Open a File"
+mode = 0
+access = 2
+filters = PoolStringArray( "*.res" )
+
+[node name="SaveFileDialog" type="FileDialog" parent="."]
+margin_left = -664.0
+margin_top = -24.0
+margin_right = -80.0
+margin_bottom = 438.0
+popup_exclusive = true
+window_title = "Save File"
+access = 2
+filters = PoolStringArray( "*.res" )
+
 [connection signal="about_to_show" from="CanvasLayer/HBoxContainer/FileMenuButton" to="." method="_on_FileMenuButton_about_to_show"]
 [connection signal="about_to_show" from="CanvasLayer/HBoxContainer/EditMenuButton" to="." method="_on_EditMenuButton_about_to_show"]
 [connection signal="about_to_show" from="CanvasLayer/HBoxContainer/SelecMenuButton" to="." method="_on_SelecMenuButton_about_to_show"]
@@ -285,3 +306,5 @@ THE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMP
 [connection signal="popup_hide" from="FFMpegDialog" to="." method="_on_FFMpegDialog_popup_hide"]
 [connection signal="meta_clicked" from="FFMpegDialog/Label2" to="." method="_on_Label2_meta_clicked"]
 [connection signal="popup_hide" from="AboutDialog" to="." method="_on_AboutDialog_popup_hide"]
+[connection signal="file_selected" from="OpenFileDialog" to="." method="_on_OpenFileDialog_file_selected"]
+[connection signal="file_selected" from="SaveFileDialog" to="." method="_on_SaveFileDialog_file_selected"]

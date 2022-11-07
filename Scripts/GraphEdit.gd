@@ -8,8 +8,6 @@ enum {
 	PARTICLES_OUT,
 }
 
-const APP_NAME: String = "StoryboardMapper"
-const DEFAULT_PROJECT_FILENAME: String = "Untitled"
 const PROJECT_FILE_VERSION_MAJOR: int = 0
 const PROJECT_FILE_VERSION_MINOR: int = 2
 const PROJECT_FILE_VERSION_SUBMINOR: int = 4
@@ -19,8 +17,6 @@ const MIN_DRAG_DISTANCE: float = 5.0
 const NEW_NODE_DEFAULT_OFFSET: = Vector2(0.0, 200.0) # graph space
 
 var custom_img_node_size: Vector2
-var project_file_path: String
-var project_file_name: String
 var selected_img_nodes: Array = [] # array of ImageGraphNode
 var selected_com_nodes: Array = [] # array of CommentGraphNode
 var active_img_node: ImageGraphNode = null
@@ -42,8 +38,6 @@ onready var particlesOut = preload("res://Scenes/ParticlesOut.tscn")
 onready var display_dlg: = $DisplayDialog
 onready var open_image_file_dlg: = $OpenImgFileDialog
 onready var open_sound_file_dlg: = $OpenSndFileDialog
-onready var open_project_file_dlg: = $OpenFileDialog
-onready var save_project_file_dlg: = $SaveFileDialog
 onready var export_video_file_dlg := $ExportVideoFileDialog
 onready var grid_num_columns: = $CanvasLayer/HBoxContainer/GridColsSpinBox
 onready var graph_bg_colorpicker: = $CanvasLayer/HBoxContainer/GraphBgColorPicker
@@ -63,10 +57,6 @@ func _ready():
 	
 	var custom_styles: StyleBox = get("custom_styles/bg")
 	graph_bg_colorpicker.color = custom_styles.bg_color
-	
-	project_file_name = DEFAULT_PROJECT_FILENAME
-	project_file_path = ""
-	update_main_window_title()
 	
 	get_tree().connect("files_dropped", self, "_on_files_dropped")
 	move_hidden_popups_out_of_the_way()
@@ -195,10 +185,6 @@ func _on_DebugButton_pressed():
 #		print("img: ", str(img))
 
 
-func update_main_window_title():
-	OS.set_window_title(project_file_name + " - " + APP_NAME)
-
-
 func update_buttons():
 	display_button.disabled = selected_img_nodes.size() != 1
 
@@ -212,10 +198,6 @@ func move_hidden_popups_out_of_the_way():
 		open_image_file_dlg.rect_position = infinite_pos
 	if not open_sound_file_dlg.visible:
 		open_sound_file_dlg.rect_position = infinite_pos
-	if not open_project_file_dlg.visible:
-		open_project_file_dlg.rect_position = infinite_pos
-	if not save_project_file_dlg.visible:
-		save_project_file_dlg.rect_position = infinite_pos
 	if not export_video_file_dlg.visible:
 		export_video_file_dlg.rect_position = infinite_pos
 #	var parent = get_parent()
@@ -1028,6 +1010,7 @@ func build_graph(graph_data: GraphData):
 
 
 func load_graph_from_file(path: String):
+	move_hidden_popups_out_of_the_way()
 	var dir = Directory.new()
 	if not dir.file_exists(path):
 		print("File ", path, " doesn't exist")
@@ -1042,10 +1025,6 @@ func load_graph_from_file(path: String):
 #				print("Error, incompatible file version ", graph_data.version)
 #				return
 			build_graph(graph_data)
-	
-	project_file_name = path.get_file()
-	project_file_path = path
-	update_main_window_title()
 
 
 func store_graph_nodes(graph_data: GraphData, selected_nodes_only: bool = false):
@@ -1099,6 +1078,7 @@ func store_graph(graph_data: GraphData, selected_nodes_only: bool):
 
 
 func save_graph_to_file(path: String):
+	move_hidden_popups_out_of_the_way()
 	var graph_data = GraphData.new()
 	assert(graph_data)
 	store_graph(graph_data, false)
@@ -1117,42 +1097,6 @@ func save_graph_to_file(path: String):
 	if err != OK:
 		print("Error saving graph: ", err)
 		return
-	
-	project_file_name = path.get_file()
-	project_file_path = path
-	update_main_window_title()
-
-
-func new_project():
-	clear_graph()
-	project_file_name = DEFAULT_PROJECT_FILENAME
-	project_file_path = ""
-	update_main_window_title()
-
-
-func open_project_file():
-	open_project_file_dlg.popup_centered()
-
-
-func save_project_file():
-	if project_file_path == "":
-		save_project_file_as()
-	else:
-		save_graph_to_file(project_file_path)
-
-
-func save_project_file_as():
-	save_project_file_dlg.popup_centered()
-
-
-func _on_OpenFileDialog_file_selected(path):
-	load_graph_from_file(path)
-	move_hidden_popups_out_of_the_way()
-
-
-func _on_SaveFileDialog_file_selected(path):
-	save_graph_to_file(path)
-	move_hidden_popups_out_of_the_way()
 
 
 ############
