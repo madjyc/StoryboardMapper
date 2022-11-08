@@ -1,5 +1,5 @@
-extends GraphEdit
 class_name ImageGraph
+extends GraphEdit
 
 signal play_sequence(bg_color, first_node)
 signal refresh_sequence
@@ -958,7 +958,7 @@ func build_graph_nodes(graph_data: GraphData, keep_names: bool, select: bool, gr
 	for connection in graph_data.connections:
 		var err = connect_node(old_to_new[connection.from], connection.from_port, old_to_new[connection.to], connection.to_port)
 		if err != OK:
-			print("Error loading graph: ", err)
+			printerr("Error loading graph: ", err)
 		
 		var from_node: ImageGraphNode = get_node(old_to_new[connection.from])
 		var to_node: ImageGraphNode = get_node(old_to_new[connection.to])
@@ -1011,7 +1011,7 @@ func load_graph_from_file(path: String):
 	move_hidden_popups_out_of_the_way()
 	var dir = Directory.new()
 	if not dir.file_exists(path):
-		print("File ", path, " doesn't exist")
+		printerr("File ", path, " does not exist.")
 		return
 	
 	if ResourceLoader.exists(path):
@@ -1080,26 +1080,83 @@ func store_graph(graph_data: GraphData, selected_nodes_only: bool):
 	store_graph_nodes(graph_data, selected_nodes_only)
 
 
-func save_graph_to_file(path: String):
-	move_hidden_popups_out_of_the_way()
-	var graph_data = GraphData.new()
+func store_graph_JSON(graph_data: GraphDataJSON, selected_nodes_only: bool):
 	assert(graph_data)
-	store_graph(graph_data, false)
+	graph_data.version_major = PROJECT_FILE_VERSION_MAJOR
+	graph_data.version_minor = PROJECT_FILE_VERSION_MINOR
+	graph_data.version_subminor = PROJECT_FILE_VERSION_SUBMINOR
 	
-	# Crée le directory s'il n'existe pas.
-	var dir_path: String = path.get_base_dir()
-	var dir = Directory.new()
-	if not dir.dir_exists(dir_path):
-		dir.make_dir_recursive(dir_path)
-	if not dir.dir_exists(dir_path):
-		print("Makedir failed")
-		return
+	graph_data.scroll_offset = scroll_offset
+	graph_data.zoom = zoom
+	graph_data.use_snap = use_snap
+	graph_data.snap_distance = snap_distance
+
+	graph_data.graph_bg_color = graph_bg_colorpicker.color
+	graph_data.img_node_bg_color = img_node_colorpicker.color
 	
-	# Sauvegarde graph_data dans le directory donné sous le nom donné.
-	var err = ResourceSaver.save(path, graph_data)
-	if err != OK:
-		print("Error saving graph: ", err)
-		return
+	graph_data.img_nodes.clear()
+	graph_data.connections.clear()
+	graph_data.com_nodes.clear()
+	
+	# Image nodes
+	for node in get_children():
+		if node is ImageGraphNode and (!selected_nodes_only or node.selected):
+			var node_data = GraphNodeData.new()
+			assert(node_data)
+			node_data.name = node.name
+			node_data.offset = node.offset
+			node_data.rect_size = node.rect_size
+			node_data.extra_data = node.get_extra_data()
+			graph_data.img_nodes.append(node_data)
+	
+	# Connexions
+	var connection_list: = get_connection_list()
+	if selected_nodes_only:
+		for connection in connection_list:
+			if get_node(connection.from).selected and get_node(connection.to).selected:
+				graph_data.connections.push_back(connection)
+	else:
+		graph_data.connections = connection_list
+	
+	# Comment nodes
+	for node in get_children():
+		if node is CommentGraphNode and (!selected_nodes_only or node.selected):
+			var node_data = GraphNodeData.new()
+			assert(node_data)
+			node_data.name = node.name
+			node_data.offset = node.offset
+			node_data.rect_size = node.rect_size
+			node_data.extra_data = node.get_extra_data() # /!\ saves all contained image node names
+			graph_data.com_nodes.append(node_data)
+
+
+func save_graph_to_file(path: String):
+	var graph_data = GraphDataJSON.new()
+	assert(graph_data)
+	store_graph_JSON(graph_data, false)
+	graph_data.save_graph_data("H:/Download/Prog/Godot/__POUB/json.txt")
+	graph_data.load_graph_data("H:/Download/Prog/Godot/__POUB/json.txt")
+
+
+#	move_hidden_popups_out_of_the_way()
+#	var graph_data = GraphData.new()
+#	assert(graph_data)
+#	store_graph(graph_data, false)
+#
+#	# Crée le directory s'il n'existe pas.
+#	var dir_path: String = path.get_base_dir()
+#	var dir = Directory.new()
+#	if not dir.dir_exists(dir_path):
+#		dir.make_dir_recursive(dir_path)
+#	if not dir.dir_exists(dir_path):
+#		printerr("Makedir failed")
+#		return
+#
+#	# Sauvegarde graph_data dans le directory donné sous le nom donné.
+#	var err = ResourceSaver.save(path, graph_data)
+#	if err != OK:
+#		printerr("Error saving graph: ", err)
+#		return
 
 
 ############

@@ -1,5 +1,5 @@
-extends GraphNode
 class_name ImageGraphNode
+extends GraphNode
 
 const THUMBNAIL_WIDTH: int = 160
 const THUMBNAIL_HEIGHT: int = 90

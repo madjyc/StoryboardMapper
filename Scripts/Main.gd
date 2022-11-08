@@ -337,9 +337,9 @@ func update_main_window_title():
 	OS.set_window_title(project_file_name + " - " + APP_NAME)
 
 
-###################
-## NEW/LOAD/SAVE ##
-###################
+#########
+## NEW ##
+#########
 
 func new_project():
 	project_file_name = DEFAULT_PROJECT_FILENAME
@@ -347,6 +347,10 @@ func new_project():
 	update_main_window_title()
 	graph.clear_graph()
 
+
+###############
+## LOAD/SAVE ##
+###############
 
 func open_project_file():
 	open_project_file_dlg.popup_centered()
@@ -389,14 +393,17 @@ func load_recent_paths():
 	recent_files.clear()
 	var file = File.new()
 	if file.file_exists(RECENT_FILES_PATH):
-		file.open(RECENT_FILES_PATH, File.READ)
-		var file_as_string: String = file.get_as_text(true)
-		var paths: PoolStringArray = file_as_string.split('\n')
-		for path in paths:
-			if not path.empty():
-				recent_files.push_back(path)
-				if recent_files.size() >= 10:
-					break
+		var err: int = file.open(RECENT_FILES_PATH, File.READ)
+		if err == OK:
+			var file_as_string: String = file.get_as_text(true)
+			var paths: PoolStringArray = file_as_string.split('\n')
+			for path in paths:
+				if not path.empty():
+					recent_files.push_back(path)
+					if recent_files.size() >= 10:
+						break
+		else:
+			printerr("Could not open the file %s. Aborting load operation. Error code: %s" % [RECENT_FILES_PATH, err])
 		file.close()
 	else:
 		save_recent_files()
@@ -415,9 +422,12 @@ func store_path_to_recent_files(path: String):
 
 func save_recent_files():
 	var file = File.new()
-	file.open(RECENT_FILES_PATH, File.WRITE)
-	for path in recent_files:
-		file.store_line(path)
+	var err: int = file.open(RECENT_FILES_PATH, File.WRITE)
+	if err == OK:
+		for path in recent_files:
+			file.store_line(path)
+	else:
+		printerr("Could not open the file %s. Aborting save operation. Error code: %s" % [RECENT_FILES_PATH, err])
 	file.close()
 
 

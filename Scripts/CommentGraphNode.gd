@@ -1,5 +1,5 @@
-extends GraphNode
 class_name CommentGraphNode
+extends GraphNode
 
 const DEFAULT_SIZE: = Vector2(230.0, 80.0) # graph space
 const LEFT_MARGIN: = 16.0 # graph space

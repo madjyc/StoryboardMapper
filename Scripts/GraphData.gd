@@ -1,5 +1,5 @@
-extends Resource
 class_name GraphData
+extends Resource
 
 # Load/save data
 export var version_major: int

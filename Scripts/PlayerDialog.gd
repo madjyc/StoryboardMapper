@@ -1,6 +1,5 @@
-extends WindowDialog
 class_name DisplayDialog
-
+extends WindowDialog
 
 enum {
 	PLAYING,

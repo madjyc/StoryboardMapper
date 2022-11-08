@@ -1,5 +1,5 @@
-extends Resource
 class_name GraphNodeData
+extends Resource
 
 # Load/save data
 export var name: String
