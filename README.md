@@ -1,8 +1,8 @@
 ![License](https://img.shields.io/badge/license-MIT-orange.svg)
 ![Godot Version](https://img.shields.io/badge/godot-3.5-blue.svg)
-![Version](https://img.shields.io/badge/version-v0.2.4-green.svg)
+![Version](https://img.shields.io/badge/version-v0.2.5-green.svg)
 
-# StoryboardMapper v0.2.4
+# StoryboardMapper v0.2.5
 
 **Mind-mapping for storyboarders**, made in **Godot Engine 3.5**.
 
@@ -10,11 +10,7 @@
 
 ![screenshot](../Images/Screencopies/StoryboardMapper.jpg)
 
-## Download the latest executable for Windows 7+
-
-![StoryboardMapper_0_2_3.exe (36.6 Mb)](../binaries/win64/StoryboardMapper_win64_0_2_3.exe)
-
-## Or run StoryboardMapper directly in Godot Engine 3.5
+## Run StoryboardMapper directly in Godot Engine 3.5
 
 **As simple as 1-2-3:**
 
