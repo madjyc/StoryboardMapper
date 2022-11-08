@@ -13,7 +13,7 @@ enum {
 
 const PROJECT_FILE_VERSION_MAJOR: int = 0
 const PROJECT_FILE_VERSION_MINOR: int = 2
-const PROJECT_FILE_VERSION_SUBMINOR: int = 4
+const PROJECT_FILE_VERSION_SUBMINOR: int = 5
 const IMAGE_FILE_EXTENSIONS: Array = ["jpg", "jpeg", "png", "bmp"]
 const DEFAULT_IMG_NODE_SPACING: float = 40.0
 const MIN_DRAG_DISTANCE: float = 5.0
