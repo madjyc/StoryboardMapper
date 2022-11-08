@@ -3,6 +3,7 @@ extends Control
 enum {
 	FILE_MENU_NEW,
 	FILE_MENU_OPEN,
+	FILE_MENU_OPEN_RECENT,
 	FILE_MENU_SAVE,
 	FILE_MENU_SAVEAS,
 	FILE_MENU_SEPARATOR_1,
@@ -70,6 +71,7 @@ onready var ffmpeg_dlg: = $FFMpegDialog
 onready var about_dlg: = $AboutDialog
 onready var open_project_file_dlg: = $OpenFileDialog
 onready var save_project_file_dlg: = $SaveFileDialog
+onready var export_video_file_dlg := $ExportVideoFileDialog
 
 
 func _ready():
@@ -183,10 +185,9 @@ func populate_recent_submenu():
 func _on_FileMenuButton_about_to_show():
 	var popup: PopupMenu = file_menu_button.get_popup()
 	var num_selected: int = graph.get_num_selected_img_nodes()
-	var dir = Directory.new()
-	popup.set_item_disabled(FILE_EXPORT_VIDEO, num_selected != 1 or not dir.file_exists("res://ffmpeg.exe"))
+	popup.set_item_disabled(FILE_EXPORT_VIDEO, num_selected != 1 or not is_ffmpeg_installed())
 	populate_recent_submenu()
-
+	
 
 func _on_FileMenu_item_pressed(item_id: int):
 	match item_id:
@@ -199,7 +200,7 @@ func _on_FileMenu_item_pressed(item_id: int):
 		FILE_MENU_SAVEAS:
 			save_project_file_as()
 		FILE_EXPORT_VIDEO:
-			graph.display_export_video_file_dialog()
+			display_export_video_file_dialog()
 		FILE_MENU_QUIT:
 			get_tree().quit()
 
@@ -320,6 +321,8 @@ func move_hidden_popups_out_of_the_way():
 		open_project_file_dlg.rect_position = infinite_pos
 	if not save_project_file_dlg.visible:
 		save_project_file_dlg.rect_position = infinite_pos
+	if not export_video_file_dlg.visible:
+		export_video_file_dlg.rect_position = infinite_pos
 
 
 func _on_HelpDialog_popup_hide():
@@ -400,8 +403,10 @@ func load_recent_paths():
 
 
 func store_path_to_recent_files(path: String):
-	if path.empty() or recent_files.has(path):
+	if path.empty():
 		return
+	if recent_files.has(path):
+		recent_files.erase(path)
 	recent_files.push_front(path)
 	while recent_files.size() > 10:
 		recent_files.pop_back()
@@ -414,3 +419,23 @@ func save_recent_files():
 	for path in recent_files:
 		file.store_line(path)
 	file.close()
+
+
+func is_ffmpeg_installed() -> bool:
+	var dir = Directory.new()
+	return dir.file_exists("res://ffmpeg.exe")
+
+
+func display_export_video_file_dialog():
+	assert(is_ffmpeg_installed())
+	export_video_file_dlg.popup_centered()
+
+
+func _on_ExportVideoFileDialog_file_selected(path):
+	if not path.empty():
+		graph.export_to_video(path)
+	move_hidden_popups_out_of_the_way()
+
+
+func _on_ExportVideoFileDialog_popup_hide():
+	move_hidden_popups_out_of_the_way()

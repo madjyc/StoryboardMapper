@@ -38,7 +38,6 @@ onready var particlesOut = preload("res://Scenes/ParticlesOut.tscn")
 onready var display_dlg: = $DisplayDialog
 onready var open_image_file_dlg: = $OpenImgFileDialog
 onready var open_sound_file_dlg: = $OpenSndFileDialog
-onready var export_video_file_dlg := $ExportVideoFileDialog
 onready var grid_num_columns: = $CanvasLayer/HBoxContainer/GridColsSpinBox
 onready var graph_bg_colorpicker: = $CanvasLayer/HBoxContainer/GraphBgColorPicker
 onready var img_node_colorpicker: = $CanvasLayer/HBoxContainer/ImgNodeColorPicker
@@ -198,8 +197,6 @@ func move_hidden_popups_out_of_the_way():
 		open_image_file_dlg.rect_position = infinite_pos
 	if not open_sound_file_dlg.visible:
 		open_sound_file_dlg.rect_position = infinite_pos
-	if not export_video_file_dlg.visible:
-		export_video_file_dlg.rect_position = infinite_pos
 #	var parent = get_parent()
 #	assert(parent)
 #	if parent.has_method("move_popups_out_of_the_way"):
@@ -1261,22 +1258,6 @@ func export_to_video(video_path: String):
 	
 	# Play the output video.
 	OS.shell_open(video_path)
-
-
-func display_export_video_file_dialog():
-	var dir = Directory.new()
-	assert(dir.file_exists("res://ffmpeg.exe"))
-	export_video_file_dlg.popup_centered()
-
-
-func _on_ExportVideoFileDialog_file_selected(path):
-	if not path.empty():
-		export_to_video(path)
-	move_hidden_popups_out_of_the_way()
-
-
-func _on_ExportVideoFileDialog_popup_hide():
-	move_hidden_popups_out_of_the_way()
 
 
 #############

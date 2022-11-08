@@ -115,36 +115,6 @@ mode = 0
 access = 2
 filters = PoolStringArray( "*.mp3", "*.ogg" )
 
-[node name="OpenFileDialog" type="FileDialog" parent="."]
-margin_left = -696.0
-margin_top = 8.0
-margin_right = -112.0
-margin_bottom = 470.0
-popup_exclusive = true
-window_title = "Open a File"
-mode = 0
-access = 2
-filters = PoolStringArray( "*.res" )
-
-[node name="SaveFileDialog" type="FileDialog" parent="."]
-margin_left = -664.0
-margin_top = -24.0
-margin_right = -80.0
-margin_bottom = 438.0
-popup_exclusive = true
-window_title = "Save File"
-access = 2
-filters = PoolStringArray( "*.res" )
-
-[node name="ExportVideoFileDialog" type="FileDialog" parent="."]
-margin_left = -664.0
-margin_top = -24.0
-margin_right = -80.0
-margin_bottom = 438.0
-popup_exclusive = true
-access = 2
-filters = PoolStringArray( "*.mp4" )
-
 [connection signal="connection_from_empty" from="." to="." method="_on_GraphEdit_connection_from_empty"]
 [connection signal="connection_request" from="." to="." method="_on_GraphEdit_connection_request"]
 [connection signal="connection_to_empty" from="." to="." method="_on_GraphEdit_connection_to_empty"]
@@ -166,10 +136,3 @@ filters = PoolStringArray( "*.mp4" )
 [connection signal="popup_hide" from="OpenImgFileDialog" to="." method="_on_OpenImgFileDialog_popup_hide"]
 [connection signal="file_selected" from="OpenSndFileDialog" to="." method="_on_OpenSndFileDialog_file_selected"]
 [connection signal="popup_hide" from="OpenSndFileDialog" to="." method="_on_OpenSndFileDialog_popup_hide"]
-[connection signal="file_selected" from="OpenFileDialog" to="." method="_on_OpenFileDialog_file_selected"]
-[connection signal="popup_hide" from="OpenFileDialog" to="." method="_on_OpenFileDialog_popup_hide"]
-[connection signal="file_selected" from="SaveFileDialog" to="." method="_on_SaveFileDialog_file_selected"]
-[connection signal="popup_hide" from="SaveFileDialog" to="." method="_on_SaveFileDialog_popup_hide"]
-[connection signal="dir_selected" from="ExportVideoFileDialog" to="." method="_on_ExportVideoFileDialog_dir_selected"]
-[connection signal="file_selected" from="ExportVideoFileDialog" to="." method="_on_ExportVideoFileDialog_file_selected"]
-[connection signal="popup_hide" from="ExportVideoFileDialog" to="." method="_on_ExportVideoFileDialog_popup_hide"]

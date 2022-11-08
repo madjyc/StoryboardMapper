@@ -299,6 +299,15 @@ window_title = "Save File"
 access = 2
 filters = PoolStringArray( "*.res" )
 
+[node name="ExportVideoFileDialog" type="FileDialog" parent="."]
+margin_left = -664.0
+margin_top = -24.0
+margin_right = -80.0
+margin_bottom = 438.0
+popup_exclusive = true
+access = 2
+filters = PoolStringArray( "*.mp4" )
+
 [connection signal="about_to_show" from="CanvasLayer/HBoxContainer/FileMenuButton" to="." method="_on_FileMenuButton_about_to_show"]
 [connection signal="about_to_show" from="CanvasLayer/HBoxContainer/EditMenuButton" to="." method="_on_EditMenuButton_about_to_show"]
 [connection signal="about_to_show" from="CanvasLayer/HBoxContainer/SelecMenuButton" to="." method="_on_SelecMenuButton_about_to_show"]
@@ -308,3 +317,5 @@ filters = PoolStringArray( "*.res" )
 [connection signal="popup_hide" from="AboutDialog" to="." method="_on_AboutDialog_popup_hide"]
 [connection signal="file_selected" from="OpenFileDialog" to="." method="_on_OpenFileDialog_file_selected"]
 [connection signal="file_selected" from="SaveFileDialog" to="." method="_on_SaveFileDialog_file_selected"]
+[connection signal="file_selected" from="ExportVideoFileDialog" to="." method="_on_ExportVideoFileDialog_file_selected"]
+[connection signal="popup_hide" from="ExportVideoFileDialog" to="." method="_on_ExportVideoFileDialog_popup_hide"]
