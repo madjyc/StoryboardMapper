@@ -9,7 +9,7 @@
 config_version=4
 
 _global_script_classes=[ {
-"base": "GraphNodeBase",
+"base": "GraphNode",
 "class": "CommentGraphNode",
 "language": "GDScript",
 "path": "res://Scripts/CommentGraphNode.gd"
@@ -29,11 +29,6 @@ _global_script_classes=[ {
 "language": "GDScript",
 "path": "res://Scripts/GraphData.gd"
 }, {
-"base": "GraphNode",
-"class": "GraphNodeBase",
-"language": "GDScript",
-"path": "res://Scripts/GraphNodeBase.gd"
-}, {
 "base": "Resource",
 "class": "GraphNodeData",
 "language": "GDScript",
@@ -49,7 +44,7 @@ _global_script_classes=[ {
 "language": "GDScript",
 "path": "res://Scripts/GraphEdit.gd"
 }, {
-"base": "GraphNodeBase",
+"base": "GraphNode",
 "class": "ImageGraphNode",
 "language": "GDScript",
 "path": "res://Scripts/ImageGraphNode.gd"
@@ -59,7 +54,6 @@ _global_script_class_icons={
 "CommentRect": "",
 "DisplayDialog": "",
 "GraphData": "",
-"GraphNodeBase": "",
 "GraphNodeData": "",
 "IconButton": "",
 "ImageGraph": "",

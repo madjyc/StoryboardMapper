@@ -369,7 +369,6 @@ func throw_particles(node: GraphNode, particles_type: int, selected: bool):
 func add_new_image_node(ofs: Vector2, exclusive_select: bool = true, open_image_file: bool = true) -> ImageGraphNode:
 	var node: ImageGraphNode = imageGraphNode.instance()
 	add_child(node, true) # /!\ before set_offset
-	node.connect("node_close_request", self, "delete_node")
 	node.set_offset(ofs - node.rect_size / 2)
 	node.set_bg_color(img_node_colorpicker.color)
 	select_node(node, exclusive_select)
@@ -755,7 +754,6 @@ func duplicate_node(node: ImageGraphNode, ofs: Vector2) -> ImageGraphNode:
 	new_node.set_offset(ofs - node.rect_size / 2)
 	new_node.img_path = node.img_path
 	add_child(new_node, true)
-	new_node.connect("node_close_request", self, "delete_node")
 	return new_node
 
 
@@ -849,9 +847,6 @@ func _on_GraphEdit_delete_nodes_request(node_names: Array): # only when selected
 func add_new_com_node(ofs: Vector2) -> CommentGraphNode:
 	var com_node = commentGraphNode.instance()
 	add_child(com_node, true) # /!\ before set_offset
-	com_node.connect("add_selected_img_nodes_to_com_node_request", self, "add_selected_img_nodes_to_com_node")
-	com_node.connect("remove_selected_img_nodes_from_com_node_request", self, "remove_selected_img_nodes_from_com_node")
-	com_node.connect("node_close_request", self, "delete_node")
 	if selected_img_nodes.size() > 0:
 		add_selected_img_nodes_to_com_node(com_node)
 	else:
@@ -948,7 +943,6 @@ func build_graph_nodes(graph_data: GraphData, keep_names: bool, select: bool, gr
 			img_node.set_name(node_data.name)
 		img_node.rect_size = node_data.rect_size
 		add_child(img_node, true) # /!\ before assigning data
-		img_node.connect("node_close_request", self, "delete_node")
 		old_to_new[node_data.name] = img_node.name # same name if keep_names is true
 		if group_center_diff == Vector2.INF:
 			img_node.offset = node_data.offset
@@ -979,7 +973,6 @@ func build_graph_nodes(graph_data: GraphData, keep_names: bool, select: bool, gr
 			com_node.set_name(node_data.name)
 		com_node.rect_size = node_data.rect_size
 		add_child(com_node, true) # /!\ before assigning data
-		com_node.connect("node_close_request", self, "delete_node")
 		move_child(com_node, 0)
 		if group_center_diff == Vector2.INF:
 			com_node.offset = node_data.offset

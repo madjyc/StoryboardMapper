@@ -1,8 +1,5 @@
-extends GraphNodeBase
+extends GraphNode
 class_name CommentGraphNode
-
-signal add_selected_img_nodes_to_com_node_request(node)
-signal remove_selected_img_nodes_from_com_node_request(node)
 
 const DEFAULT_SIZE: = Vector2(230.0, 80.0) # graph space
 const LEFT_MARGIN: = 16.0 # graph space
@@ -176,15 +173,15 @@ func _on_CommentNode_resize_request(new_size):
 
 
 func _on_CommentNode_close_request():
-	emit_signal("node_close_request", self)
+	get_parent().delete_node(self)
 
 
 func _on_AddButton_pressed():
-	emit_signal("add_selected_img_nodes_to_com_node_request", self)
+	get_parent().add_selected_img_nodes_to_com_node(self)
 
 
 func _on_SubButton_pressed():
-	emit_signal("remove_selected_img_nodes_from_com_node_request", self)
+	get_parent().remove_selected_img_nodes_from_com_node(self)
 
 
 func _on_CommentNode_gui_input(event):
