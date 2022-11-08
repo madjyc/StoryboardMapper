@@ -1,6 +1,7 @@
-[gd_scene load_steps=4 format=2]
+[gd_scene load_steps=5 format=2]
 
 [ext_resource path="res://Scenes/GraphEdit.tscn" type="PackedScene" id=1]
+[ext_resource path="res://Scenes/PlayerDialog.tscn" type="PackedScene" id=2]
 [ext_resource path="res://Scripts/Main.gd" type="Script" id=3]
 [ext_resource path="res://Resources/theme.tres" type="Theme" id=4]
 
@@ -54,7 +55,7 @@ margin_bottom = 24.0
 text = "Help"
 align = 0
 
-[node name="HelpDialog" type="AcceptDialog" parent="."]
+[node name="HelpDialog" type="AcceptDialog" parent="CanvasLayer"]
 visible = true
 margin_left = -592.0
 margin_top = 379.0
@@ -63,7 +64,7 @@ margin_bottom = 801.0
 popup_exclusive = true
 window_title = "Help"
 
-[node name="Label2" type="RichTextLabel" parent="HelpDialog"]
+[node name="Label2" type="RichTextLabel" parent="CanvasLayer/HelpDialog"]
 anchor_right = 1.0
 anchor_bottom = 1.0
 margin_left = 8.0
@@ -188,7 +189,7 @@ Hosting frames in a comment box
 KNOWN BUG
   Sometimes, frames inside a comment box won't let you connect or disconnect them. Just zoom out a bit and you will be able to drag connections normally."
 
-[node name="FFMpegDialog" type="AcceptDialog" parent="."]
+[node name="FFMpegDialog" type="AcceptDialog" parent="CanvasLayer"]
 visible = true
 margin_left = -592.0
 margin_top = 890.0
@@ -197,7 +198,7 @@ margin_bottom = 1312.0
 popup_exclusive = true
 window_title = "How to install FFMpeg"
 
-[node name="Label2" type="RichTextLabel" parent="FFMpegDialog"]
+[node name="Label2" type="RichTextLabel" parent="CanvasLayer/FFMpegDialog"]
 anchor_right = 1.0
 anchor_bottom = 1.0
 margin_left = 8.0
@@ -240,7 +241,7 @@ For Windows users, that would mean:
 
 Congratulations! You can now export a sequence of frames to a video file."
 
-[node name="AboutDialog" type="AcceptDialog" parent="."]
+[node name="AboutDialog" type="AcceptDialog" parent="CanvasLayer"]
 visible = true
 margin_left = -593.0
 margin_top = -82.0
@@ -249,7 +250,7 @@ margin_bottom = 294.0
 popup_exclusive = true
 window_title = "About"
 
-[node name="Label2" type="RichTextLabel" parent="AboutDialog"]
+[node name="Label2" type="RichTextLabel" parent="CanvasLayer/AboutDialog"]
 anchor_right = 1.0
 anchor_bottom = 1.0
 margin_left = 8.0
@@ -278,7 +279,7 @@ The above copyright notice and this permission notice shall be included in all c
 
 THE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE."
 
-[node name="OpenFileDialog" type="FileDialog" parent="."]
+[node name="OpenFileDialog" type="FileDialog" parent="CanvasLayer"]
 margin_left = -696.0
 margin_top = 8.0
 margin_right = -112.0
@@ -289,7 +290,7 @@ mode = 0
 access = 2
 filters = PoolStringArray( "*.res" )
 
-[node name="SaveFileDialog" type="FileDialog" parent="."]
+[node name="SaveFileDialog" type="FileDialog" parent="CanvasLayer"]
 margin_left = -664.0
 margin_top = -24.0
 margin_right = -80.0
@@ -299,7 +300,7 @@ window_title = "Save File"
 access = 2
 filters = PoolStringArray( "*.res" )
 
-[node name="ExportVideoFileDialog" type="FileDialog" parent="."]
+[node name="ExportVideoFileDialog" type="FileDialog" parent="CanvasLayer"]
 margin_left = -664.0
 margin_top = -24.0
 margin_right = -80.0
@@ -308,14 +309,18 @@ popup_exclusive = true
 access = 2
 filters = PoolStringArray( "*.mp4" )
 
+[node name="PlayerDialog" parent="CanvasLayer" instance=ExtResource( 2 )]
+
+[connection signal="play_sequence" from="Graph" to="." method="_on_Graph_play_sequence"]
+[connection signal="refresh_sequence" from="Graph" to="." method="_on_Graph_refresh_sequence"]
 [connection signal="about_to_show" from="CanvasLayer/HBoxContainer/FileMenuButton" to="." method="_on_FileMenuButton_about_to_show"]
 [connection signal="about_to_show" from="CanvasLayer/HBoxContainer/EditMenuButton" to="." method="_on_EditMenuButton_about_to_show"]
 [connection signal="about_to_show" from="CanvasLayer/HBoxContainer/SelecMenuButton" to="." method="_on_SelecMenuButton_about_to_show"]
-[connection signal="popup_hide" from="HelpDialog" to="." method="_on_HelpDialog_popup_hide"]
-[connection signal="popup_hide" from="FFMpegDialog" to="." method="_on_FFMpegDialog_popup_hide"]
-[connection signal="meta_clicked" from="FFMpegDialog/Label2" to="." method="_on_Label2_meta_clicked"]
-[connection signal="popup_hide" from="AboutDialog" to="." method="_on_AboutDialog_popup_hide"]
-[connection signal="file_selected" from="OpenFileDialog" to="." method="_on_OpenFileDialog_file_selected"]
-[connection signal="file_selected" from="SaveFileDialog" to="." method="_on_SaveFileDialog_file_selected"]
-[connection signal="file_selected" from="ExportVideoFileDialog" to="." method="_on_ExportVideoFileDialog_file_selected"]
-[connection signal="popup_hide" from="ExportVideoFileDialog" to="." method="_on_ExportVideoFileDialog_popup_hide"]
+[connection signal="popup_hide" from="CanvasLayer/HelpDialog" to="." method="_on_HelpDialog_popup_hide"]
+[connection signal="popup_hide" from="CanvasLayer/FFMpegDialog" to="." method="_on_FFMpegDialog_popup_hide"]
+[connection signal="meta_clicked" from="CanvasLayer/FFMpegDialog/Label2" to="." method="_on_Label2_meta_clicked"]
+[connection signal="popup_hide" from="CanvasLayer/AboutDialog" to="." method="_on_AboutDialog_popup_hide"]
+[connection signal="file_selected" from="CanvasLayer/OpenFileDialog" to="." method="_on_OpenFileDialog_file_selected"]
+[connection signal="file_selected" from="CanvasLayer/SaveFileDialog" to="." method="_on_SaveFileDialog_file_selected"]
+[connection signal="file_selected" from="CanvasLayer/ExportVideoFileDialog" to="." method="_on_ExportVideoFileDialog_file_selected"]
+[connection signal="popup_hide" from="CanvasLayer/ExportVideoFileDialog" to="." method="_on_ExportVideoFileDialog_popup_hide"]

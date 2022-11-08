@@ -1,6 +1,9 @@
 extends GraphEdit
 class_name ImageGraph
 
+signal play_sequence(bg_color, first_node)
+signal refresh_sequence
+
 #export(NodePath) var popup
 
 enum {
@@ -35,7 +38,6 @@ onready var commentGraphNode = preload("res://Scenes/CommentGraphNode.tscn")
 onready var particlesIn = preload("res://Scenes/ParticlesIn.tscn")
 onready var particlesOut = preload("res://Scenes/ParticlesOut.tscn")
 
-onready var display_dlg: = $DisplayDialog
 onready var open_image_file_dlg: = $OpenImgFileDialog
 onready var open_sound_file_dlg: = $OpenSndFileDialog
 onready var grid_num_columns: = $CanvasLayer/HBoxContainer/GridColsSpinBox
@@ -146,10 +148,7 @@ func _on_DebugButton_pressed():
 	print("-----------------------------")
 	print("Selected image nodes: ", selected_img_nodes)
 	print("Selected comment nodes: ", selected_com_nodes)
-#	print("DisplayDialog: ", display_dlg.rect_position)
 #	print("ImgFileDlg: ", image_dlg.rect_position)
-#	print("OpenFileDialog: ", open_dlg.rect_position)
-#	print("SaveFileDialog: ", save_dlg.rect_position)
 #	var img_loader: AsyncImageLoader = AsyncImageLoader
 #	assert(img_loader)
 #	var images: = [
@@ -191,8 +190,6 @@ func update_buttons():
 # Hack to prevent hidden popups from stealing mouse input.
 func move_hidden_popups_out_of_the_way():
 	var infinite_pos: = Vector2(-1e6, -1e6)
-#	if not display_dlg.visible:
-#		display_dlg.rect_position = infinite_pos
 	if not open_image_file_dlg.visible:
 		open_image_file_dlg.rect_position = infinite_pos
 	if not open_sound_file_dlg.visible:
@@ -1289,8 +1286,7 @@ func reload_node_sound(node: ImageGraphNode):
 
 
 func refresh_display_dialog():
-	if display_dlg.visible:
-		display_dlg.refresh()
+	emit_signal("refresh_sequence")
 
 
 func _on_OpenImgFileDialog_file_selected(path):
@@ -1310,11 +1306,7 @@ func _on_OpenSndFileDialog_file_selected(path):
 func play_animation():
 	if selected_img_nodes.size() != 1:
 		return
-	display_dlg.init_dialog(img_node_colorpicker.color, selected_img_nodes.front())
-	if display_dlg.window_bounds == Rect2():
-		display_dlg.popup_centered()
-	else:
-		display_dlg.popup(display_dlg.window_bounds)
+	emit_signal("play_sequence", img_node_colorpicker.color, selected_img_nodes.front())
 
 
 func _on_PlayButton_pressed():

@@ -22,7 +22,7 @@ _global_script_classes=[ {
 "base": "WindowDialog",
 "class": "DisplayDialog",
 "language": "GDScript",
-"path": "res://Scripts/DisplayDialog.gd"
+"path": "res://Scripts/PlayerDialog.gd"
 }, {
 "base": "Resource",
 "class": "GraphData",

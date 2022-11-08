@@ -66,12 +66,13 @@ onready var edit_menu_button: = $CanvasLayer/HBoxContainer/EditMenuButton
 onready var selec_menu_button: = $CanvasLayer/HBoxContainer/SelecMenuButton
 onready var help_menu_button: = $CanvasLayer/HBoxContainer/HelpMenuButton
 onready var graph: = $Graph
-onready var help_dlg: = $HelpDialog
-onready var ffmpeg_dlg: = $FFMpegDialog
-onready var about_dlg: = $AboutDialog
-onready var open_project_file_dlg: = $OpenFileDialog
-onready var save_project_file_dlg: = $SaveFileDialog
-onready var export_video_file_dlg := $ExportVideoFileDialog
+onready var help_dlg: = $CanvasLayer/HelpDialog
+onready var ffmpeg_dlg: = $CanvasLayer/FFMpegDialog
+onready var about_dlg: = $CanvasLayer/AboutDialog
+onready var open_project_file_dlg: = $CanvasLayer/OpenFileDialog
+onready var save_project_file_dlg: = $CanvasLayer/SaveFileDialog
+onready var export_video_file_dlg := $CanvasLayer/ExportVideoFileDialog
+onready var player: = $CanvasLayer/PlayerDialog
 
 
 func _ready():
@@ -80,6 +81,14 @@ func _ready():
 	assert(selec_menu_button)
 	assert(help_menu_button)
 	assert(graph)
+	build_menu()
+
+
+##########
+## MENU ##
+##########
+
+func build_menu():
 	var popup: PopupMenu
 	move_hidden_popups_out_of_the_way()
 	
@@ -308,23 +317,6 @@ func _on_HelpMenu_item_pressed(item_id: int):
 			about_dlg.popup_centered()
 
 
-# Hack to prevent hidden popups from stealing mouse input.
-func move_hidden_popups_out_of_the_way():
-	var infinite_pos: = Vector2(-1e6, -1e6)
-	if help_dlg and not help_dlg.visible:
-		help_dlg.rect_position = infinite_pos
-	if ffmpeg_dlg and not ffmpeg_dlg.visible:
-		ffmpeg_dlg.rect_position = infinite_pos
-	if about_dlg and not about_dlg.visible:
-		about_dlg.rect_position = infinite_pos
-	if not open_project_file_dlg.visible:
-		open_project_file_dlg.rect_position = infinite_pos
-	if not save_project_file_dlg.visible:
-		save_project_file_dlg.rect_position = infinite_pos
-	if not export_video_file_dlg.visible:
-		export_video_file_dlg.rect_position = infinite_pos
-
-
 func _on_HelpDialog_popup_hide():
 	move_hidden_popups_out_of_the_way()
 
@@ -344,6 +336,10 @@ func _on_Label2_meta_clicked(meta):
 func update_main_window_title():
 	OS.set_window_title(project_file_name + " - " + APP_NAME)
 
+
+###################
+## NEW/LOAD/SAVE ##
+###################
 
 func new_project():
 	project_file_name = DEFAULT_PROJECT_FILENAME
@@ -385,6 +381,10 @@ func _on_SaveFileDialog_file_selected(path):
 	graph.save_graph_to_file(path)
 
 
+############
+## RECENT ##
+############
+
 func load_recent_paths():
 	recent_files.clear()
 	var file = File.new()
@@ -421,6 +421,10 @@ func save_recent_files():
 	file.close()
 
 
+#####################
+## EXPORT TO VIDEO ##
+#####################
+
 func is_ffmpeg_installed() -> bool:
 	var dir = Directory.new()
 	return dir.file_exists("res://ffmpeg.exe")
@@ -439,3 +443,36 @@ func _on_ExportVideoFileDialog_file_selected(path):
 
 func _on_ExportVideoFileDialog_popup_hide():
 	move_hidden_popups_out_of_the_way()
+
+
+############
+## PLAYER ##
+############
+
+func _on_Graph_refresh_sequence():
+	if not player.visible:
+		return
+	player.refresh()
+
+
+func _on_Graph_play_sequence(bg_color: Color, first_node: ImageGraphNode):
+	player.open_dialog(bg_color, first_node)
+
+
+# Hack to prevent hidden popups from stealing mouse input.
+func move_hidden_popups_out_of_the_way():
+	var infinite_pos: = Vector2(-1e6, -1e6)
+	if help_dlg and not help_dlg.visible:
+		help_dlg.rect_position = infinite_pos
+	if ffmpeg_dlg and not ffmpeg_dlg.visible:
+		ffmpeg_dlg.rect_position = infinite_pos
+	if about_dlg and not about_dlg.visible:
+		about_dlg.rect_position = infinite_pos
+	if not open_project_file_dlg.visible:
+		open_project_file_dlg.rect_position = infinite_pos
+	if not save_project_file_dlg.visible:
+		save_project_file_dlg.rect_position = infinite_pos
+	if not export_video_file_dlg.visible:
+		export_video_file_dlg.rect_position = infinite_pos
+#	if not display_dlg.visible:
+#		display_dlg.rect_position = infinite_pos

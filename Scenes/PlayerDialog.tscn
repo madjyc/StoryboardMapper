@@ -1,6 +1,6 @@
 [gd_scene load_steps=15 format=2]
 
-[ext_resource path="res://Scripts/DisplayDialog.gd" type="Script" id=1]
+[ext_resource path="res://Scripts/PlayerDialog.gd" type="Script" id=1]
 [ext_resource path="res://Assets/Icons/Remove.svg" type="Texture" id=2]
 [ext_resource path="res://Assets/Icons/PagePrevious.svg" type="Texture" id=3]
 [ext_resource path="res://Assets/Icons/PageLast.svg" type="Texture" id=4]

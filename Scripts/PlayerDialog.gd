@@ -33,11 +33,16 @@ func _ready():
 	move_hidden_popup_out_of_the_way()
 
 
-func init_dialog(bg_color: Color, first_node: ImageGraphNode):
+func open_dialog(bg_color: Color, first_node: ImageGraphNode):
 	assert(first_node)
 	state = STOPPED
 	bg_color_rect.color = bg_color
 	update_node_chain(first_node)
+	if not visible:
+		if window_bounds == Rect2():
+			popup_centered()
+		else:
+			popup(window_bounds)
 
 
 # Hack to prevent hidden popups from stealing mouse input.
