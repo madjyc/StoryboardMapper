@@ -1,8 +1,8 @@
 ![License](https://img.shields.io/badge/license-MIT-orange.svg)
 ![Godot Version](https://img.shields.io/badge/godot-3.5-blue.svg)
-![Version](https://img.shields.io/badge/version-v0.2.5-green.svg)
+![Version](https://img.shields.io/badge/version-v0.2.6-green.svg)
 
-# StoryboardMapper v0.2.5
+# StoryboardMapper v0.2.6
 
 **Mind-mapping for storyboarders**, made in **Godot Engine 3.5**.
 
