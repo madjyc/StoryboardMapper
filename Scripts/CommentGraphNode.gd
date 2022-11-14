@@ -48,7 +48,7 @@ func _exit_tree():
 #	return min_index
 
 
-# Extra data to be saved
+#TODO: TO BE REMOVED
 func get_extra_data() -> Dictionary:
 	var extra_data = {
 		"title": get_title(),
@@ -68,11 +68,56 @@ func get_extra_data() -> Dictionary:
 	return extra_data
 
 
-# Extra data to be loaded
+# Extra data to be saved
+func get_extra_data_JSON() -> Dictionary:
+	var extra_data = {
+		"title": get_title(),
+		"color": [colorpicker.color.r, colorpicker.color.g, colorpicker.color.b, colorpicker.color.a],
+		"text": user_text.text,
+		"img_node_names": [], # filled below
+		"icon_buttons": [], # filled below
+	}
+	
+	for node in img_nodes:
+		extra_data["img_node_names"].push_back(node.name)
+	
+	for icon_button in iconbutton_container.get_children():
+		assert(icon_button is IconButton)
+		extra_data["icon_buttons"].push_back(icon_button.get_selected_id())
+	
+	return extra_data
+
+
+#TODO: TO BE REMOVED
 func set_extra_data(extra_data: Dictionary, old_to_new: Dictionary, update_size: bool = true):
 	assert(is_inside_tree())
 	set_title(extra_data["title"])
 	set_color(extra_data["color"])
+	user_text.text = extra_data["text"]
+
+	img_nodes.clear()
+	for node_name in extra_data["img_node_names"]:
+		if old_to_new.has(node_name): # user might have copied a comment node without all of its image nodes
+			img_nodes.push_back(get_node("../" + old_to_new[node_name]))
+
+	for selected_id in extra_data["icon_buttons"]:
+		var icon_button = iconButton.instance()
+		iconbutton_container.add_child(icon_button)
+		icon_button.select(selected_id)
+
+	if update_size:
+		update_size_options()
+		if not img_nodes.empty():
+			update_rect()
+
+
+# Extra data to be loaded
+func set_extra_data_JSON(extra_data: Dictionary, old_to_new: Dictionary, update_size: bool = true):
+	assert(is_inside_tree())
+	set_title(extra_data["title"])
+
+	var arr: Array = extra_data["color"]
+	set_color(Color(arr[0], arr[1], arr[2], arr[3]))
 	user_text.text = extra_data["text"]
 	
 	img_nodes.clear()

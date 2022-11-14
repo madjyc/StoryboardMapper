@@ -181,7 +181,7 @@ func populate_recent_submenu():
 	recent_submenu.clear()
 	for i in range(recent_files.size()):
 		var url: String = recent_files[i]
-		url = url.rstrip('.' + url.get_extension())
+#		url = url.rstrip('.' + url.get_extension())
 		if url.length() >= RECENT_FILES_PATH_MAX_LENGTH:
 			url = "..." + url.right(url.length() - (RECENT_FILES_PATH_MAX_LENGTH - 3))
 		recent_submenu.add_item(url, i)
@@ -342,8 +342,8 @@ func update_main_window_title():
 #########
 
 func new_project():
-	project_file_name = DEFAULT_PROJECT_FILENAME
 	project_file_path = ""
+	project_file_name = DEFAULT_PROJECT_FILENAME
 	update_main_window_title()
 	graph.clear_graph()
 
@@ -360,7 +360,12 @@ func save_project_file():
 	if project_file_path == "":
 		save_project_file_as()
 	else:
-		graph.save_graph_to_file(project_file_path)
+		if project_file_path.get_extension().nocasecmp_to("res") == 0: #TODO: TO BE REMOVED
+			project_file_path = project_file_path.get_basename() + ".sbm"
+			project_file_name = project_file_path.get_file()
+			update_main_window_title()
+			store_path_to_recent_files(project_file_path)
+		graph.save_graph_to_file_JSON(project_file_path)
 
 
 func save_project_file_as():
@@ -368,21 +373,27 @@ func save_project_file_as():
 
 
 func _on_OpenFileDialog_file_selected(path):
-	save_project_file_dlg.set_current_path(path)
-	project_file_name = path.get_file()
 	project_file_path = path
+	project_file_name = path.get_file()
 	update_main_window_title()
 	store_path_to_recent_files(path)
-	graph.load_graph_from_file(path)
+	var ext: String = path.get_extension()
+	if ext.nocasecmp_to("sbm") == 0:
+		save_project_file_dlg.set_current_path(path)
+		graph.load_graph_from_file_JSON(path)
+	elif ext.nocasecmp_to("res") == 0: #TODO: TO BE REMOVED
+		# https://godotengine.org/qa/82799/filedialog-path-not-showing-c
+		save_project_file_dlg.set_current_path(path.get_basename() + ".sbm") # BUG: does not include drive
+		graph.load_graph_from_file(path)
 
 
 func _on_SaveFileDialog_file_selected(path):
 	open_project_file_dlg.set_current_path(path)
-	project_file_name = path.get_file()
 	project_file_path = path
+	project_file_name = path.get_file()
 	update_main_window_title()
 	store_path_to_recent_files(path)
-	graph.save_graph_to_file(path)
+	graph.save_graph_to_file_JSON(path)
 
 
 ############

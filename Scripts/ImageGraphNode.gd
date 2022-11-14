@@ -39,7 +39,7 @@ func _ready():
 #	particles.emitting = true
 
 
-# Extra data to be saved
+#TODO: TO BE REMOVED
 func get_extra_data() -> Dictionary:
 	var extra_data = {
 			"title": get_title(),
@@ -51,8 +51,34 @@ func get_extra_data() -> Dictionary:
 	return extra_data
 
 
-# Extra data to be loaded
+# Extra data to be saved
+func get_extra_data_JSON() -> Dictionary:
+	var extra_data = {
+			"title": get_title(),
+			"img_path": img_path,
+			"snd_path": snd_path,
+			"subtitle": subedit.text,
+			"duration": spinbox.get_value(),
+	}
+	return extra_data
+
+
+#TODO: TO BE REMOVED
 func set_extra_data(extra_data: Dictionary):
+	assert(is_inside_tree())
+	set_title(extra_data["title"])
+	img_path =extra_data["img_path"]
+	snd_path = extra_data["snd_path"]
+	set_subtitle(extra_data["subtitle"])
+	spinbox.set_value(extra_data["duration"])
+	if not img_path.empty():
+		load_thumbnail_from_file(img_path)
+	if not snd_path.empty():
+		load_sound_from_file(snd_path)
+
+
+# Extra data to be loaded
+func set_extra_data_JSON(extra_data: Dictionary):
 	assert(is_inside_tree())
 	set_title(extra_data["title"])
 	img_path =extra_data["img_path"]

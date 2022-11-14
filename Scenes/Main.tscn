@@ -288,7 +288,7 @@ popup_exclusive = true
 window_title = "Open a File"
 mode = 0
 access = 2
-filters = PoolStringArray( "*.res" )
+filters = PoolStringArray( "*.sbm", "*.res" )
 
 [node name="SaveFileDialog" type="FileDialog" parent="CanvasLayer"]
 margin_left = -664.0
@@ -298,7 +298,7 @@ margin_bottom = 438.0
 popup_exclusive = true
 window_title = "Save File"
 access = 2
-filters = PoolStringArray( "*.res" )
+filters = PoolStringArray( "*.sbm" )
 
 [node name="ExportVideoFileDialog" type="FileDialog" parent="CanvasLayer"]
 margin_left = -664.0

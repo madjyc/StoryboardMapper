@@ -47,7 +47,7 @@ onready var add_button: = $CanvasLayer/HBoxContainer/AddButton
 onready var comment_button: = $CanvasLayer/HBoxContainer/CommentButton
 onready var display_button: = $CanvasLayer/HBoxContainer/PlayButton
 
-onready var copy_graph_data = GraphData.new()
+onready var copy_graph_data = GraphDataJSON.new()
 onready var copy_group_center: = Vector2.ZERO
 onready var ffmpeg_path: String = ProjectSettings.globalize_path("res://") + "ffmpeg"
 
@@ -780,7 +780,7 @@ func _on_GraphEdit_copy_nodes_request():
 	if selected_img_nodes.empty() and selected_com_nodes.empty():
 		return
 	copy_group_center = get_group_center_in_graph_space(selected_img_nodes + selected_com_nodes)
-	store_graph_nodes(copy_graph_data, true)
+	store_graph_nodes_JSON(copy_graph_data, true)
 
 
 func get_group_center_in_graph_space(nodes: Array) -> Vector2: # offset
@@ -803,18 +803,18 @@ func _on_GraphEdit_paste_nodes_request():
 	if copy_graph_data.img_nodes.empty() and copy_graph_data.com_nodes.empty():
 		return
 	var group_center: Vector2 = convert_position_in_viewport_to_offset_in_graph(get_global_mouse_position() - rect_position)
-	build_graph_nodes(copy_graph_data, false, true, group_center - copy_group_center)
+	build_graph_nodes_JSON(copy_graph_data, false, true, group_center - copy_group_center)
 
 
 func _on_GraphEdit_duplicate_nodes_request():
 	if selected_img_nodes.empty() and selected_com_nodes.empty():
 		return
 	
-	var dup_graph_data = GraphData.new()
-	store_graph_nodes(dup_graph_data, true)
+	var dup_graph_data = GraphDataJSON.new()
+	store_graph_nodes_JSON(dup_graph_data, true)
 	var old_group_center: Vector2 = get_group_center_in_graph_space(selected_img_nodes + selected_com_nodes)
 	var new_group_center: Vector2 = convert_position_in_viewport_to_offset_in_graph(get_global_mouse_position() - rect_position)
-	build_graph_nodes(dup_graph_data, false, true, new_group_center - old_group_center)
+	build_graph_nodes_JSON(dup_graph_data, false, true, new_group_center - old_group_center)
 
 
 ############
@@ -931,7 +931,165 @@ func clear_graph():
 			node.queue_free()
 
 
+#TODO: TO BE REMOVED
+#func store_graph_nodes(graph_data: GraphData, selected_nodes_only: bool = false):
+#	assert(graph_data)
+#	graph_data.img_nodes.clear()
+#	graph_data.connections.clear()
+#	graph_data.com_nodes.clear()
+#
+#	# Image nodes
+#	for node in get_children():
+#		if node is ImageGraphNode and (!selected_nodes_only or node.selected):
+#			var node_data = GraphNodeData.new()
+#			assert(node_data)
+#			node_data.name = node.name
+#			node_data.offset = node.offset
+#			node_data.rect_size = node.rect_size
+#			node_data.extra_data = node.get_extra_data()
+#			graph_data.img_nodes.append(node_data)
+#
+#	# Connexions
+#	var connection_list: = get_connection_list()
+#	if selected_nodes_only:
+#		for connection in connection_list:
+#			if get_node(connection.from).selected and get_node(connection.to).selected:
+#				graph_data.connections.push_back(connection)
+#	else:
+#		graph_data.connections = connection_list
+#
+#	# Comment nodes
+#	for node in get_children():
+#		if node is CommentGraphNode and (!selected_nodes_only or node.selected):
+#			var node_data = GraphNodeData.new()
+#			assert(node_data)
+#			node_data.name = node.name
+#			node_data.offset = node.offset
+#			node_data.rect_size = node.rect_size
+#			node_data.extra_data = node.get_extra_data() # /!\ saves all contained image node names
+#			graph_data.com_nodes.append(node_data)
+
+
+func store_graph_nodes_JSON(graph_data: GraphDataJSON, selected_nodes_only: bool = false):
+	assert(graph_data)
+	graph_data.img_nodes.clear()
+	graph_data.connections.clear()
+	graph_data.com_nodes.clear()
+	
+	# Image nodes
+	for node in get_children():
+		if node is ImageGraphNode and (!selected_nodes_only or node.selected):
+			var node_data = GraphNodeDataJSON.new()
+			assert(node_data)
+			node_data.name = node.name
+			node_data.offset = node.offset
+			node_data.rect_size = node.rect_size
+			node_data.extra_data = node.get_extra_data_JSON()
+			graph_data.img_nodes.append(node_data)
+	
+	# Connexions
+	var connection_list: = get_connection_list()
+	if selected_nodes_only:
+		for connection in connection_list:
+			if get_node(connection.from).selected and get_node(connection.to).selected:
+				graph_data.connections.push_back(connection)
+	else:
+		graph_data.connections = connection_list
+	
+	# Comment nodes
+	for node in get_children():
+		if node is CommentGraphNode and (!selected_nodes_only or node.selected):
+			var node_data = GraphNodeDataJSON.new()
+			assert(node_data)
+			node_data.name = node.name
+			node_data.offset = node.offset
+			node_data.rect_size = node.rect_size
+			node_data.extra_data = node.get_extra_data_JSON() # /!\ saves all contained image node names
+			graph_data.com_nodes.append(node_data)
+
+
+#TODO: TO BE REMOVED
+#func store_graph(graph_data: GraphData, selected_nodes_only: bool):
+#	assert(graph_data)
+#	graph_data.version_major = PROJECT_FILE_VERSION_MAJOR
+#	graph_data.version_minor = PROJECT_FILE_VERSION_MINOR
+#	graph_data.version_subminor = PROJECT_FILE_VERSION_SUBMINOR
+#
+#	graph_data.scroll_offset = scroll_offset
+#	graph_data.zoom = zoom
+#	graph_data.use_snap = use_snap
+#	graph_data.snap_distance = snap_distance
+#
+#	graph_data.graph_bg_color = graph_bg_colorpicker.color
+#	graph_data.img_node_bg_color = img_node_colorpicker.color
+#
+#	store_graph_nodes(graph_data, selected_nodes_only)
+
+
+func store_graph_JSON(graph_data: GraphDataJSON, selected_nodes_only: bool):
+	assert(graph_data)
+	graph_data.version_major = PROJECT_FILE_VERSION_MAJOR
+	graph_data.version_minor = PROJECT_FILE_VERSION_MINOR
+	graph_data.version_subminor = PROJECT_FILE_VERSION_SUBMINOR
+	
+	graph_data.scroll_offset = scroll_offset
+	graph_data.zoom = zoom
+	graph_data.use_snap = use_snap
+	graph_data.snap_distance = snap_distance
+	
+	graph_data.graph_bg_color = graph_bg_colorpicker.color
+	graph_data.img_node_bg_color = img_node_colorpicker.color
+	
+	store_graph_nodes_JSON(graph_data, selected_nodes_only)
+	
+
+
+#TODO: TO BE REMOVED
+#func save_graph_to_file(path: String):
+#	move_hidden_popups_out_of_the_way()
+#	var graph_data = GraphData.new()
+#	assert(graph_data)
+#	store_graph(graph_data, false)
+#
+#	# Create the output directory if it doesn't already exist.
+#	var dir_path: String = path.get_base_dir()
+#	var dir = Directory.new()
+#	if not dir.dir_exists(dir_path):
+#		dir.make_dir_recursive(dir_path)
+#	if not dir.dir_exists(dir_path):
+#		printerr("Makedir failed")
+#		return
+#
+#	# Save graph_data as a file.
+#	var err = ResourceSaver.save(path, graph_data)
+#	if err != OK:
+#		printerr("Error saving graph: ", err)
+#		return
+
+
+func save_graph_to_file_JSON(path: String):
+	move_hidden_popups_out_of_the_way()
+	var graph_data = GraphDataJSON.new()
+	assert(graph_data)
+	store_graph_JSON(graph_data, false)
+	
+	# Create the output directory if it doesn't already exist.
+	var dir_path: String = path.get_base_dir()
+	var dir = Directory.new()
+	if not dir.dir_exists(dir_path):
+		dir.make_dir_recursive(dir_path)
+	if not dir.dir_exists(dir_path):
+		printerr("Makedir failed")
+		return
+	
+	# Save graph_data as a file.
+#	graph_data.save_graph_data("H:/Download/Prog/Godot/__POUB/json.txt")
+	graph_data.save_graph_data(path)
+
+
+#TODO: TO BE REMOVED
 func build_graph_nodes(graph_data: GraphData, keep_names: bool, select: bool, group_center_diff: Vector2 = Vector2.INF):
+	assert(graph_data)
 	var old_to_new: = {}
 	if select:
 		deselect_all_nodes()
@@ -984,7 +1142,63 @@ func build_graph_nodes(graph_data: GraphData, keep_names: bool, select: bool, gr
 		throw_particles(com_node, PARTICLES_IN, com_node.selected)
 
 
+func build_graph_nodes_JSON(graph_data: GraphDataJSON, keep_names: bool, select: bool, group_center_diff: Vector2 = Vector2.INF):
+	assert(graph_data)
+	var old_to_new: = {}
+	if select:
+		deselect_all_nodes()
+	
+	# Image nodes
+	for node_data in graph_data.img_nodes:
+		var img_node: ImageGraphNode = imageGraphNode.instance()
+		if keep_names:
+			img_node.set_name(node_data.name)
+		img_node.rect_size = node_data.rect_size
+		add_child(img_node, true) # /!\ before assigning data
+		old_to_new[node_data.name] = img_node.name # same name if keep_names is true
+		if group_center_diff == Vector2.INF:
+			img_node.offset = node_data.offset
+		else:
+			img_node.offset = group_center_diff + node_data.offset
+		img_node.set_bg_color(img_node_colorpicker.color)
+		img_node.set_extra_data_JSON(node_data.extra_data)
+		if select:
+			select_node(img_node, false)
+		throw_particles(img_node, PARTICLES_IN, img_node.selected)
+	
+	# Connections
+	for connection in graph_data.connections:
+		var err = connect_node(old_to_new[connection.from], connection.from_port, old_to_new[connection.to], connection.to_port)
+		if err != OK:
+			printerr("Error loading graph: ", err)
+		
+		var from_node: ImageGraphNode = get_node(old_to_new[connection.from])
+		var to_node: ImageGraphNode = get_node(old_to_new[connection.to])
+		assert(from_node)
+		assert(to_node)
+		from_node.next_node = to_node
+	
+	# Comment nodes
+	for node_data in graph_data.com_nodes:
+		var com_node: CommentGraphNode = commentGraphNode.instance()
+		if keep_names:
+			com_node.set_name(node_data.name)
+		com_node.rect_size = node_data.rect_size
+		add_child(com_node, true) # /!\ before assigning data
+		move_child(com_node, 0)
+		if group_center_diff == Vector2.INF:
+			com_node.offset = node_data.offset
+		else:
+			com_node.offset = group_center_diff + node_data.offset
+		com_node.set_extra_data_JSON(node_data.extra_data, old_to_new)
+		if select:
+			select_node(com_node, false)
+		throw_particles(com_node, PARTICLES_IN, com_node.selected)
+
+
+#TODO: TO BE REMOVED
 func build_graph(graph_data: GraphData):
+	assert(graph_data)
 	clear_graph()
 	
 	if graph_data.get("scroll_offset"):
@@ -1007,6 +1221,31 @@ func build_graph(graph_data: GraphData):
 	build_graph_nodes(graph_data, true, false)
 
 
+func build_graph_JSON(graph_data: GraphDataJSON):
+	assert(graph_data)
+	clear_graph()
+	
+	if graph_data.get("scroll_offset"):
+		scroll_offset = graph_data.scroll_offset
+	if graph_data.get("zoom"):
+		zoom = graph_data.zoom
+	if graph_data.get("use_snap"):
+		use_snap = graph_data.use_snap
+	if graph_data.get("snap_distance"):
+		snap_distance = graph_data.snap_distance
+	
+	if graph_data.get("graph_bg_color"):
+		graph_bg_colorpicker.color = graph_data.graph_bg_color
+		var custom_styles: StyleBox = get("custom_styles/bg")
+		custom_styles.bg_color = graph_data.graph_bg_color
+	
+	if graph_data.get("img_node_bg_color"):
+		img_node_colorpicker.color = graph_data.img_node_bg_color
+	
+	build_graph_nodes_JSON(graph_data, true, false)
+
+
+#TODO: TO BE REMOVED
 func load_graph_from_file(path: String):
 	move_hidden_popups_out_of_the_way()
 	var dir = Directory.new()
@@ -1025,138 +1264,18 @@ func load_graph_from_file(path: String):
 			build_graph(graph_data)
 
 
-func store_graph_nodes(graph_data: GraphData, selected_nodes_only: bool = false):
-	assert(graph_data)
-	graph_data.img_nodes.clear()
-	graph_data.connections.clear()
-	graph_data.com_nodes.clear()
+func load_graph_from_file_JSON(path: String):
+	move_hidden_popups_out_of_the_way()
+	var dir = Directory.new()
+	if not dir.file_exists(path):
+		printerr("File ", path, " does not exist.")
+		return
 	
-	# Image nodes
-	for node in get_children():
-		if node is ImageGraphNode and (!selected_nodes_only or node.selected):
-			var node_data = GraphNodeData.new()
-			assert(node_data)
-			node_data.name = node.name
-			node_data.offset = node.offset
-			node_data.rect_size = node.rect_size
-			node_data.extra_data = node.get_extra_data()
-			graph_data.img_nodes.append(node_data)
-	
-	# Connexions
-	var connection_list: = get_connection_list()
-	if selected_nodes_only:
-		for connection in connection_list:
-			if get_node(connection.from).selected and get_node(connection.to).selected:
-				graph_data.connections.push_back(connection)
-	else:
-		graph_data.connections = connection_list
-	
-	# Comment nodes
-	for node in get_children():
-		if node is CommentGraphNode and (!selected_nodes_only or node.selected):
-			var node_data = GraphNodeData.new()
-			assert(node_data)
-			node_data.name = node.name
-			node_data.offset = node.offset
-			node_data.rect_size = node.rect_size
-			node_data.extra_data = node.get_extra_data() # /!\ saves all contained image node names
-			graph_data.com_nodes.append(node_data)
-
-
-func store_graph(graph_data: GraphData, selected_nodes_only: bool):
-	assert(graph_data)
-	graph_data.version_major = PROJECT_FILE_VERSION_MAJOR
-	graph_data.version_minor = PROJECT_FILE_VERSION_MINOR
-	graph_data.version_subminor = PROJECT_FILE_VERSION_SUBMINOR
-	
-	graph_data.scroll_offset = scroll_offset
-	graph_data.zoom = zoom
-	graph_data.use_snap = use_snap
-	graph_data.snap_distance = snap_distance
-
-	graph_data.graph_bg_color = graph_bg_colorpicker.color
-	graph_data.img_node_bg_color = img_node_colorpicker.color
-	
-	store_graph_nodes(graph_data, selected_nodes_only)
-
-
-func store_graph_JSON(graph_data: GraphDataJSON, selected_nodes_only: bool):
-	assert(graph_data)
-	graph_data.version_major = PROJECT_FILE_VERSION_MAJOR
-	graph_data.version_minor = PROJECT_FILE_VERSION_MINOR
-	graph_data.version_subminor = PROJECT_FILE_VERSION_SUBMINOR
-	
-	graph_data.scroll_offset = scroll_offset
-	graph_data.zoom = zoom
-	graph_data.use_snap = use_snap
-	graph_data.snap_distance = snap_distance
-
-	graph_data.graph_bg_color = graph_bg_colorpicker.color
-	graph_data.img_node_bg_color = img_node_colorpicker.color
-	
-	graph_data.img_nodes.clear()
-	graph_data.connections.clear()
-	graph_data.com_nodes.clear()
-	
-	# Image nodes
-	for node in get_children():
-		if node is ImageGraphNode and (!selected_nodes_only or node.selected):
-			var node_data = GraphNodeData.new()
-			assert(node_data)
-			node_data.name = node.name
-			node_data.offset = node.offset
-			node_data.rect_size = node.rect_size
-			node_data.extra_data = node.get_extra_data()
-			graph_data.img_nodes.append(node_data)
-	
-	# Connexions
-	var connection_list: = get_connection_list()
-	if selected_nodes_only:
-		for connection in connection_list:
-			if get_node(connection.from).selected and get_node(connection.to).selected:
-				graph_data.connections.push_back(connection)
-	else:
-		graph_data.connections = connection_list
-	
-	# Comment nodes
-	for node in get_children():
-		if node is CommentGraphNode and (!selected_nodes_only or node.selected):
-			var node_data = GraphNodeData.new()
-			assert(node_data)
-			node_data.name = node.name
-			node_data.offset = node.offset
-			node_data.rect_size = node.rect_size
-			node_data.extra_data = node.get_extra_data() # /!\ saves all contained image node names
-			graph_data.com_nodes.append(node_data)
-
-
-func save_graph_to_file(path: String):
 	var graph_data = GraphDataJSON.new()
 	assert(graph_data)
-	store_graph_JSON(graph_data, false)
-	graph_data.save_graph_data("H:/Download/Prog/Godot/__POUB/json.txt")
-	graph_data.load_graph_data("H:/Download/Prog/Godot/__POUB/json.txt")
-
-
-#	move_hidden_popups_out_of_the_way()
-#	var graph_data = GraphData.new()
-#	assert(graph_data)
-#	store_graph(graph_data, false)
-#
-#	# Crée le directory s'il n'existe pas.
-#	var dir_path: String = path.get_base_dir()
-#	var dir = Directory.new()
-#	if not dir.dir_exists(dir_path):
-#		dir.make_dir_recursive(dir_path)
-#	if not dir.dir_exists(dir_path):
-#		printerr("Makedir failed")
-#		return
-#
-#	# Sauvegarde graph_data dans le directory donné sous le nom donné.
-#	var err = ResourceSaver.save(path, graph_data)
-#	if err != OK:
-#		printerr("Error saving graph: ", err)
-#		return
+#	graph_data.load_graph_data("H:/Download/Prog/Godot/__POUB/json.txt")
+	graph_data.load_graph_data(path)
+	build_graph_JSON(graph_data)
 
 
 ############

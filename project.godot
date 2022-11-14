@@ -34,6 +34,11 @@ _global_script_classes=[ {
 "language": "GDScript",
 "path": "res://Scripts/GraphNodeData.gd"
 }, {
+"base": "Reference",
+"class": "GraphNodeDataJSON",
+"language": "GDScript",
+"path": "res://Scripts/GraphNodeDataJSON.gd"
+}, {
 "base": "OptionButton",
 "class": "IconButton",
 "language": "GDScript",
@@ -55,6 +60,7 @@ _global_script_class_icons={
 "GraphData": "",
 "GraphDataJSON": "",
 "GraphNodeData": "",
+"GraphNodeDataJSON": "",
 "IconButton": "",
 "ImageGraph": "",
 "ImageGraphNode": ""
