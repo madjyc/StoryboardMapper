@@ -1,10 +1,6 @@
 class_name GraphDataJSON
 extends Reference
 
-const PROJECT_FILE_VERSION_MAJOR: int = 0
-const PROJECT_FILE_VERSION_MINOR: int = 2
-const PROJECT_FILE_VERSION_SUBMINOR: int = 5
-
 # Load/save data
 var version_major: int
 var version_minor: int
@@ -23,7 +19,7 @@ var connections: Array # array of connections
 var com_nodes: Array # array of GraphNodeData
 
 
-func save_exists(path: String) -> bool:
+func does_save_exists(path: String) -> bool:
 	assert(not path.empty())
 	if path.empty():
 		return false
@@ -33,11 +29,21 @@ func save_exists(path: String) -> bool:
 
 
 func save_graph_data(path: String):
+	# Create the output directory if it doesn't already exist.
+	var dir_path: String = path.get_base_dir()
+	var dir = Directory.new()
+	if not dir.dir_exists(dir_path):
+		dir.make_dir_recursive(dir_path)
+	if not dir.dir_exists(dir_path):
+		printerr("Makedir failed")
+		return
+	
+	# Save a JSON file containing all graph data.
 	var file = File.new()
 	var err: int = file.open(path, File.WRITE)
 	if err == OK:
 		var data: = {
-			"version": [PROJECT_FILE_VERSION_MAJOR, PROJECT_FILE_VERSION_MINOR, PROJECT_FILE_VERSION_SUBMINOR],
+			"version": [version_major, version_minor, version_subminor],
 			"scroll_offset": [scroll_offset.x, scroll_offset.y],
 			"zoom": zoom,
 			"use_snap": use_snap,

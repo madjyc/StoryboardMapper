@@ -13,7 +13,7 @@ enum {
 
 const PROJECT_FILE_VERSION_MAJOR: int = 0
 const PROJECT_FILE_VERSION_MINOR: int = 2
-const PROJECT_FILE_VERSION_SUBMINOR: int = 5
+const PROJECT_FILE_VERSION_SUBMINOR: int = 6
 const IMAGE_FILE_EXTENSIONS: Array = ["jpg", "jpeg", "png", "bmp"]
 const DEFAULT_IMG_NODE_SPACING: float = 40.0
 const MIN_DRAG_DISTANCE: float = 5.0
@@ -1072,15 +1072,6 @@ func save_graph_to_file_JSON(path: String):
 	var graph_data = GraphDataJSON.new()
 	assert(graph_data)
 	store_graph_JSON(graph_data, false)
-	
-	# Create the output directory if it doesn't already exist.
-	var dir_path: String = path.get_base_dir()
-	var dir = Directory.new()
-	if not dir.dir_exists(dir_path):
-		dir.make_dir_recursive(dir_path)
-	if not dir.dir_exists(dir_path):
-		printerr("Makedir failed")
-		return
 	
 	# Save graph_data as a file.
 #	graph_data.save_graph_data("H:/Download/Prog/Godot/__POUB/json.txt")
