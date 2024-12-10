@@ -285,7 +285,7 @@ margin_top = 8.0
 margin_right = -112.0
 margin_bottom = 470.0
 popup_exclusive = true
-window_title = "Open a File"
+window_title = "Ouvrir un fichier"
 mode = 0
 access = 2
 filters = PoolStringArray( "*.sbm", "*.res" )
@@ -306,6 +306,7 @@ margin_top = -24.0
 margin_right = -80.0
 margin_bottom = 438.0
 popup_exclusive = true
+window_title = "Enregistrer un fichier"
 access = 2
 filters = PoolStringArray( "*.mp4" )
 
