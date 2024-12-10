@@ -1400,19 +1400,9 @@ func export_to_video(video_path: String):
 	var img_list_path_safe: String = get_safe_path(img_list_path)
 	var snd_list_path_safe: String = get_safe_path(snd_list_path)
 	var video_path_safe: String = get_safe_path(video_path)
-	var exit_code = OS.execute(ffmpeg_path_safe, [
-		"-loglevel", "debug",
-		"-y",  # overwrite output without asking
-		"-f", "concat",  # input is a concat list
-		"-safe", "0",  # unsafe paths
-		"-i", img_list_path_safe,  # image list file
-		"-f", "concat",  # input is a concat list
-		"-safe", "0",  # unsafe paths
-		"-i", snd_list_path_safe,  # sound list file
-		"-pix_fmt", "yuv420p",  # ensure compatibility with most players
-		"-movflags", "+faststart",  # optimize for streaming
-		video_path_safe # output video path
-	], true)
+	var command = ffmpeg_path_safe + " -y -f concat -safe 0 -i " + img_list_path_safe + " -f concat -safe 0 -i " + snd_list_path_safe + " -pix_fmt yuv420p -movflags +faststart " + video_path_safe
+	var process_output = []
+	var exit_code = OS.execute("cmd", ["/c", command], true, process_output)
 	print("(export_to_video) exit_code ", exit_code)
 	
 	# Delete temporary files.
